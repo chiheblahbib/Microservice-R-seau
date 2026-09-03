@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ============================================================================================
+  processStation - circuit enfant, une instance par station declaree
+  ============================================================================================
+  A DEPLOYER EN XML DIRECT (voir l'en-tete de processImplantation).
+
+  Calque du process d'homologation deploye : memes etapes de visa puis de signature,
+  meme signataire dynamique, meme decharge finale.
+
+  L'AUTORISATION D'IMPLANTATION est creee ici, et seulement ici : une station, une
+  autorisation. Le circuit parent n'en cree aucune. L'appel est GARDE contre les
+  boucles de retour :
+      ${empty data.attestations
+          ? attestationService.createAttestationForAutorisation(data)
+          : execution.setVariable('isCreatedAtt', true)}
+  Sans cette garde, un aller-retour "Pour Verification" recreerait une autorisation
+  a chaque passage ~~ AttestationService n'est pas idempotent.
+  ============================================================================================
+-->
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" targetNamespace="http://flowable.org/test">
+  <collaboration id="Collaboration_processStation">
+    <participant id="pool_processStation" name="Processus station d&#39;implantation" processRef="processStation" />
+  </collaboration>
+  <process id="processStation" name="Processus station d&#39;implantation" isExecutable="true">
+    <laneSet id="laneSet_processStation">
+      <lane id="lane_reception" name="Réception">
+        <flowNodeRef>Start_station</flowNodeRef>
+        <flowNodeRef>Task_s_saisie</flowNodeRef>
+      </lane>
+      <lane id="lane_numerotation" name="Numérotation">
+        <flowNodeRef>Task_s_numerotation</flowNodeRef>
+        <flowNodeRef>Task_s_decharge</flowNodeRef>
+        <flowNodeRef>End_station</flowNodeRef>
+      </lane>
+      <lane id="lane_chefcentre" name="Chef Centre">
+        <flowNodeRef>Task_s_orientation</flowNodeRef>
+        <flowNodeRef>Gw_s_orientation</flowNodeRef>
+        <flowNodeRef>Task_s_visa</flowNodeRef>
+        <flowNodeRef>Gw_s_visa</flowNodeRef>
+        <flowNodeRef>Task_s_informer</flowNodeRef>
+      </lane>
+      <lane id="lane_technique" name="Service Technique">
+        <flowNodeRef>Task_s_etude</flowNodeRef>
+        <flowNodeRef>Gw_s_etude</flowNodeRef>
+      </lane>
+      <lane id="lane_presidence" name="Présidence de l&#39;Autorité">
+        <flowNodeRef>Task_s_signature</flowNodeRef>
+      </lane>
+    </laneSet>
+    <startEvent id="Start_station" name="Début" />
+    <userTask id="Task_s_saisie" name="Saisie &#38; Étude Complétude" flowable:assignee="Réception" flowable:candidateGroups="Reception" flowable:formFieldValidation="true">
+      <extensionElements>
+        <flowable:executionListener expression="${execution.setVariable('${data.state}','En attente')}" event="start" />
+        <flowable:executionListener expression="${createEvent._execute(execution,'DepotStationNotif')}" event="start" />
+        <flowable:inputOutput>
+          <flowable:inputParameter name="components">
+            <flowable:map>
+              <flowable:entry key="SectionStation">WRITE</flowable:entry>
+              <flowable:entry key="SectionSite">WRITE</flowable:entry>
+              <flowable:entry key="SectionFrequence">WRITE</flowable:entry>
+              <flowable:entry key="SectionAttachment">WRITE</flowable:entry>
+            </flowable:map>
+          </flowable:inputParameter>
+        </flowable:inputOutput>
+      </extensionElements>
+    </userTask>
+    <userTask id="Task_s_numerotation" name="Contrôle &#38; Numérotation" flowable:assignee="Service Numérotation" flowable:candidateGroups="Numerotation" flowable:formFieldValidation="true">
+      <extensionElements>
+        <flowable:executionListener expression="${execution.setVariable('${data.state}','En cours')}" event="start" />
+        <flowable:executionListener expression="${createEvent._execute(execution,'NumeriserStationNotif')}" event="start" />
+        <flowable:inputOutput>
+          <flowable:inputParameter name="components">
+            <flowable:map>
+              <flowable:entry key="SectionStation">WRITE</flowable:entry>
+              <flowable:entry key="SectionSite">WRITE</flowable:entry>
+              <flowable:entry key="SectionFrequence">WRITE</flowable:entry>
+              <flowable:entry key="SectionAttachment">WRITE</flowable:entry>
+            </flowable:map>
+          </flowable:inputParameter>
+        </flowable:inputOutput>
+      </extensionElements>
+    </userTask>
+    <userTask id="Task_s_orientation" name="Orientation du Dossier" flowable:assignee="Chef Centre" flowable:candidateGroups="ChefCentre" flowable:dueDate="P2D" flowable:formFieldValidation="true">
+      <extensionElements>
+        <flowable:executionListener expression="${createEvent._execute(execution,'OrientationStationNotif')}" event="start" />
+        <flowable:inputOutput>
+          <flowable:inputParameter name="components">
+            <flowable:map>
+              <flowable:entry key="SectionStation">READ</flowable:entry>
+              <flowable:entry key="SectionSite">READ</flowable:entry>
+              <flowable:entry key="SectionFrequence">READ</flowable:entry>
+              <flowable:entry key="SectionAttachment">READ</flowable:entry>
+            </flowable:map>
+          </flowable:inputParameter>
+        </flowable:inputOutput>
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="Gw_s_orientation" />
+    <userTask id="Task_s_etude" name="Étude Technique" flowable:assignee="Service Technique" flowable:candidateGroups="ServiceTechnique" flowable:formFieldValidation="true">
+      <extensionElements>
+        <flowable:executionListener expression="${createEvent._execute(execution,'EtudeTechniqueStationNotif')}" event="start" />
+        <flowable:inputOutput>
+          <flowable:inputParameter name="components">
+            <flowable:map>
+              <flowable:entry key="SectionStation">WRITE</flowable:entry>
+              <flowable:entry key="SectionSite">WRITE</flowable:entry>
+              <flowable:entry key="SectionFrequence">WRITE</flowable:entry>
+              <flowable:entry key="SectionAttachment">WRITE</flowable:entry>
+            </flowable:map>
+          </flowable:inputParameter>
+        </flowable:inputOutput>
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="Gw_s_etude" />
+    <userTask id="Task_s_visa" name="Viser les Certificats" flowable:assignee="Chef Centre" flowable:candidateGroups="ChefCentre" flowable:formFieldValidation="true">
+      <extensionElements>
+        <flowable:executionListener expression="${createEvent._execute(execution,'VisaCertificatStationNotif')}" event="start" />
+        <flowable:inputOutput>
+          <flowable:inputParameter name="components">
+            <flowable:map>
+              <flowable:entry key="SectionStation">READ</flowable:entry>
+              <flowable:entry key="SectionSite">READ</flowable:entry>
+              <flowable:entry key="SectionFrequence">READ</flowable:entry>
+              <flowable:entry key="SectionAttachment">READ</flowable:entry>
+            </flowable:map>
+          </flowable:inputParameter>
+        </flowable:inputOutput>
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="Gw_s_visa" />
+    <userTask id="Task_s_signature" name="Signer l&#39;Autorisation" flowable:assignee="${data.signataire}" flowable:candidateGroups="${data.signataire}" flowable:formFieldValidation="true">
+      <extensionElements>
+        <flowable:executionListener expression="${createEvent._execute(execution,'SignatureAutorisationNotif')}" event="start" />
+        <flowable:inputOutput>
+          <flowable:inputParameter name="components">
+            <flowable:map>
+              <flowable:entry key="SectionStation">READ</flowable:entry>
+              <flowable:entry key="SectionSite">READ</flowable:entry>
+              <flowable:entry key="SectionFrequence">READ</flowable:entry>
+              <flowable:entry key="SectionAttachment">READ</flowable:entry>
+            </flowable:map>
+          </flowable:inputParameter>
+        </flowable:inputOutput>
+      </extensionElements>
+    </userTask>
+    <userTask id="Task_s_informer" name="Informer l&#39;opérateur" flowable:assignee="Chef Centre" flowable:candidateGroups="ChefCentre" flowable:formFieldValidation="true">
+      <extensionElements>
+        <flowable:executionListener expression="${createEvent._execute(execution,'InformerOperateurStationNotif')}" event="start" />
+        <flowable:inputOutput>
+          <flowable:inputParameter name="components">
+            <flowable:map>
+              <flowable:entry key="SectionStation">READ</flowable:entry>
+              <flowable:entry key="SectionSite">READ</flowable:entry>
+              <flowable:entry key="SectionFrequence">READ</flowable:entry>
+              <flowable:entry key="SectionAttachment">READ</flowable:entry>
+            </flowable:map>
+          </flowable:inputParameter>
+        </flowable:inputOutput>
+      </extensionElements>
+    </userTask>
+    <userTask id="Task_s_decharge" name="Décharger la livraison" flowable:assignee="Reception &amp; Numerotation" flowable:candidateGroups="Numerotation,Reception" flowable:formFieldValidation="true">
+      <extensionElements>
+        <flowable:executionListener expression="${createEvent._execute(execution,'DechargeStationNotif')}" event="start" />
+        <flowable:inputOutput>
+          <flowable:inputParameter name="components">
+            <flowable:map>
+              <flowable:entry key="SectionStation">READ</flowable:entry>
+              <flowable:entry key="SectionSite">READ</flowable:entry>
+              <flowable:entry key="SectionFrequence">READ</flowable:entry>
+              <flowable:entry key="SectionAttachment">READ</flowable:entry>
+            </flowable:map>
+          </flowable:inputParameter>
+        </flowable:inputOutput>
+      </extensionElements>
+    </userTask>
+    <endEvent id="End_station" name="Confirmé &#38; Clôturé">
+      <extensionElements>
+        <flowable:executionListener expression="${execution.setVariable('${data.state}','Confirmé &amp; Clôturé')}" event="start" />
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="Flow_s_debut" sourceRef="Start_station" targetRef="Task_s_saisie" />
+    <sequenceFlow id="Flow_s_soumettre" name="Soumettre" sourceRef="Task_s_saisie" targetRef="Task_s_numerotation">
+      <extensionElements>
+        <flowable:properties>
+          <flowable:property name="ordre" value="0" />
+          <flowable:property name="color" value="bg-green-600 hover:bg-green-700 text-white" />
+          <flowable:property name="icon" value="submit" />
+          <flowable:property name="decisionMessageConfirmation" value="Soumettre la station au service numérotation" />
+        </flowable:properties>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_s_pour_validation" name="Pour Validation" sourceRef="Task_s_numerotation" targetRef="Task_s_orientation">
+      <extensionElements>
+        <flowable:properties>
+          <flowable:property name="ordre" value="0" />
+          <flowable:property name="color" value="bg-green-600 hover:bg-green-700 text-white" />
+          <flowable:property name="icon" value="submit" />
+          <flowable:property name="decisionMessageConfirmation" value="Transmettre au chef de centre" />
+        </flowable:properties>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_s_vers_gw_orientation" sourceRef="Task_s_orientation" targetRef="Gw_s_orientation" />
+    <sequenceFlow id="Flow_s_pour_etude" name="Pour Étude" sourceRef="Gw_s_orientation" targetRef="Task_s_etude">
+      <extensionElements>
+        <flowable:properties>
+          <flowable:property name="ordre" value="0" />
+          <flowable:property name="color" value="bg-green-600 hover:bg-green-700 text-white" />
+          <flowable:property name="icon" value="submit" />
+          <flowable:property name="decisionMessageConfirmation" value="Transmettre au service technique" />
+        </flowable:properties>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression">${Decision == 'Flow_s_pour_etude'}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_s_orientation_verif" name="Pour Vérification" sourceRef="Gw_s_orientation" targetRef="Task_s_numerotation">
+      <extensionElements>
+        <flowable:properties>
+          <flowable:property name="ordre" value="1" />
+          <flowable:property name="color" value="bg-red-600 hover:bg-red-700 text-white" />
+          <flowable:property name="icon" value="undo" />
+          <flowable:property name="decisionMessageConfirmation" value="Renvoyer au service numérotation" />
+        </flowable:properties>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression">${Decision == 'Flow_s_orientation_verif'}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_s_vers_gw_etude" sourceRef="Task_s_etude" targetRef="Gw_s_etude" />
+    <sequenceFlow id="Flow_s_visa" name="Visa des Certificats" sourceRef="Gw_s_etude" targetRef="Task_s_visa">
+      <extensionElements>
+        <flowable:properties>
+          <flowable:property name="ordre" value="0" />
+          <flowable:property name="color" value="bg-green-600 hover:bg-green-700 text-white" />
+          <flowable:property name="icon" value="submit" />
+          <flowable:property name="decisionMessageConfirmation" value="Soumettre les certificats au visa" />
+        </flowable:properties>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression">${Decision == 'Flow_s_visa'}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_s_etude_retour" name="Retourner" sourceRef="Gw_s_etude" targetRef="Task_s_orientation">
+      <extensionElements>
+        <flowable:properties>
+          <flowable:property name="ordre" value="1" />
+          <flowable:property name="color" value="bg-red-600 hover:bg-red-700 text-white" />
+          <flowable:property name="icon" value="undo" />
+          <flowable:property name="decisionMessageConfirmation" value="Retourner au chef de centre" />
+        </flowable:properties>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression">${Decision == 'Flow_s_etude_retour'}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_s_vers_gw_visa" sourceRef="Task_s_visa" targetRef="Gw_s_visa" />
+    <sequenceFlow id="Flow_s_pour_signature" name="Envoyer pour Signature" sourceRef="Gw_s_visa" targetRef="Task_s_signature">
+      <extensionElements>
+        <flowable:executionListener expression="${empty data.attestations ? attestationService.createAttestationForAutorisation(data) : execution.setVariable('isCreatedAtt', true)}" event="take" />
+        <flowable:properties>
+          <flowable:property name="ordre" value="0" />
+          <flowable:property name="color" value="bg-green-600 hover:bg-green-700 text-white" />
+          <flowable:property name="icon" value="submit" />
+          <flowable:property name="decisionMessageConfirmation" value="Envoyer l'autorisation à la signature" />
+        </flowable:properties>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression">${Decision == 'Flow_s_pour_signature'}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_s_visa_verif" name="Pour Vérification" sourceRef="Gw_s_visa" targetRef="Task_s_etude">
+      <extensionElements>
+        <flowable:properties>
+          <flowable:property name="ordre" value="1" />
+          <flowable:property name="color" value="bg-red-600 hover:bg-red-700 text-white" />
+          <flowable:property name="icon" value="undo" />
+          <flowable:property name="decisionMessageConfirmation" value="Renvoyer au service technique" />
+        </flowable:properties>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression">${Decision == 'Flow_s_visa_verif'}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_s_informer" name="Soumettre" sourceRef="Task_s_signature" targetRef="Task_s_informer">
+      <extensionElements>
+        <flowable:properties>
+          <flowable:property name="ordre" value="0" />
+          <flowable:property name="color" value="bg-green-600 hover:bg-green-700 text-white" />
+          <flowable:property name="icon" value="submit" />
+          <flowable:property name="decisionMessageConfirmation" value="Informer l'opérateur" />
+        </flowable:properties>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_s_decharge" name="Soumettre" sourceRef="Task_s_informer" targetRef="Task_s_decharge">
+      <extensionElements>
+        <flowable:properties>
+          <flowable:property name="ordre" value="0" />
+          <flowable:property name="color" value="bg-green-600 hover:bg-green-700 text-white" />
+          <flowable:property name="icon" value="submit" />
+          <flowable:property name="decisionMessageConfirmation" value="Transmettre pour décharge" />
+        </flowable:properties>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_s_confirmer" name="Confirmer" sourceRef="Task_s_decharge" targetRef="End_station">
+      <extensionElements>
+        <flowable:properties>
+          <flowable:property name="ordre" value="0" />
+          <flowable:property name="color" value="bg-green-600 hover:bg-green-700 text-white" />
+          <flowable:property name="icon" value="check" />
+          <flowable:property name="decisionMessageConfirmation" value="Confirmer et clôturer" />
+        </flowable:properties>
+      </extensionElements>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_processStation">
+    <bpmndi:BPMNPlane id="BPMNPlane_processStation" bpmnElement="Collaboration_processStation">
+      <bpmndi:BPMNShape id="BPMNShape_pool_processStation" bpmnElement="pool_processStation" isHorizontal="true">
+        <omgdc:Bounds x="40" y="20" width="2018" height="770" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_lane_reception" bpmnElement="lane_reception" isHorizontal="true">
+        <omgdc:Bounds x="70" y="20" width="1988" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_lane_numerotation" bpmnElement="lane_numerotation" isHorizontal="true">
+        <omgdc:Bounds x="70" y="170" width="1988" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_lane_chefcentre" bpmnElement="lane_chefcentre" isHorizontal="true">
+        <omgdc:Bounds x="70" y="320" width="1988" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_lane_technique" bpmnElement="lane_technique" isHorizontal="true">
+        <omgdc:Bounds x="70" y="470" width="1988" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_lane_presidence" bpmnElement="lane_presidence" isHorizontal="true">
+        <omgdc:Bounds x="70" y="620" width="1988" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Start_station" bpmnElement="Start_station">
+        <omgdc:Bounds x="130" y="80" width="30" height="30" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_s_saisie" bpmnElement="Task_s_saisie">
+        <omgdc:Bounds x="210" y="60" width="130" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_s_numerotation" bpmnElement="Task_s_numerotation">
+        <omgdc:Bounds x="400" y="210" width="130" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_s_orientation" bpmnElement="Task_s_orientation">
+        <omgdc:Bounds x="590" y="360" width="130" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Gw_s_orientation" bpmnElement="Gw_s_orientation">
+        <omgdc:Bounds x="760" y="375" width="40" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_s_etude" bpmnElement="Task_s_etude">
+        <omgdc:Bounds x="840" y="510" width="130" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Gw_s_etude" bpmnElement="Gw_s_etude">
+        <omgdc:Bounds x="1010" y="525" width="40" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_s_visa" bpmnElement="Task_s_visa">
+        <omgdc:Bounds x="1090" y="360" width="130" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Gw_s_visa" bpmnElement="Gw_s_visa">
+        <omgdc:Bounds x="1260" y="375" width="40" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_s_signature" bpmnElement="Task_s_signature">
+        <omgdc:Bounds x="1340" y="660" width="130" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_s_informer" bpmnElement="Task_s_informer">
+        <omgdc:Bounds x="1530" y="360" width="130" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_s_decharge" bpmnElement="Task_s_decharge">
+        <omgdc:Bounds x="1720" y="210" width="130" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_End_station" bpmnElement="End_station">
+        <omgdc:Bounds x="1910" y="231" width="28" height="28" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_s_debut" bpmnElement="Flow_s_debut">
+        <omgdi:waypoint x="145" y="95" />
+        <omgdi:waypoint x="275" y="95" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_s_soumettre" bpmnElement="Flow_s_soumettre">
+        <omgdi:waypoint x="275" y="95" />
+        <omgdi:waypoint x="275" y="245" />
+        <omgdi:waypoint x="465" y="245" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_s_pour_validation" bpmnElement="Flow_s_pour_validation">
+        <omgdi:waypoint x="465" y="245" />
+        <omgdi:waypoint x="465" y="395" />
+        <omgdi:waypoint x="655" y="395" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_s_vers_gw_orientation" bpmnElement="Flow_s_vers_gw_orientation">
+        <omgdi:waypoint x="655" y="395" />
+        <omgdi:waypoint x="780" y="395" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_s_pour_etude" bpmnElement="Flow_s_pour_etude">
+        <omgdi:waypoint x="780" y="395" />
+        <omgdi:waypoint x="780" y="545" />
+        <omgdi:waypoint x="905" y="545" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_s_orientation_verif" bpmnElement="Flow_s_orientation_verif">
+        <omgdi:waypoint x="780" y="395" />
+        <omgdi:waypoint x="780" y="245" />
+        <omgdi:waypoint x="465" y="245" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_s_vers_gw_etude" bpmnElement="Flow_s_vers_gw_etude">
+        <omgdi:waypoint x="905" y="545" />
+        <omgdi:waypoint x="1030" y="545" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_s_visa" bpmnElement="Flow_s_visa">
+        <omgdi:waypoint x="1030" y="545" />
+        <omgdi:waypoint x="1030" y="395" />
+        <omgdi:waypoint x="1155" y="395" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_s_etude_retour" bpmnElement="Flow_s_etude_retour">
+        <omgdi:waypoint x="1030" y="545" />
+        <omgdi:waypoint x="1030" y="395" />
+        <omgdi:waypoint x="655" y="395" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_s_vers_gw_visa" bpmnElement="Flow_s_vers_gw_visa">
+        <omgdi:waypoint x="1155" y="395" />
+        <omgdi:waypoint x="1280" y="395" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_s_pour_signature" bpmnElement="Flow_s_pour_signature">
+        <omgdi:waypoint x="1280" y="395" />
+        <omgdi:waypoint x="1280" y="695" />
+        <omgdi:waypoint x="1405" y="695" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_s_visa_verif" bpmnElement="Flow_s_visa_verif">
+        <omgdi:waypoint x="1280" y="395" />
+        <omgdi:waypoint x="1280" y="545" />
+        <omgdi:waypoint x="905" y="545" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_s_informer" bpmnElement="Flow_s_informer">
+        <omgdi:waypoint x="1405" y="695" />
+        <omgdi:waypoint x="1405" y="395" />
+        <omgdi:waypoint x="1595" y="395" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_s_decharge" bpmnElement="Flow_s_decharge">
+        <omgdi:waypoint x="1595" y="395" />
+        <omgdi:waypoint x="1595" y="245" />
+        <omgdi:waypoint x="1785" y="245" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_s_confirmer" bpmnElement="Flow_s_confirmer">
+        <omgdi:waypoint x="1785" y="245" />
+        <omgdi:waypoint x="1924" y="245" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

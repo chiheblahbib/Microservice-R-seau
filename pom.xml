@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.5.7</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>picosoft.biz</groupId>
+	<artifactId>reseau</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>war</packaging>
+	<name>reseau</name>
+	<description>Reseau de communications electroniques - ARCEP</description>
+	<url>https://www.picosoft.biz</url>
+	
+	<licenses>
+		<license/>
+	</licenses>
+	<developers>
+		<developer/>
+	</developers>
+	<scm>
+		<connection/>
+		<developerConnection/>
+		<tag/>
+		<url/>
+	</scm>
+	
+	<properties>
+		<java.version>17</java.version>
+		<maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>
+		<jhipster-framework.version>3.9.1</jhipster-framework.version>
+		<spring-cloud.version>2020.0.6</spring-cloud.version>
+	</properties>
+	
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	
+	<dependencies>
+		<!--web dependancy-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<!--
+			Validation des donnees recues.
+
+			Depuis Spring Boot 2.3, hibernate-validator n'est plus tire par
+			starter-web. Seule l'API javax.validation etait presente : les
+			annotations @Size et @NotBlank COMPILAIENT sans jamais etre evaluees.
+			Sans cette dependance, toute annotation de validation est inerte.
+		-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+		
+		<!--jpa dependancy-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		
+
+		<!--postgresql dependancy-->
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>42.7.7</version>
+			<scope>runtime</scope>
+		</dependency>
+		
+		<!--lombok dependancy-->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+		
+		<!--jhipster dependancy-->
+		<dependency>
+			<groupId>io.github.jhipster</groupId>
+			<artifactId>jhipster-framework</artifactId>
+			<version>${jhipster-framework.version}</version>
+		</dependency>
+		
+		<!--echache dependancy-->
+		<dependency>
+			<groupId>org.ehcache</groupId>
+			<artifactId>ehcache</artifactId>
+			<version>3.10.0</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.cache</groupId>
+			<artifactId>cache-api</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+		<!--mapstruct dependancy-->
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct</artifactId>
+			<version>1.6.2</version>
+		</dependency>
+		
+		<!--cloud dependancy-->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+		</dependency>
+		
+		<!--acl dependancy-->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-acl</artifactId>
+		</dependency>
+		
+		<!--tomcat dependancy-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		
+		<!--json dependancy-->
+		<dependency>
+			<groupId>com.googlecode.json-simple</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20180813</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.8.8</version>
+		</dependency>
+		
+		<!--envers dependancy-->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-envers</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-jcache</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-hibernate5</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-jpamodelgen</artifactId>
+			<version>5.4.32.Final</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.vladmihalcea</groupId>
+			<artifactId>hibernate-types-52</artifactId>
+			<version>2.10.0</version>
+		</dependency>
+		
+		<!--javax dependancy-->
+		<dependency>
+			<groupId>javax</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>8.0.1</version>
+			<scope>provided</scope>
+		</dependency>
+
+		
+		
+<!--		flowable dependancys-->
+		<dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-spring-boot-starter-process</artifactId>
+			<version>6.7.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-json-converter</artifactId>
+			<version>6.7.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-bpmn-layout</artifactId>
+			<version>6.7.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.flowable</groupId>
+			<artifactId>flowable-bpmn-converter</artifactId>
+			<version>6.7.2</version>
+		</dependency>
+		
+		<!--		freemarker dependnacy-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-freemarker</artifactId>
+		</dependency>
+		
+		<!--		freemarker dependnacy-->
+		<dependency>
+			<groupId>org.zalando</groupId>
+			<artifactId>problem-spring-web</artifactId>
+			<version>0.25.2</version>
+		</dependency>
+	</dependencies>
+	
+	<profiles>
+		<!-- Profile for developpement environment -->
+		<profile>
+			<id>local</id>
+			<properties>
+				<environment>local</environment>
+				<spring.profiles.active>local</spring.profiles.active>
+			</properties>
+		</profile>
+		<!-- Profile for developpement environment -->
+		<profile>
+			<id>dev</id>
+			<properties>
+				<environment>dev</environment>
+				<spring.profiles.active>dev</spring.profiles.active>
+			</properties>
+		</profile>
+		<!-- Profile for production environment -->
+		<profile>
+			<id>prod</id>
+			<properties>
+				<environment>prod</environment>
+				<spring.profiles.active>prod</spring.profiles.active>
+			</properties>
+		</profile>
+		
+		<!-- Profile for test environment -->
+		<profile>
+			<id>test</id>
+			<properties>
+				<environment>test</environment>
+				<spring.profiles.active>test</spring.profiles.active>
+			</properties>
+		</profile>
+		
+	</profiles>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.1</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<encoding>UTF-8</encoding>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>1.18.30</version>
+						</path>
+						<!-- MapStruct -->
+						<path>
+							<groupId>org.mapstruct</groupId>
+							<artifactId>mapstruct-processor</artifactId>
+							<version>1.5.3.Final</version>
+						</path>
+						<path>
+							<groupId>org.hibernate</groupId> <!-- ✅ CORRECT -->
+							<artifactId>hibernate-jpamodelgen</artifactId>
+							<version>5.4.32.Final</version>
+						</path>
+					</annotationProcessorPaths>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+						<configuration>
+							<skip>true</skip>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
