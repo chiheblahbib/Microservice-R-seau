@@ -4,6 +4,11 @@ Microservice ARCEP de l'**autorisation d'établissement et d'exploitation d'un r
 communications électroniques**. Troisième service de la suite Picosoft, après `homologation`
 et `implantation`, dont il reprend l'architecture à l'identique.
 
+La carte de la famille est dans [../README.md](../README.md), les décisions qui
+traversent plusieurs services dans [../JOURNAL.md](../JOURNAL.md). Les dix
+services suivants ont été engendrés depuis celui-ci : c'est pourquoi leurs
+README décrivaient tous le modèle du réseau jusqu'au 7 septembre 2026.
+
 ## État
 
 Le service **démarre et fonctionne** contre un PostgreSQL local (vérifié le
