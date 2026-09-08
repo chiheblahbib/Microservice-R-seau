@@ -9,7 +9,9 @@ traversent plusieurs services dans [../JOURNAL.md](../JOURNAL.md). Les dix
 services suivants ont été engendrés depuis celui-ci : c'est pourquoi leurs
 README décrivaient tous le modèle du réseau jusqu'au 7 septembre 2026.
 
-## État
+## Le service
+
+### État
 
 Le service **démarre et fonctionne** contre un PostgreSQL local (vérifié le
 03/09/2026) :
@@ -34,7 +36,7 @@ Les écrans Angular du module DRRRS (`/drrrs/demandes-autorisations-erpt`,
 été rejouée telle quelle contre ce service — mais uniquement par le chemin CRUD,
 jamais par le chemin workflow.
 
-### Quatre défauts trouvés en démarrant, et corrigés
+#### Quatre défauts trouvés en démarrant, et corrigés
 
 Le service compilait avant chacun d'eux : ils ne se voyaient qu'à l'exécution.
 
@@ -51,7 +53,7 @@ Le service compilait avant chacun d'eux : ils ne se voyaient qu'à l'exécution.
    colonne nullable : PostgreSQL place les NULL en tête, si bien qu'une ligne
    **sans date d'effet l'emportait sur toute révision**. `nulls last` ajouté.
 
-### Un trou fonctionnel corrigé depuis (03/09/2026, `processReseau` v2)
+#### Un trou fonctionnel corrigé depuis (03/09/2026, `processReseau` v2)
 
 **Aucune autorisation n'était jamais créée.** `AttestationService.createAttestationForAutorisation`
 n'avait aucun appelant : ni Java, ni le diagramme. Chez implantation, c'était le circuit ENFANT
@@ -82,7 +84,7 @@ confirmer sur un circuit complet.
 `sysdateCreated` à côté, sur laquelle les écrans se rabattent — sinon la colonne « Date » du
 suivi était vide pour tout dossier non encore soumis.
 
-## Premier démarrage
+### Premier démarrage
 
 ```bash
 psql -h localhost -U postgres -f local-setup.sql
@@ -99,7 +101,7 @@ mais jamais les schémas. Deux ne sont pas évidents — `kernel` porte une enti
 (`StateWorkflow` vers la table `k_e_pa_states`) et `audit` reçoit les révisions Envers **dans
 la base primaire**, pas dans `ARCEP-AUDIT` comme son nom le suggère.
 
-## Démarrage en dev (LAN)
+### Démarrage en dev (LAN)
 
 ```bash
 .\mvnw.cmd -Pdev spring-boot:run
@@ -143,7 +145,7 @@ enregistrée au kernel — `GET /initClassDemandeReseau` sur ce service. C'est u
 la classe à `processReseau`, sans quoi `getaclClassByClassName` trouve la classe mais aucun
 circuit à démarrer.
 
-## Build
+### Build
 
 Un profil Maven est **obligatoire** (`application.properties` contient
 `spring.profiles.active=@spring.profiles.active@`, résolu par filtrage de ressources).
@@ -157,7 +159,7 @@ le port 8088 sans source de données.
 Port **8005**, context-path `/` en local ; 8080 et `/reseau` en `dev`. Le serveur de
 développement Angular relaie `/reseau/api` vers ce port (`proxy.conf.json`).
 
-## Déploiement du diagramme
+### Déploiement du diagramme
 
 `src/main/resources/processes/processReseau.bpmn20.xml` est **auto-déployé au démarrage** par
 Flowable. Aucune propriété à configurer, `checkProcessDefinitions=true` et
@@ -172,7 +174,7 @@ sur `ARCEP-DEV`. Sans danger, la clé est neuve — mais à savoir.
 `flowable:inputOutput`, mesuré avec `BpmnJsonConverter` 6.7.2. C'est la chaîne d'outils, pas
 ce fichier.
 
-## Ce qui est partagé avec homologation
+### Ce qui est partagé avec homologation
 
 Base `ARCEP-DEV`, schéma `reseau` pour les tables propres. Trois conséquences :
 
@@ -188,7 +190,7 @@ Base `ARCEP-DEV`, schéma `reseau` pour les tables propres. Trois conséquences 
   référentiel d'opérateurs : c'est **un enregistrement par dossier**, en 1-1.
   `Commentaire` n'a aucune FK — il se lie par le couple générique `classId` + `objectID`.
 
-## Modèle
+### Modèle
 
 ```
 DemandeReseau ──── dossier unique, porte le circuit processReseau
@@ -210,9 +212,9 @@ L'y ajouter aurait modifié une table dont homologation est propriétaire.
 convention de toute la suite et c'est ce que le diagramme compare —
 `${data.statutDossier== 'soumis'}`. Le front en est propriétaire.
 
-## Le circuit unique — et pourquoi un seul
+### Le circuit unique — et pourquoi un seul
 
-### La différence de fond avec implantation
+#### La différence de fond avec implantation
 
 Implantation a **deux** circuits : `processImplantation` (le dossier administratif) et
 `processStation` (l'autorisation technique, une instance par station, engendrée par
@@ -234,7 +236,7 @@ PARENT (`processAsi`) plutôt que dans l'enfant. Trois services, trois choix : i
 sépare et met le titre dans l'enfant, homologation sépare et met le titre dans le parent,
 réseau ne sépare pas du tout.
 
-### `processReseau` — l'unique circuit
+#### `processReseau` — l'unique circuit
 
 Transposé de `processImplantation`, avec les six premières étapes reprises à l'identique, et
 la fin adaptée au signataire du formulaire réseau :
@@ -267,7 +269,7 @@ autorisations ARCEP des installateurs déclarés (item d du formulaire) et les j
 d'homologation des équipements (item g) ; à séparer en tâches si l'instruction les confie à
 des agents différents.
 
-## Trois pièges hérités, déjà rencontrés sur implantation
+### Trois pièges hérités, déjà rencontrés sur implantation
 
 **Les références retour doivent être posées avant de persister.** La cascade écrit bien les
 enfants, mais c'est l'enfant qui porte la FK. Sans câblage explicite ils sont persistés en
@@ -280,7 +282,7 @@ service : un enfant créé par cascade ne passe jamais par un service dédié.
 
 **`ddl-auto=update` crée les TABLES mais jamais les SCHÉMAS.** D'où `local-setup.sql`.
 
-## Une liaison désigne des sites par leur identifiant
+### Une liaison désigne des sites par leur identifiant
 
 `LiaisonReseau.siteOrigineId` et `siteExtremiteId` pointent des `SiteReseau` du même dossier.
 Un site saisi à l'instant n'a pas encore d'identifiant : le back **ne résout pas** de
@@ -293,7 +295,7 @@ identifiants que le service vient d'attribuer (`FormulaireReseauComponent.repose
 dans la charge utile — mais elle n'a pas été écrite : elle demandait de pouvoir tester, ce que
 l'absence de schéma interdit aujourd'hui.
 
-## Transaction canonique
+### Transaction canonique
 
 `DemandeReseauService.initAndSubmit` / `submit` reproduisent celle de `HomologationService` :
 
@@ -303,7 +305,7 @@ l'absence de schéma interdit aujourd'hui.
 4. repousser auteurs et lecteurs au kernel par `applySecurity(...)` et rattacher
    l'`AclObjectIdentity`.
 
-## Deux avertissements sur le diagramme
+### Deux avertissements sur le diagramme
 
 **`Decision` transporte un id de sequence flow**, jamais un libellé. `getGatewayDecision`
 renvoie au front `id` (l'id du flux) et `decision` (son `name`, pour le texte du bouton) ;
@@ -319,7 +321,7 @@ la tâche qui la précède : plus aucun bouton, le dossier se bloque.
 pom, pour le modèle ACL. Les annotations sont décoratives, ici comme dans `homologation` ;
 l'autorisation est portée en amont par le kernel.
 
-## Ce qui reste à confirmer avec le métier
+### Ce qui reste à confirmer avec le métier
 
 Le circuit `processReseau` est **transposé** de celui de l'implantation, confirmé le
 27/08/2026 pour ce dernier — **rien n'a été validé pour le réseau** :
@@ -340,13 +342,14 @@ tâches distinctes, l'étude technique étant censée les couvrir :
 
 À séparer en tâches si l'instruction les confie à des agents différents.
 
-## Un risque qui reste ouvert
+### Un risque qui reste ouvert
 
 `typeDossier` et `statutDossier` sont des **String libres**, posés par le front. Rien côté
 serveur ne contraint leurs valeurs : une faute de frappe sur `'COMMERCE'` enverra
 silencieusement le dossier au Chef Centre, et une valeur autre que `'soumis'` fera sauter
 l'ordre de recette. Aucune erreur ne sera levée. Un contrôle des valeurs acceptées à l'entrée
 du service fermerait ce risque.
+
 
 ## Reste à faire, dans l'ordre
 
