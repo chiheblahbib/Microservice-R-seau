@@ -23,7 +23,7 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "service_declare", schema = "reseau")
+@Table(name = "service_declare", schema = "drrrs")
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @EntityListeners(AuditingEntityListener.class)
 public class ServiceDeclare extends Auditable implements Serializable {

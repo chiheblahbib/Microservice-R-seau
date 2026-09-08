@@ -36,7 +36,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "ref_tarif", schema = "reseau")
+@Table(name = "ref_tarif", schema = "drrrs")
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @EntityListeners(AuditingEntityListener.class)
 public class RefTarif extends Auditable implements Serializable {

@@ -28,7 +28,7 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "personne_reseau", schema = "reseau")
+@Table(name = "personne_reseau", schema = "drrrs")
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @EntityListeners(AuditingEntityListener.class)
 public class PersonneReseau extends Auditable implements Serializable {

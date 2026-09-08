@@ -16,7 +16,8 @@ README décrivaient tous le modèle du réseau jusqu'au 7 septembre 2026.
 Le service **démarre et fonctionne** contre un PostgreSQL local (vérifié le
 03/09/2026) :
 
-- les 7 entités créent leurs tables dans le schéma `reseau` ;
+- les 7 entités créent leurs tables dans le schéma `drrrs` — elles étaient
+  dans `reseau` jusqu'au 8 septembre 2026 ;
 - Flowable **déploie `processReseau` v1** au démarrage (`act_re_procdef`) ;
 - le CRUD fonctionne de bout en bout : `POST` d'un graphe imbriqué complet
   (dossier + titulaire + 2 personnes + 2 types + 2 services + 2 sites +
@@ -124,7 +125,7 @@ export SPRING_APPLICATION_JSON='{"server":{"port":8005,"servlet":{"context-path"
 ```
 
 **Ce qui se passe sur la base partagée au premier démarrage** — vérifié le 03/09/2026 :
-Hibernate crée le schéma `reseau` (7 tables) s'il n'existe pas encore, et `ddl-auto=update`
+Hibernate crée les 7 tables dans le schéma `drrrs`, et `ddl-auto=update`
 ajoute `client.demande_reseau_id` à une table dont **homologation reste propriétaire**
 (217 lignes existantes intactes — `update` n'ajoute que des colonnes, elle est déjà partagée
 avec `implantation`, `asi` et `homologation` elle-même via leurs propres FK). Le circuit se
@@ -176,7 +177,7 @@ ce fichier.
 
 ### Ce qui est partagé avec homologation
 
-Base `ARCEP-DEV`, schéma `reseau` pour les tables propres. Trois conséquences :
+Base `ARCEP-DEV`, schéma `drrrs` pour les tables propres. Trois conséquences :
 
 - **Le moteur Flowable est partagé** en profil `dev` : `processReseau` se déploie dans les
   mêmes tables `ACT_*` que `process`, `processAsi` et `processImplantation`. Plusieurs moteurs
@@ -350,6 +351,40 @@ silencieusement le dossier au Chef Centre, et une valeur autre que `'soumis'` fe
 l'ordre de recette. Aucune erreur ne sera levée. Un contrôle des valeurs acceptées à l'entrée
 du service fermerait ce risque.
 
+
+### Le schéma est passé de `reseau` à `drrrs`
+
+Les sept entités déclarent désormais `schema = "drrrs"`. Les quatre tables
+partagées — `Client`, `Applicant`, `Attestation`, `Commentaire` — restent dans
+`homologation`, dont il est propriétaire.
+
+**Le schéma doit exister avant le démarrage** : `ddl-auto=update` crée les
+tables, jamais les schémas. Vérifié le 8 septembre 2026 : `drrrs` existe sur
+`ARCEP-DEV`, mais **pas sur la base locale**, où seul `reseau` subsiste avec
+ses sept tables. Un démarrage en profil `local` échouera tant que le schéma
+n'aura pas été créé :
+
+```sql
+CREATE SCHEMA IF NOT EXISTS drrrs;
+```
+
+Les anciennes tables du schéma `reseau` ne sont pas migrées : elles restent
+là, vides ou non, sans que rien ne les lise.
+
+### La rubrique demandeur suit celle d'ASI
+
+Le requérant — rubrique 1 — est porté par `Applicant`, la table partagée, et
+le titulaire — rubrique 2 — par `Client`. Mêmes huit champs que la rubrique
+« Demandeur » d'ASI, et **le référentiel pilote la saisie** : choisir une
+société renseigne ses champs et charge ses contacts, choisir un contact
+renseigne le demandeur.
+
+Le responsable du réseau — rubrique 3 — garde sa `PersonneReseau` : ce n'est
+pas le demandeur mais un tiers, qui répond techniquement du réseau.
+
+**La nature et le numéro de la pièce d'identité ne sont plus saisis.** Le
+formulaire les demande, mais les tables partagées ne les portent pas et on
+n'y ajoute rien. Le document reste exigé comme pièce jointe.
 
 ## Reste à faire, dans l'ordre
 

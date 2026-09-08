@@ -9,6 +9,7 @@ import picosoft.biz.arcep.configuration.audit.Auditable;
 import picosoft.biz.arcep.domain.reseau.enumeration.*;
 import picosoft.biz.arcep.client.kernel.model.acl.AclObjectIdentity;
 import picosoft.biz.arcep.domain.shared.Attestation;
+import picosoft.biz.arcep.domain.shared.Applicant;
 import picosoft.biz.arcep.domain.shared.Client;
 
 import javax.persistence.*;
@@ -43,7 +44,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "demande_reseau", schema = "reseau")
+@Table(name = "demande_reseau", schema = "drrrs")
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @EntityListeners(AuditingEntityListener.class)
 public class DemandeReseau extends Auditable implements Serializable {
@@ -152,7 +153,31 @@ public class DemandeReseau extends Auditable implements Serializable {
               cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
     private Client client;
 
-    /** Requerant et responsable, distingues par leur role. */
+    /**
+     * Le REQUERANT, rubrique 1 -- la personne qui demande.
+     *
+     * Porte par `Applicant`, la table partagee, comme le fait ASI pour son
+     * demandeur et l'implantation pour le sien. La rubrique 1 du formulaire
+     * et celle d'ASI demandent la meme chose : qui demande, en quelle
+     * qualite, et comment le joindre.
+     *
+     * Le formulaire demande en plus la NATURE ET LE NUMERO DE SA PIECE
+     * D'IDENTITE. `Applicant` ne les porte pas, et on n'ajoute rien aux
+     * tables partagees : le document reste exige comme PIECE JOINTE -- il
+     * figure a la liste des pieces du dossier -- mais son type et son numero
+     * ne sont plus saisis.
+     */
+    @OneToOne(mappedBy = "demandeReseau", fetch = FetchType.LAZY,
+              cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
+    private Applicant applicant;
+
+    /**
+     * Le RESPONSABLE DU RESEAU, rubrique 3.
+     *
+     * Reste une `PersonneReseau` : ce n'est pas le demandeur mais un tiers,
+     * qui repond techniquement du reseau. La collection garde son role pour
+     * que la rubrique 1, desormais portee par `Applicant`, n'y figure plus.
+     */
     @OneToMany(mappedBy = "demandeReseau", fetch = FetchType.LAZY,
                cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
     private List<PersonneReseau> personnes;

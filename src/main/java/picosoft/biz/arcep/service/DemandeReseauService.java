@@ -27,6 +27,8 @@ import picosoft.biz.arcep.repository.CommentaireRepository;
 import picosoft.biz.arcep.repository.DemandeReseauRepository;
 import picosoft.biz.arcep.service.criteria.DemandeReseauCriteria;
 import picosoft.biz.arcep.domain.reseau.enumeration.*;
+import picosoft.biz.arcep.service.dto.ApplicantDTO;
+import picosoft.biz.arcep.service.dto.ClientDTO;
 import picosoft.biz.arcep.service.dto.DemandeReseauDTO;
 import picosoft.biz.arcep.service.dto.PersonneReseauDTO;
 import picosoft.biz.arcep.service.dto.SiteReseauDTO;
@@ -220,7 +222,7 @@ public class DemandeReseauService {
 
         // Rubriques 1 et 3 : deux personnes distinctes, et le formulaire les
         // separe parce que l'instruction a besoin de savoir qui repond du reseau.
-        exigerPersonne(input, RolePersonne.REQUERANT, "le requerant", manques);
+        exigerDemandeur(input, manques);
         exigerPersonne(input, RolePersonne.RESPONSABLE, "le responsable du reseau", manques);
 
         if (input.getTypesReseau() == null || input.getTypesReseau().isEmpty()) {
@@ -258,10 +260,6 @@ public class DemandeReseauService {
             }
         }
 
-        if (estVide(input.getEngagementNom()) || estVide(input.getEngagementQualite())) {
-            manques.add("l'engagement sur l'honneur (nom et qualite du signataire)");
-        }
-
         if (!manques.isEmpty()) {
             throw new BadRequestAlertException(
                     "Le dossier ne peut pas etre soumis, il manque : " + String.join(", ", manques),
@@ -274,7 +272,41 @@ public class DemandeReseauService {
         return v == null || v.trim().isEmpty();
     }
 
-    /** Une personne du dossier doit au moins etre nommee et joignable. */
+    /**
+     * Le demandeur : la structure et la personne qui demande pour elle.
+     *
+     * Meme jeu de champs que la rubrique « Demandeur » d'ASI, dont cette
+     * rubrique est la transposition : la raison sociale et l'adresse du
+     * titulaire (rubrique 2), l'identite et la qualite du requerant
+     * (rubrique 1), et de quoi le joindre.
+     */
+    private void exigerDemandeur(DemandeReseauInputDTO input, List<String> manques) {
+        ClientDTO c = input.getClient();
+        ApplicantDTO a = input.getApplicant();
+
+        // L'identite du titulaire est deja exigee plus haut, et de facon plus
+        // juste : `company` OU `clientName`, un particulier ayant le droit de
+        // deposer. On ne verifie ici que ce qui n'y est pas.
+        if (c == null || estVide(c.getAddress())) {
+            manques.add("l'adresse du titulaire du reseau");
+        }
+        if (a == null || estVide(a.getApplicantName())) {
+            manques.add("l'identite du requerant");
+        }
+        if (a == null || estVide(a.getQualification())) {
+            manques.add("la qualite du requerant (fonction ou titre)");
+        }
+        if (a == null || estVide(a.getEmail())) {
+            manques.add("l'adresse electronique du requerant");
+        }
+    }
+
+    /**
+     * Une personne du dossier doit au moins etre nommee et joignable.
+     *
+     * La PIECE D'IDENTITE n'est plus exigee ici : `Applicant` ne la porte pas,
+     * et on ne l'a pas ajoutee. Le document reste demande comme piece jointe.
+     */
     private void exigerPersonne(DemandeReseauInputDTO input, RolePersonne role,
                                 String libelle, List<String> manques) {
         PersonneReseauDTO p = input.getPersonnes() == null ? null
@@ -288,9 +320,6 @@ public class DemandeReseauService {
         if (estVide(p.getNom()))        { manques.add(libelle + " : le nom"); }
         if (estVide(p.getFonction()))   { manques.add(libelle + " : la fonction"); }
         if (estVide(p.getEmail()))      { manques.add(libelle + " : l'adresse electronique"); }
-        if (p.getTypePieceIdentite() == null || estVide(p.getNumeroPieceIdentite())) {
-            manques.add(libelle + " : la piece d'identite et son numero");
-        }
     }
 
     private void exigerPiecesObligatoires(DemandeReseauInputDTO input, AclClass aclClass) {
@@ -573,6 +602,9 @@ public class DemandeReseauService {
     private void rattacherEnfants(DemandeReseau entity) {
         if (entity.getClient() != null) {
             entity.getClient().setDemandeReseau(entity);
+        }
+        if (entity.getApplicant() != null) {
+            entity.getApplicant().setDemandeReseau(entity);
         }
         if (entity.getPersonnes() != null) {
             entity.getPersonnes().forEach(p -> p.setDemandeReseau(entity));
