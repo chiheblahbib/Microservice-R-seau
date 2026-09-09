@@ -22,7 +22,10 @@ import java.io.Serializable;
 @Getter
 @Setter
 @NoArgsConstructor
-@Entity
+// NOM D'ENTITE QUALIFIE : le nom JPA est GLOBAL au service, et deux classes
+// homonymes vivent dans deux paquets depuis la fusion des douze. Sans cela,
+// Hibernate refuse de demarrer -- DuplicateMappingException.
+@Entity(name = "ServiceDeclareReseau")
 @Table(name = "service_declare", schema = "drrrs")
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @EntityListeners(AuditingEntityListener.class)
