@@ -225,7 +225,7 @@ public class DemandeAeronefService {
         // Il vit desormais sur `applicant`, la table partagee, et se reconnait a
         // son ROLE. Le nom et les prenoms s'y fondent dans `applicantName`,
         // comme chez ASI : les tables partagees n'ont pas de champ de prenom.
-        ApplicantDTO r = Acteurs.parRole(input.getApplicants(), Acteurs.REPRESENTANT);
+        ApplicantDTO r = input.getApplicant();
         if (r == null) {
             manques.add("le representant de l'operateur");
         } else {
@@ -596,8 +596,10 @@ public class DemandeAeronefService {
         if (entity.getClient() != null) {
             entity.getClient().setDemandeAeronef(entity);
         }
-        if (entity.getApplicants() != null) {
-            entity.getApplicants().forEach(a -> a.setDemandeAeronef(entity));
+        if (entity.getApplicant() != null) {
+
+            entity.getApplicant().setDemandeAeronef(entity);
+
         }
         if (entity.getEquipements() != null) {
             entity.getEquipements().forEach(e -> e.setDemandeAeronef(entity));

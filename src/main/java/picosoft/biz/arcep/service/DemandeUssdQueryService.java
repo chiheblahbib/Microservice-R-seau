@@ -190,31 +190,22 @@ public class DemandeUssdQueryService extends QueryService<DemandeUssd> {
             specification = specification.and(buildSpecification(criteria.getClientCompany(),
                     root -> root.join(DemandeUssd_.client, JoinType.LEFT).get(Client_.clientName)));
         }
-        // Le reseau n'a pas d'« applicant » : il a des PERSONNES, requerant et
-        // responsable, distinguees par leur role. On cherche sur leur nom.
+        // Le dossier n'a qu'une personne, sur `applicant` : la table
+        // partagee d'ASI. On cherche sur son nom.
         if (criteria.getPersonneNom() != null) {
             specification = specification.and(buildSpecification(criteria.getPersonneNom(),
-                    root -> root.join(DemandeUssd_.applicants, JoinType.LEFT).get(Applicant_.applicantName)));
-        
-            // La jointure est vers-PLUSIEURS depuis que les personnes vivent
-            // sur `applicant` : sans cela, un dossier dont deux personnes
-            // repondent au terme sortirait deux fois.
-            specification = specification.and((root, query, cb) -> {
-                query.distinct(true);
-                return null;
-            });
+                    root -> root.join(DemandeUssd_.applicant, JoinType.LEFT).get(Applicant_.applicantName)));
         }
 
         // ---- recherche libre : un seul terme, plusieurs colonnes ----
         if (criteria.getSearch() != null && criteria.getSearch().getContains() != null) {
             String terme = "%" + criteria.getSearch().getContains().toLowerCase() + "%";
             specification = specification.and((root, query, cb) -> {
-                query.distinct(true);   // jointures vers-plusieurs : voir plus haut
                 return cb.or(
                     cb.like(cb.lower(root.get(DemandeUssd_.reference)), terme),
                     cb.like(cb.lower(root.get(DemandeUssd_.typeDossier)), terme),
                     cb.like(cb.lower(root.join(DemandeUssd_.client, JoinType.LEFT).get(Client_.clientName)), terme),
-                    cb.like(cb.lower(root.join(DemandeUssd_.applicants, JoinType.LEFT).get(Applicant_.applicantName)), terme));
+                    cb.like(cb.lower(root.join(DemandeUssd_.applicant, JoinType.LEFT).get(Applicant_.applicantName)), terme));
             });
         }
 
@@ -307,7 +298,7 @@ public class DemandeUssdQueryService extends QueryService<DemandeUssd> {
             if (property.startsWith("client.")) {
                 specification = specification.and((root, query, cb) -> { root.join(DemandeUssd_.client, JoinType.LEFT); return null; });
             } else if (property.startsWith("personnes.")) {
-                specification = specification.and((root, query, cb) -> { root.join(DemandeUssd_.applicants, JoinType.LEFT); query.distinct(true); return null; });
+                specification = specification.and((root, query, cb) -> { root.join(DemandeUssd_.applicant, JoinType.LEFT); query.distinct(true); return null; });
             } else if (property.startsWith("sites.")) {
             }
         }

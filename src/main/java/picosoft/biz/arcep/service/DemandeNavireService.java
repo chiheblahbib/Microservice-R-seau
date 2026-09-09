@@ -225,10 +225,10 @@ public class DemandeNavireService {
         // proprietaire ». Le reclamer refuserait le cas le plus courant, celui
         // ou l'armateur depose pour son propre navire.
         //
-        // Les personnes vivent desormais sur `applicant`, la table partagee, et
-        // se reconnaissent a leur ROLE. Le nom et les prenoms s'y fondent dans
-        // `applicantName`, comme chez ASI.
-        ApplicantDTO r = Acteurs.parRole(input.getApplicants(), Acteurs.DEMANDEUR);
+        // La personne vit sur `applicant`, la table partagee : UNE SEULE par
+        // dossier, en paire avec le `client` qui porte la structure. Le nom et
+        // les prenoms s'y fondent dans `applicantName`, comme chez ASI.
+        ApplicantDTO r = input.getApplicant();
         if (r == null) {
             manques.add("le demandeur de l'autorisation");
         } else {
@@ -607,8 +607,10 @@ public class DemandeNavireService {
         if (entity.getClient() != null) {
             entity.getClient().setDemandeNavire(entity);
         }
-        if (entity.getApplicants() != null) {
-            entity.getApplicants().forEach(a -> a.setDemandeNavire(entity));
+        if (entity.getApplicant() != null) {
+
+            entity.getApplicant().setDemandeNavire(entity);
+
         }
         if (entity.getAutorisationsAnterieures() != null) {
             entity.getAutorisationsAnterieures().forEach(a -> a.setDemandeNavire(entity));

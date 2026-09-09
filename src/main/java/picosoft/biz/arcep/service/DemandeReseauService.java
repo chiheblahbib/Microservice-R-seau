@@ -220,10 +220,9 @@ public class DemandeReseauService {
             manques.add("l'identite du titulaire du reseau");
         }
 
-        // Rubriques 1 et 3 : deux personnes distinctes, et le formulaire les
-        // separe parce que l'instruction a besoin de savoir qui repond du reseau.
+        // Rubriques 1 et 3 : le requerant et le responsable du reseau sont la
+        // MEME personne, sous deux titres. Un seul controle les couvre.
         exigerDemandeur(input, manques);
-        exigerActeur(input, Acteurs.RESPONSABLE, "le responsable du reseau", manques);
 
         if (input.getTypesReseau() == null || input.getTypesReseau().isEmpty()) {
             manques.add("au moins un type de reseau a exploiter");
@@ -279,10 +278,13 @@ public class DemandeReseauService {
      * rubrique est la transposition : la raison sociale et l'adresse du
      * titulaire (rubrique 2), l'identite et la qualite du requerant
      * (rubrique 1), et de quoi le joindre.
+     *
+     * La PIECE D'IDENTITE n'est plus exigee : `Applicant` ne la porte pas, et on
+     * ne l'a pas ajoutee. Le document reste demande comme piece jointe.
      */
     private void exigerDemandeur(DemandeReseauInputDTO input, List<String> manques) {
         ClientDTO c = input.getClient();
-        ApplicantDTO a = Acteurs.parRole(input.getApplicants(), Acteurs.REQUERANT);
+        ApplicantDTO a = input.getApplicant();
 
         // L'identite du titulaire est deja exigee plus haut, et de facon plus
         // juste : `company` OU `clientName`, un particulier ayant le droit de
@@ -299,24 +301,6 @@ public class DemandeReseauService {
         if (a == null || estVide(a.getEmail())) {
             manques.add("l'adresse electronique du requerant");
         }
-    }
-
-    /**
-     * Une personne du dossier doit au moins etre nommee et joignable.
-     *
-     * La PIECE D'IDENTITE n'est plus exigee ici : `Applicant` ne la porte pas,
-     * et on ne l'a pas ajoutee. Le document reste demande comme piece jointe.
-     */
-    private void exigerActeur(DemandeReseauInputDTO input, String role,
-                              String libelle, List<String> manques) {
-        ApplicantDTO p = Acteurs.parRole(input.getApplicants(), role);
-        if (p == null) {
-            manques.add(libelle);
-            return;
-        }
-        if (estVide(p.getApplicantName())) { manques.add(libelle + " : l'identite"); }
-        if (estVide(p.getQualification())) { manques.add(libelle + " : la fonction"); }
-        if (estVide(p.getEmail()))         { manques.add(libelle + " : l'adresse electronique"); }
     }
 
     private void exigerPiecesObligatoires(DemandeReseauInputDTO input, AclClass aclClass) {
@@ -600,8 +584,10 @@ public class DemandeReseauService {
         if (entity.getClient() != null) {
             entity.getClient().setDemandeReseau(entity);
         }
-        if (entity.getApplicants() != null) {
-            entity.getApplicants().forEach(a -> a.setDemandeReseau(entity));
+        if (entity.getApplicant() != null) {
+
+            entity.getApplicant().setDemandeReseau(entity);
+
         }
         if (entity.getTypesReseau() != null) {
             entity.getTypesReseau().forEach(t -> t.setDemandeReseau(entity));

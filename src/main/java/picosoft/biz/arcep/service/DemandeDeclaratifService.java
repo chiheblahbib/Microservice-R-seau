@@ -223,27 +223,24 @@ public class DemandeDeclaratifService {
 
         // Rubriques 1 et 3 : deux personnes distinctes, et le formulaire les
         // separe parce que l'instruction a besoin de savoir qui repond du reseau.
-        // ----- les correspondants obligatoires, rubriques 2 et 3
+        // ----- le correspondant, rubriques 2 et 3
         //
-        // Le formulaire marque les DEUX d'un asterisque. On exige donc le
-        // correspondant de la declaration, et on signale separement l'absence
-        // de celui du paiement plutot que de les confondre.
+        // Le formulaire marque les deux rubriques d'un asterisque, mais elles
+        // designent la MEME personne : un seul correspondant est saisi, pour la
+        // declaration comme pour le paiement.
         //
-        // Les personnes vivent desormais sur `applicant`, la table partagee, et
-        // se reconnaissent a leur ROLE. Le nom et les prenoms s'y fondent dans
-        // `applicantName`, comme chez ASI.
-        ApplicantDTO r = Acteurs.parRole(input.getApplicants(), Acteurs.DECLARATION);
-        if (!Acteurs.nomme(input.getApplicants(), Acteurs.PAIEMENT)) {
-            manques.add("le correspondant relatif au paiement (rubrique 3)");
-        }
+        // La personne vit sur `applicant`, la table partagee : UNE SEULE par
+        // dossier, en paire avec le `client` qui porte la structure. Le nom et
+        // les prenoms s'y fondent dans `applicantName`, comme chez ASI.
+        ApplicantDTO r = input.getApplicant();
         if (r == null) {
-            manques.add("le correspondant relatif a la declaration (rubrique 2)");
+            manques.add("le correspondant du dossier (rubriques 2 et 3)");
         } else {
-            if (estVide(r.getApplicantName())) { manques.add("le correspondant de la declaration : l'identite"); }
-            if (estVide(r.getQualification())) { manques.add("le correspondant de la declaration : la fonction"); }
-            if (estVide(r.getEmail()))         { manques.add("le correspondant de la declaration : l'adresse electronique"); }
+            if (estVide(r.getApplicantName())) { manques.add("le correspondant : l'identite"); }
+            if (estVide(r.getQualification())) { manques.add("le correspondant : la fonction"); }
+            if (estVide(r.getEmail()))         { manques.add("le correspondant : l'adresse electronique"); }
             if (estVide(r.getAddress())) {
-                manques.add("le correspondant de la declaration : l'adresse permanente");
+                manques.add("le correspondant : l'adresse permanente");
             }
         }
 
@@ -611,8 +608,10 @@ public class DemandeDeclaratifService {
         if (entity.getClient() != null) {
             entity.getClient().setDemandeDeclaratif(entity);
         }
-        if (entity.getApplicants() != null) {
-            entity.getApplicants().forEach(a -> a.setDemandeDeclaratif(entity));
+        if (entity.getApplicant() != null) {
+
+            entity.getApplicant().setDemandeDeclaratif(entity);
+
         }
         if (entity.getInfrastructures() != null) {
             entity.getInfrastructures().forEach(i -> i.setDemandeDeclaratif(entity));

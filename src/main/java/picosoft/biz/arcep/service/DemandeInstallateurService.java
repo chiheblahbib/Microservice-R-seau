@@ -222,16 +222,17 @@ public class DemandeInstallateurService {
 
         // Rubriques 1 et 3 : deux personnes distinctes, et le formulaire les
         // separe parce que l'instruction a besoin de savoir qui repond du reseau.
-        // ----- le representant legal
+        // ----- la personne du dossier, rubriques 1 et 4
         //
-        // Le REQUERANT n'est pas exige : le formulaire porte « remplir cette
-        // partie si l'identite du requerant differe de celle du
-        // representant ». Le reclamer refuserait le cas le plus courant.
+        // Le formulaire nomme un representant legal, un requerant et un
+        // responsable de l'activite, mais c'est la MEME personne : il porte
+        // lui-meme « remplir cette partie si l'identite du requerant differe de
+        // celle du representant ». Un seul controle, donc, et un seul saisi.
         //
-        // Les personnes vivent desormais sur `applicant`, la table partagee, et
-        // se reconnaissent a leur ROLE. Le nom et les prenoms s'y fondent dans
-        // `applicantName`, comme chez ASI.
-        ApplicantDTO r = Acteurs.parRole(input.getApplicants(), Acteurs.REPRESENTANT);
+        // La personne vit sur `applicant`, la table partagee : UNE SEULE par
+        // dossier, en paire avec le `client` qui porte la structure. Le nom et
+        // les prenoms s'y fondent dans `applicantName`, comme chez ASI.
+        ApplicantDTO r = input.getApplicant();
         if (r == null) {
             manques.add("le representant legal de l'entreprise");
         } else {
@@ -263,14 +264,6 @@ public class DemandeInstallateurService {
         } else if (input.getEtendues().contains(EtendueActivite.AUTRE)
                 && estVide(input.getEtendueAutrePrecision())) {
             manques.add("preciser l'autre etendue d'activite");
-        }
-
-        // ----- le responsable de l'activite, rubrique 4
-        //
-        // C'est lui qui repond techniquement de l'activite autorisee : un
-        // dossier qui ne le nomme pas ne dit pas qui en repond.
-        if (!Acteurs.nomme(input.getApplicants(), Acteurs.RESPONSABLE)) {
-            manques.add("le responsable de l'activite sollicitee (rubrique 4)");
         }
 
         // ----- les techniciens specialistes, rubrique 5
@@ -659,8 +652,10 @@ public class DemandeInstallateurService {
         if (entity.getClient() != null) {
             entity.getClient().setDemandeInstallateur(entity);
         }
-        if (entity.getApplicants() != null) {
-            entity.getApplicants().forEach(a -> a.setDemandeInstallateur(entity));
+        if (entity.getApplicant() != null) {
+
+            entity.getApplicant().setDemandeInstallateur(entity);
+
         }
         if (entity.getTechniciens() != null) {
             entity.getTechniciens().forEach(t -> t.setDemandeInstallateur(entity));

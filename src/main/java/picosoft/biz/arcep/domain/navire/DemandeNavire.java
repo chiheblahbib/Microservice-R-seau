@@ -306,20 +306,22 @@ public class DemandeNavire extends Auditable implements Serializable {
     private Client client;
 
     /**
-     * TOUTES les personnes physiques du dossier, quel que soit leur role.
+     * LA personne physique du dossier : le demandeur (rubrique 1) et le proprietaire du
+     * navire (rubrique 2) designent la meme.
      *
-     * `Applicant` est la table partagee, celle d'ASI et d'homologation. Le role
-     * -- REQUERANT, RESPONSABLE, REPRESENTANT... -- est porte par la LIGNE, non
-     * par une relation : une personne de plus dans une rubrique n'oblige alors
-     * ni a une colonne ni a une migration.
+     * MOITIE D'UNE PAIRE avec `Client` -- la structure d'un cote, la personne
+     * qui agit pour elle de l'autre. C'est ainsi qu'ASI emploie ses deux tables
+     * partagees, dans une seule rubrique « Demandeur ».
+     *
+     * UN-A-UN : le dossier n'a qu'une personne, et pas de tiers.
      *
      * Le nom et les prenoms s'y fondent dans `applicantName`, comme chez ASI :
      * les tables partagees n'ont pas de champ de prenom, et c'est le contrat que
      * le front suit deja pour le demandeur.
      */
-    @OneToMany(mappedBy = "demandeNavire", fetch = FetchType.LAZY,
-               cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
-    private List<Applicant> applicants;
+    @OneToOne(mappedBy = "demandeNavire", fetch = FetchType.LAZY,
+              cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
+    private Applicant applicant;
 
     /**
      * Rubrique 4 : les autorisations deja obtenues, une par ligne.

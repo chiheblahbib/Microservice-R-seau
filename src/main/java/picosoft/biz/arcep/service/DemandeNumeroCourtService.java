@@ -228,7 +228,7 @@ public class DemandeNumeroCourtService {
         // Il vit desormais sur `applicant`, la table partagee, et se reconnait a
         // son ROLE. Le nom et les prenoms s'y fondent dans `applicantName`,
         // comme chez ASI : les tables partagees n'ont pas de champ de prenom.
-        ApplicantDTO r = Acteurs.parRole(input.getApplicants(), Acteurs.REPRESENTANT);
+        ApplicantDTO r = input.getApplicant();
         if (r == null) {
             manques.add("le representant de l'operateur");
         } else {
@@ -632,8 +632,10 @@ public class DemandeNumeroCourtService {
         if (entity.getClient() != null) {
             entity.getClient().setDemandeNumeroCourt(entity);
         }
-        if (entity.getApplicants() != null) {
-            entity.getApplicants().forEach(a -> a.setDemandeNumeroCourt(entity));
+        if (entity.getApplicant() != null) {
+
+            entity.getApplicant().setDemandeNumeroCourt(entity);
+
         }
         if (entity.getNumerosRattachement() != null) {
             entity.getNumerosRattachement().forEach(e -> e.setDemandeNumeroCourt(entity));

@@ -20,9 +20,6 @@ public class ApplicantDTO implements Serializable {
 
     private ApplicantType applicantType;
 
-    /** REQUERANT, RESPONSABLE, REPRESENTANT... Voir l'entite. */
-    private String role;
-
     private String applicantName;
 
     private String qualification;

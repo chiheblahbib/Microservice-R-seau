@@ -67,7 +67,7 @@ public class DemandeReseauOutputDTO implements Serializable {
     private ClientDTO client;
 
     @Valid
-    private List<ApplicantDTO> applicants;
+    private ApplicantDTO applicant;
 
     @Valid
     private List<TypeReseauDeclareDTO> typesReseau;

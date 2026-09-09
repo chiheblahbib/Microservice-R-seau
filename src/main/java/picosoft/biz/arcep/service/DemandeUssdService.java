@@ -226,7 +226,7 @@ public class DemandeUssdService {
         // Il vit desormais sur `applicant`, la table partagee, et se reconnait a
         // son ROLE. Le nom et les prenoms s'y fondent dans `applicantName`,
         // comme chez ASI : les tables partagees n'ont pas de champ de prenom.
-        ApplicantDTO r = Acteurs.parRole(input.getApplicants(), Acteurs.REPRESENTANT);
+        ApplicantDTO r = input.getApplicant();
         if (r == null) {
             manques.add("le representant de l'operateur");
         } else {
@@ -590,8 +590,10 @@ public class DemandeUssdService {
         if (entity.getClient() != null) {
             entity.getClient().setDemandeUssd(entity);
         }
-        if (entity.getApplicants() != null) {
-            entity.getApplicants().forEach(a -> a.setDemandeUssd(entity));
+        if (entity.getApplicant() != null) {
+
+            entity.getApplicant().setDemandeUssd(entity);
+
         }
         if (entity.getCodes() != null) {
             entity.getCodes().forEach(e -> e.setDemandeUssd(entity));

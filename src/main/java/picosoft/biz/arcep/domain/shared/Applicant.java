@@ -32,12 +32,22 @@ import java.io.Serializable;
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @EntityListeners(AuditingEntityListener.class)
 /**
- * Une personne physique rattachee a un dossier.
+ * La PERSONNE PHYSIQUE qui agit pour le compte d'une structure.
  *
- * LA TABLE PARTAGEE, celle d'ASI et d'homologation, et desormais la SEULE ou
- * DRRRS range ses personnes -- requerant, responsable, representant, contact.
- * Les onze tables `personne_<x>` qui les portaient ont disparu le 9 septembre
- * 2026.
+ * MOITIE D'UNE PAIRE, et non un acteur isole : `Client` porte la structure --
+ * raison sociale, registre de commerce, nature d'activite -- et `Applicant` la
+ * personne qui agit pour elle. C'est ainsi que le formulaire d'ASI les emploie,
+ * dans UNE SEULE rubrique `SectionDemandeur` etalee sur les deux tables :
+ * « Identite du demandeur » sur `applicantName`, « Agissant en qualite de » sur
+ * `qualification`, mais « Demande pour le compte de la structure » sur
+ * `client.company`. Le partage est en partie arbitraire -- le telephone DU
+ * DEMANDEUR est range dans `client.phone` -- et les champs de `client` sont
+ * masques quand le demandeur est un particulier.
+ *
+ * DANS DRRRS, l'operateur de la rubrique 1 est le `Client` ; son representant,
+ * son responsable, le proprietaire ou le correspondant des rubriques suivantes
+ * sont des `Applicant`. Les onze tables `personne_<x>` qui les portaient ont
+ * disparu le 9 septembre 2026.
  *
  * L'OBJECTION QU'ELLES PORTAIENT etait qu'`applicant` decrit une STRUCTURE
  * quand l'imprime demande une personne, et qu'il n'a pas de champ de PRENOM.
@@ -46,8 +56,11 @@ import java.io.Serializable;
  * `fonction` sur `qualification`, `adressePermanente` sur `address`,
  * `telephone` sur `phone`, `nationalite` sur `nationality`.
  *
- * PLUSIEURS-A-UN, et non un-a-un comme chez ASI : un dossier DRRRS porte
- * plusieurs personnes. C'est `role` qui dit laquelle est laquelle.
+ * UN-A-UN, comme chez ASI : un dossier n'a qu'une personne. Les imprimes qui
+ * semblaient en nommer plusieurs -- le requerant et le responsable du reseau,
+ * le demandeur et le proprietaire du navire, les correspondants du declaratif
+ * -- designent la MEME, sous le titre que leur rubrique lui donne. Il n'y a
+ * donc pas de role a porter, et pas de tiers a loger ailleurs.
  */
 public class Applicant extends Auditable implements Serializable {
 
@@ -61,22 +74,6 @@ public class Applicant extends Auditable implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name = "applicant_type", nullable = true)
     private ApplicantType applicantType;
-
-    /**
-     * Ce que cette personne est POUR CE DOSSIER : REQUERANT, RESPONSABLE,
-     * REPRESENTANT, CONTACT...
-     *
-     * CHAINE et non enumeration, pour la meme raison que `statutDossier` : le
-     * vocabulaire varie d'un imprime a l'autre -- le reseau nomme un
-     * responsable technique, le declaratif un correspondant de paiement -- et
-     * une enumeration aurait oblige a republier le service des qu'une rubrique
-     * ajoute un role.
-     *
-     * NULLE pour homologation et ASI, qui n'ont qu'un demandeur et n'ont donc
-     * rien a distinguer. La colonne s'ajoute a leur table sans les concerner.
-     */
-    @Column(name = "role", length = 32, nullable = true)
-    private String role;
 
     @Column(name = "qualification", length = 100, nullable = true)
     private String qualification;
@@ -111,51 +108,51 @@ public class Applicant extends Auditable implements Serializable {
     @Column(name = "website", length = 100)
     private String website;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_aeronef_id", nullable = true)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "demande_aeronef_id", nullable = true, unique = true)
     private DemandeAeronef demandeAeronef;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_declaratif_id", nullable = true)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "demande_declaratif_id", nullable = true, unique = true)
     private DemandeDeclaratif demandeDeclaratif;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_implantation_id", nullable = true)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "demande_implantation_id", nullable = true, unique = true)
     private DemandeImplantation demandeImplantation;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_installateur_id", nullable = true)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "demande_installateur_id", nullable = true, unique = true)
     private DemandeInstallateur demandeInstallateur;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_ispc_id", nullable = true)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "demande_ispc_id", nullable = true, unique = true)
     private DemandeIspc demandeIspc;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_mmsi_id", nullable = true)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "demande_mmsi_id", nullable = true, unique = true)
     private DemandeMmsi demandeMmsi;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_navire_id", nullable = true)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "demande_navire_id", nullable = true, unique = true)
     private DemandeNavire demandeNavire;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_numerocourt_id", nullable = true)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "demande_numerocourt_id", nullable = true, unique = true)
     private DemandeNumeroCourt demandeNumeroCourt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_numerocourturgence_id", nullable = true)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "demande_numerocourturgence_id", nullable = true, unique = true)
     private DemandeNumeroCourtUrgence demandeNumeroCourtUrgence;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_pq_id", nullable = true)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "demande_pq_id", nullable = true, unique = true)
     private DemandePq demandePq;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_reseau_id", nullable = true)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "demande_reseau_id", nullable = true, unique = true)
     private DemandeReseau demandeReseau;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_ussd_id", nullable = true)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "demande_ussd_id", nullable = true, unique = true)
     private DemandeUssd demandeUssd;
 }

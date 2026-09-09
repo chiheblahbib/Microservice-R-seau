@@ -226,7 +226,7 @@ public class DemandeIspcService {
         // Il vit desormais sur `applicant`, la table partagee, et se reconnait a
         // son ROLE. Le nom et les prenoms s'y fondent dans `applicantName`,
         // comme chez ASI : les tables partagees n'ont pas de champ de prenom.
-        ApplicantDTO r = Acteurs.parRole(input.getApplicants(), Acteurs.CONTACT);
+        ApplicantDTO r = input.getApplicant();
         if (r == null) {
             manques.add("la personne a contacter");
         } else {
@@ -600,8 +600,10 @@ public class DemandeIspcService {
         if (entity.getClient() != null) {
             entity.getClient().setDemandeIspc(entity);
         }
-        if (entity.getApplicants() != null) {
-            entity.getApplicants().forEach(a -> a.setDemandeIspc(entity));
+        if (entity.getApplicant() != null) {
+
+            entity.getApplicant().setDemandeIspc(entity);
+
         }
         if (entity.getFonctions() != null) {
             entity.getFonctions().forEach(fn -> fn.setDemandeIspc(entity));

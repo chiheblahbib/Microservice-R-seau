@@ -71,7 +71,7 @@ public class DemandePqInputDTO implements Serializable {
     private ClientDTO client;
 
     @Valid
-    private List<ApplicantDTO> applicants;
+    private ApplicantDTO applicant;
 
     /** Rubrique 5 : les equipements de bord. */
     @Valid

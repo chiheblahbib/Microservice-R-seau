@@ -61,14 +61,32 @@ la **station** — onze clés vers un dossier, une douzième vers la station.
 > nulles de plus. `ddl-auto=update` ajoute, il n'enlève jamais, et le service
 > homologation ne lit aucune de ces colonnes.
 
-**Toute personne est un `Client` ou un `Applicant`.** Les onze tables
-`personne_<x>` ont disparu — quarante-quatre fichiers avec elles.
+**La structure est un `Client`, les personnes qui agissent pour elle sont des
+`Applicant`.** Les onze tables `personne_<x>` ont disparu — quarante-quatre
+fichiers avec elles.
 
-L'objection qui les avait fait naître était que `client` et `applicant`
-décrivent une STRUCTURE — raison sociale, registre de commerce — quand l'imprimé
-demande une personne, et que ni l'une ni l'autre ne porte de champ de **prénom**.
-La réponse est celle d'ASI, qui n'en porte pas davantage : le nom et les prénoms
-se fondent dans `applicantName`. Le reste se retrouve champ pour champ.
+Ce sont les deux moitiés d'un même acteur, et non deux acteurs opposés. Le
+formulaire ASI n'a qu'**une** rubrique, `SectionDemandeur`, dont les champs se
+répartissent entre les deux tables : « Identité du demandeur » va dans
+`applicant.applicantName`, « Agissant en qualité de » dans
+`applicant.qualification`, mais « Demande pour le compte de la structure » dans
+`client.company` et « Nature d'activité » dans `client.natureActivite`. Le
+partage est même en partie arbitraire — le **téléphone du demandeur** est rangé
+dans `client.phone`, et le front d'ASI le commente ainsi. Les champs `client.*`
+sont d'ailleurs masqués quand le demandeur est un particulier : il n'y a alors
+pas de client du tout.
+
+DRRRS reprend cette paire telle quelle. L'**opérateur** de la rubrique 1 est le
+`Client` ; son **représentant**, son **responsable**, le **propriétaire** ou le
+**correspondant** des rubriques suivantes sont des `Applicant` — la ou les
+personnes physiques qui agissent pour cette structure.
+
+L'objection qui avait fait naître les tables `personne_<x>` était que `client`
+et `applicant` décrivent une STRUCTURE — raison sociale, registre de commerce —
+quand l'imprimé demande une personne, et que ni l'une ni l'autre ne porte de
+champ de **prénom**. La réponse est celle d'ASI, qui n'en porte pas davantage :
+le nom et les prénoms se fondent dans `applicantName`. Le reste se retrouve
+champ pour champ.
 
 | `personne_<x>` | `applicant` |
 |---|---|
@@ -78,17 +96,16 @@ se fondent dans `applicantName`. Le reste se retrouve champ pour champ.
 | `telephone` | `phone` |
 | `nationalite`, `nationaliteComplet`, `email` | à l'identique |
 
-La forme : **une seule colonne `demande_<x>_id`, en plusieurs-à-un**, plus un
-`role` porté par la ligne — REQUERANT, RESPONSABLE, REPRESENTANT, DECLARATION,
-PAIEMENT, DEMANDEUR, CONTACT. Chaque imprimé garde SES libellés : deux imprimés
-n'appellent pas la même chose du même nom. [`Acteurs`](src/main/java/picosoft/biz/arcep/service/Acteurs.java)
-les retrouve.
+**Un dossier, une personne.** Les rubriques qui semblaient en nommer
+plusieurs — le requérant et le responsable du réseau, le demandeur et le
+propriétaire du navire, les correspondants de la déclaration et du paiement, le
+représentant et le responsable de l'installateur — désignent la **même**, sous
+le titre que chaque rubrique lui donne. La relation est donc **un-à-un**, comme
+chez ASI : `demande_<x>_id` est unique sur `applicant`, il n'y a ni colonne
+`role` ni tiers à loger ailleurs.
 
-> Deux conséquences à connaître. Le prénom n'est plus exigé séparément à la
-> soumission — un seul contrôle d'identité le remplace. Et la jointure vers la
-> personne est devenue **vers-plusieurs** : `query.distinct(true)` est posé sur
-> les deux recherches, sans quoi un dossier dont deux personnes répondent au
-> terme sortirait deux fois, et le compte total avec.
+> Une conséquence à connaître : le prénom n'est plus exigé séparément à la
+> soumission — un seul contrôle d'identité le remplace.
 
 **Un seul `KernelService`**, assemblé depuis les douze : 42 rôles, 15 séquences,
 14 classes ACL. Les noms de rôles sont repris **mot pour mot** — `aeronef_can_read_aeronef`
