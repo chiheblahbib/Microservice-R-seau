@@ -98,13 +98,46 @@ Ce qui reste par formulaire — `/api/initClassDemande<X>` — ne se marche pas 
 Identité du service : `spring.application.name=drrrs`, context-path `/drrrs`,
 artefact maven `drrrs`.
 
+### Le CORS n'est pas notre affaire
+
+Homologation fonctionne sans une ligne de CORS, et il fallait comprendre
+pourquoi avant de rien ajouter ici. La réponse, mesurée le 9 septembre 2026 :
+**c'est la passerelle qui pose les en-têtes**, pas le service.
+
+```
+$ curl -D - -X OPTIONS -H 'Origin: http://localhost:4200'     -H 'Access-Control-Request-Method: GET'     -H 'Access-Control-Request-Headers: authorization,application'     https://arcep-dev.picosoft.biz/homologation/api/asis
+
+HTTP/1.1 200
+Access-Control-Allow-Origin: http://localhost:4200
+Access-Control-Allow-Methods: GET
+Access-Control-Allow-Headers: authorization, application
+Access-Control-Allow-Credentials: true
+```
+
+L'origine `http://localhost:4200` est renvoyée en **écho** : la passerelle sait
+et accepte que le front tourne en `ng serve` sur un poste. Les deux en-têtes
+autorisés sont exactement ceux que pose l'intercepteur du front.
+
+Côté Java, homologation ne fait **rien** :
+
+- son `WebMvcConfig` est identique au nôtre, au caractère près ;
+- il n'a aucun filtre, aucune `SecurityFilterChain` ;
+- le bean `CorsConfigurationSource` de son `ArcepApplication` **n'est consommé
+  par personne** — seul `spring-security-acl` est au classpath, jamais
+  `spring-boot-starter-security`, donc aucune chaîne de filtres ne le lit.
+  C'est du code mort, ici comme là-bas.
+
+**Il n'y a donc rien à copier d'homologation : ce service fait déjà exactement
+ce qu'il fait.** Ce qui manque n'est pas du code, c'est la route `/drrrs` sur la
+passerelle. C'est aussi pourquoi le CORS déclaré au niveau MVC, ajouté puis
+retiré le 8 septembre, était le mauvais geste : il traitait un symptôme de
+développement en modifiant une configuration commune aux services.
+
 ## Le formulaire réseau
 
 Ce qui suit décrit le **formulaire réseau**, dont ce dépôt est issu et qui reste
 le mieux documenté des douze. Les onze autres gardent leur documentation dans
 leur dépôt d'origine, qui n'est plus déployé.
-
-### État
 
 ### État
 
@@ -485,18 +518,23 @@ n'y ajoute rien. Le document reste exigé comme pièce jointe.
 
 ### Ce que la fusion laisse ouvert
 
-0. **Le service n'a jamais démarré sous cette forme.** Il compile ; le contexte
+1. **Déployer le service derrière la passerelle**, sous `/drrrs`, comme
+   homologation sous `/homologation`. C'est la seule chose qui manque pour que
+   le front l'atteigne — voir « Le CORS n'est pas notre affaire » ci-dessous.
+   Mesuré le 09/09/2026 : `…/homologation/api/asis` répond 200,
+   `…/drrrs/api/demande-reseaux` répond 404.
+2. **Le service n'a jamais démarré sous cette forme.** Il compile ; le contexte
    Spring n'a pas été monté, faute d'une base sur laquelle le faire sans écrire.
    Le premier démarrage **créera** dans le schéma `drrrs` la cinquantaine de
    tables des douze formulaires, et **ajoutera** aux trois tables partagées du
    schéma `homologation` les colonnes de clés étrangères décrites plus haut.
    C'est une écriture réelle : à déclencher sciemment.
-1. **Les personnes ne sont pas encore toutes sur `client` et `applicant`.** Dix
+3. **Les personnes ne sont pas encore toutes sur `client` et `applicant`.** Dix
    formulaires gardent une table `personne_<x>` propre. Elle doit disparaître au
    profit des deux tables partagées, avec un rôle porté par la ligne.
-2. **`reseau-back` reste sur le disque** et doit être supprimé. Il était tenu par
+4. **`reseau-back` reste sur le disque** et doit être supprimé. Il était tenu par
    l'IDE au moment de la fusion, d'où une copie plutôt qu'un renommage.
-3. **Les onze dépôts d'origine** ne sont plus la source de vérité. Ils gardent
+5. **Les onze dépôts d'origine** ne sont plus la source de vérité. Ils gardent
    leur documentation, pas leur code.
 
 ### Ce qui restait du formulaire réseau
