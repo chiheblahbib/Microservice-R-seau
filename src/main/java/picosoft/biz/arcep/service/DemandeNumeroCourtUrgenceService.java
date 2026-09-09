@@ -219,13 +219,11 @@ public class DemandeNumeroCourtUrgenceService {
             manques.add("l'identite du titulaire du reseau");
         }
 
-        // Rubriques 1 et 3 : deux personnes distinctes, et le formulaire les
-        // separe parce que l'instruction a besoin de savoir qui repond du reseau.
         // ----- le representant, rubrique 2
         //
-        // Il vit desormais sur `applicant`, la table partagee, et se reconnait a
-        // son ROLE. Le nom et les prenoms s'y fondent dans `applicantName`,
-        // comme chez ASI : les tables partagees n'ont pas de champ de prenom.
+        // Il vit sur `applicant`, la table partagee : UNE SEULE personne par
+        // dossier, en paire avec le `client` qui porte la structure. Le nom et
+        // les prenoms s'y fondent dans `applicantName`, comme chez ASI.
         ApplicantDTO r = input.getApplicant();
         if (r == null) {
             manques.add("le representant de l'operateur");

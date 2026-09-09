@@ -221,8 +221,6 @@ public class DemandeDeclaratifService {
             manques.add("l'identite du titulaire du reseau");
         }
 
-        // Rubriques 1 et 3 : deux personnes distinctes, et le formulaire les
-        // separe parce que l'instruction a besoin de savoir qui repond du reseau.
         // ----- le correspondant, rubriques 2 et 3
         //
         // Le formulaire marque les deux rubriques d'un asterisque, mais elles

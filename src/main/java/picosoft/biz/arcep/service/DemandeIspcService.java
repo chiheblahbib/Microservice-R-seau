@@ -219,21 +219,22 @@ public class DemandeIspcService {
             manques.add("l'identite du titulaire du reseau");
         }
 
-        // Rubriques 1 et 3 : deux personnes distinctes, et le formulaire les
-        // separe parce que l'instruction a besoin de savoir qui repond du reseau.
-        // ----- le representant, rubrique 2
+        // ----- la personne a contacter, rubrique 5
         //
-        // Il vit desormais sur `applicant`, la table partagee, et se reconnait a
-        // son ROLE. Le nom et les prenoms s'y fondent dans `applicantName`,
-        // comme chez ASI : les tables partagees n'ont pas de champ de prenom.
+        // L'imprime ne demande d'elle QUE son identite et de quoi la joindre :
+        // ni fonction, ni adresse. On n'exige donc pas `qualification` ni
+        // `address`, que l'ecran ne propose pas -- les reclamer rendait toute
+        // soumission impossible.
+        //
+        // Il vit sur `applicant`, la table partagee : UNE SEULE personne par
+        // dossier, en paire avec le `client` qui porte la structure. Le nom et
+        // les prenoms s'y fondent dans `applicantName`, comme chez ASI.
         ApplicantDTO r = input.getApplicant();
         if (r == null) {
             manques.add("la personne a contacter");
         } else {
             if (estVide(r.getApplicantName())) { manques.add("le contact : l'identite"); }
-            if (estVide(r.getQualification())) { manques.add("le contact : la fonction"); }
             if (estVide(r.getEmail()))         { manques.add("le contact : l'adresse electronique"); }
-            if (estVide(r.getAddress()))       { manques.add("le contact : l'adresse permanente"); }
         }
 
         // ----- la nature de la demande, rubrique 3

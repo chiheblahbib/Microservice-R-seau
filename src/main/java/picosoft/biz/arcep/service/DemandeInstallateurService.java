@@ -220,8 +220,6 @@ public class DemandeInstallateurService {
             manques.add("l'identite du titulaire du reseau");
         }
 
-        // Rubriques 1 et 3 : deux personnes distinctes, et le formulaire les
-        // separe parce que l'instruction a besoin de savoir qui repond du reseau.
         // ----- la personne du dossier, rubriques 1 et 4
         //
         // Le formulaire nomme un representant legal, un requerant et un
