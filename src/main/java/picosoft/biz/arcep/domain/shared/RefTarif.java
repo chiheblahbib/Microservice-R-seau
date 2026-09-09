@@ -1,4 +1,4 @@
-package picosoft.biz.arcep.domain.reseau;
+package picosoft.biz.arcep.domain.shared;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -6,7 +6,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import picosoft.biz.arcep.configuration.audit.Auditable;
-import picosoft.biz.arcep.domain.reseau.enumeration.MomentTarif;
+import picosoft.biz.arcep.domain.shared.enumeration.MomentTarif;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;

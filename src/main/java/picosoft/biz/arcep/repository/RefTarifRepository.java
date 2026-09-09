@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import picosoft.biz.arcep.domain.reseau.RefTarif;
+import picosoft.biz.arcep.domain.shared.RefTarif;
 
 import java.time.LocalDate;
 import java.util.List;

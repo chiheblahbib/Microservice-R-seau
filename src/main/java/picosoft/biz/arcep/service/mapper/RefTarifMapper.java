@@ -4,7 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import picosoft.biz.arcep.domain.reseau.RefTarif;
+import picosoft.biz.arcep.domain.shared.RefTarif;
 import picosoft.biz.arcep.service.dto.RefTarifDTO;
 
 /**

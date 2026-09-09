@@ -9,11 +9,11 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>picosoft.biz</groupId>
-	<artifactId>reseau</artifactId>
+	<artifactId>drrrs</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
-	<name>reseau</name>
-	<description>Reseau de communications electroniques - ARCEP</description>
+	<name>drrrs</name>
+	<description>DRRRS - les douze formulaires de la Direction des Reseaux, Radiocommunications et Ressources en numerotation - ARCEP Gabon</description>
 	<url>https://www.picosoft.biz</url>
 	
 	<licenses>

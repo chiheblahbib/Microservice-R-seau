@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import picosoft.biz.arcep.domain.reseau.enumeration.MomentTarif;
+import picosoft.biz.arcep.domain.shared.enumeration.MomentTarif;
 
 import java.io.Serializable;
 import java.math.BigDecimal;

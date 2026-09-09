@@ -1,15 +1,110 @@
-# reseau
+# drrrs
 
-Microservice ARCEP de l'**autorisation d'établissement et d'exploitation d'un réseau de
-communications électroniques**. Troisième service de la suite Picosoft, après `homologation`
-et `implantation`, dont il reprend l'architecture à l'identique.
+Microservice ARCEP de la **Direction des Réseaux, Radiocommunications et Ressources en
+numérotation**. Il porte les **douze formulaires** de la direction, réunis le
+9 septembre 2026 en un seul service — ils étaient jusque-là douze microservices
+distincts, un par imprimé.
+
+Il descend de `reseau-back`, dont il garde l'historique git ; les onze autres y
+ont été versés. Il reprend l'architecture d'`homologation` et d'`implantation`.
 
 La carte de la famille est dans [../README.md](../README.md), les décisions qui
-traversent plusieurs services dans [../JOURNAL.md](../JOURNAL.md). Les dix
-services suivants ont été engendrés depuis celui-ci : c'est pourquoi leurs
-README décrivaient tous le modèle du réseau jusqu'au 7 septembre 2026.
+traversent plusieurs services dans [../JOURNAL.md](../JOURNAL.md).
 
-## Le service
+## La fusion des douze services
+
+### Pourquoi
+
+Un microservice par imprimé était la règle jusqu'ici. Elle coûtait douze fois le
+même squelette — 147 fichiers rigoureusement identiques dans chacun — douze
+schémas, douze déclarations au kernel, douze déploiements, et un front obligé de
+viser douze adresses. Les formulaires ne sont pourtant pas douze métiers : c'est
+une même direction, un même demandeur, un même circuit d'instruction, douze
+rubriques différentes.
+
+### Ce que la fusion a demandé
+
+**Les paquets `domain` ne se marchaient pas dessus** : `domain.aeronef`,
+`domain.reseau`… restent tels quels. Rien à renommer de ce côté, la racine
+`picosoft.biz.arcep` était déjà commune aux douze.
+
+**Trois tables portaient le même nom pour des choses différentes.** Un seul
+schéma ne peut pas les tenir toutes ; elles sont donc distinguées :
+
+| était | devient |
+|---|---|
+| `equipement_bord` (aéronef **et** navire) | `equipement_bord_aeronef`, `equipement_bord_navire` |
+| `numero_rattachement` (numéro court **et** urgence) | `numero_rattachement_court`, `numero_rattachement_urgence` |
+| `service_declare` (déclaratif **et** réseau) | `service_declare_declaratif`, `service_declare` |
+
+Les **entités** gardent leur nom, elles vivent dans des paquets distincts. Seuls
+les `Repository`, `DTO` et `Mapper` — qui vivent, eux, dans des paquets **plats** —
+ont été suffixés : `EquipementBordAeronefDTO`, `NumeroRattachementCourtMapper`…
+
+**Deux tables se répétaient à l'identique et deviennent partagées :**
+
+- `ref_tarif`, douze copies au caractère près. Elle portait déjà une colonne
+  `service` : une seule table suffit, les lignes se distinguent d'elles-mêmes.
+- `rapport_technique`, dix copies. L'en-tête de ces copies disait pourquoi elles
+  existaient : « chaque service est déployable seul ». Cette raison tombe avec la
+  fusion. La table revient à la forme d'homologation — une table, une clé
+  étrangère nullable par type de dossier.
+
+**Les tables partagées s'ouvrent aux douze dossiers.** `client`, `applicant` et
+`attestation` (schéma `homologation`) portaient une clé étrangère vers *le*
+dossier de leur service. Elles en portent maintenant douze, nullables, comme
+`client` d'homologation porte déjà `asi_id` et `homologation_id`. L'attestation
+fait exception sur un point : l'implantation ne l'accroche pas au dossier mais à
+la **station** — onze clés vers un dossier, une douzième vers la station.
+
+> Ce que cela fait aux tables qu'utilise **homologation** : rien que des colonnes
+> nulles de plus. `ddl-auto=update` ajoute, il n'enlève jamais, et le service
+> homologation ne lit aucune de ces colonnes.
+
+**Un seul `KernelService`**, assemblé depuis les douze : 42 rôles, 15 séquences,
+14 classes ACL. Les noms de rôles sont repris **mot pour mot** — `aeronef_can_read_aeronef`
+reste tel quel, renommer aurait invalidé des habilitations déjà posées en base.
+
+**`seq_rapport_technique` n'existait nulle part.** `ouvrirRapportTechnique`
+demandait pourtant une référence au kernel : le rapport sortait sans numéro. Le
+format est déclaré avec les quatorze autres.
+
+**Deux adresses entraient en collision.** Tant que les services étaient séparés,
+chacun pouvait offrir `/api/initSequences` — il était seul sur son contexte.
+Réunis, ils étaient douze à la revendiquer, et Spring refuse de démarrer sur un
+chemin ambigu ; `/api/initClassRapportTechnique` posait le même problème à dix
+voix. Les deux sont passées dans [`InitKernelController`](src/main/java/picosoft/biz/arcep/controller/InitKernelController.java).
+Ce qui reste par formulaire — `/api/initClassDemande<X>` — ne se marche pas dessus.
+
+### Les douze formulaires
+
+| formulaire | dossier | chemin REST | circuit | séquence |
+|---|---|---|---|---|
+| aéronef | `DemandeAeronef` | `/api/demande-aeronefs` | `processAeronef` | `seq_aeronef` |
+| déclaratif | `DemandeDeclaratif` | `/api/demande-declaratifs` | `processDeclaratif` | `seq_declaratif` |
+| implantation | `DemandeImplantation` | `/api/demande-implantations` | `processImplantation` | `seq_implantation` |
+| implantation (station) | `Station` | `/api/stations` | `processStation` | `seq_station` |
+| installateur | `DemandeInstallateur` | `/api/demande-installateurs` | `processInstallateur` | `seq_installateur` |
+| ISPC | `DemandeIspc` | `/api/demande-ispcs` | `processIspc` | `seq_ispc` |
+| MMSI | `DemandeMmsi` | `/api/demande-mmsis` | `processMmsi` | `seq_mmsi` |
+| navire | `DemandeNavire` | `/api/demande-navires` | `processNavire` | `seq_navire` |
+| numéro court | `DemandeNumeroCourt` | `/api/demande-numerocourts` | `processNumeroCourt` | `seq_numerocourt` |
+| numéro d'urgence | `DemandeNumeroCourtUrgence` | `/api/demande-numerocourturgences` | `processNumeroCourtUrgence` | `seq_numerocourturgence` |
+| préfixe / PQ | `DemandePq` | `/api/demande-pqs` | `processPq` | `seq_pq` |
+| réseau | `DemandeReseau` | `/api/demande-reseaux` | `processReseau` | `seq_reseau` |
+| USSD | `DemandeUssd` | `/api/demande-ussds` | `processUssd` | `seq_ussd` |
+| *(rapport d'instruction)* | `RapportTechnique` | — | — | `seq_rapport_technique` |
+
+Identité du service : `spring.application.name=drrrs`, context-path `/drrrs`,
+artefact maven `drrrs`.
+
+## Le formulaire réseau
+
+Ce qui suit décrit le **formulaire réseau**, dont ce dépôt est issu et qui reste
+le mieux documenté des douze. Les onze autres gardent leur documentation dans
+leur dépôt d'origine, qui n'est plus déployé.
+
+### État
 
 ### État
 
@@ -387,6 +482,24 @@ formulaire les demande, mais les tables partagées ne les portent pas et on
 n'y ajoute rien. Le document reste exigé comme pièce jointe.
 
 ## Reste à faire, dans l'ordre
+
+### Ce que la fusion laisse ouvert
+
+0. **Le service n'a jamais démarré sous cette forme.** Il compile ; le contexte
+   Spring n'a pas été monté, faute d'une base sur laquelle le faire sans écrire.
+   Le premier démarrage **créera** dans le schéma `drrrs` la cinquantaine de
+   tables des douze formulaires, et **ajoutera** aux trois tables partagées du
+   schéma `homologation` les colonnes de clés étrangères décrites plus haut.
+   C'est une écriture réelle : à déclencher sciemment.
+1. **Les personnes ne sont pas encore toutes sur `client` et `applicant`.** Dix
+   formulaires gardent une table `personne_<x>` propre. Elle doit disparaître au
+   profit des deux tables partagées, avec un rôle porté par la ligne.
+2. **`reseau-back` reste sur le disque** et doit être supprimé. Il était tenu par
+   l'IDE au moment de la fusion, d'où une copie plutôt qu'un renommage.
+3. **Les onze dépôts d'origine** ne sont plus la source de vérité. Ils gardent
+   leur documentation, pas leur code.
+
+### Ce qui restait du formulaire réseau
 
 1. **Enregistrer la classe au kernel.** `KernelService.initClassDemandeReseau()`
    existe et le contrôleur l'expose (`GET /initClassDemandeReseau`) ; sans une

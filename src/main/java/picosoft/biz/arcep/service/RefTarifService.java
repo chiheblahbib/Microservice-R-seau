@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import picosoft.biz.arcep.controller.errors.BadRequestAlertException;
 import picosoft.biz.arcep.controller.errors.ReseauErrors;
-import picosoft.biz.arcep.domain.reseau.RefTarif;
+import picosoft.biz.arcep.domain.shared.RefTarif;
 import picosoft.biz.arcep.repository.RefTarifRepository;
 import picosoft.biz.arcep.service.criteria.RefTarifCriteria;
 import picosoft.biz.arcep.service.dto.RefTarifDTO;

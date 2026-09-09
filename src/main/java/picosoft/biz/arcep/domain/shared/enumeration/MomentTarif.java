@@ -1,4 +1,4 @@
-package picosoft.biz.arcep.domain.reseau.enumeration;
+package picosoft.biz.arcep.domain.shared.enumeration;
 
 import java.util.stream.Stream;
 

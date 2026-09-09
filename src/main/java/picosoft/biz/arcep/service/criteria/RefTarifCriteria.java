@@ -10,7 +10,7 @@ import io.github.jhipster.service.filter.StringFilter;
 import io.github.jhipster.service.filter.ZonedDateTimeFilter;
 import lombok.Getter;
 import lombok.Setter;
-import picosoft.biz.arcep.domain.reseau.enumeration.MomentTarif;
+import picosoft.biz.arcep.domain.shared.enumeration.MomentTarif;
 
 import java.io.Serializable;
 

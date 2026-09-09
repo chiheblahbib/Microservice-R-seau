@@ -159,15 +159,4 @@ public class DemandeReseauController {
         kernelService.initSequences();
         kernelService.initClassDemandeReseau();
     }
-
-    /**
-     * Les sequences seules : seq_reseau et seq_site.
-     *
-     * Sans elles, getSequenceNumberByClass ne peut attribuer la reference du
-     * dossier, qui reste alors vide.
-     */
-    @GetMapping("/initSequences")
-    public void initSequences() {
-        kernelService.initSequences();
-    }
 }
