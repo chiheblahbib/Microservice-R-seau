@@ -12,7 +12,7 @@ import picosoft.biz.arcep.service.dto.DemandeAeronefOutputDTO;
 
 /** Mapper de {@link DemandeAeronef} et de son DTO {@link DemandeAeronefOutputDTO}. */
 @Mapper(componentModel = "spring",
-        uses = {ClientMapper.class, PersonneAeronefMapper.class, EquipementBordAeronefMapper.class,
+        uses = {ClientMapper.class, ApplicantMapper.class, EquipementBordAeronefMapper.class,
                 VerificationControleMapper.class,
                 AttestationMapper.class, RapportTechniqueMapper.class},
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

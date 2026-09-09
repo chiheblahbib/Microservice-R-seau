@@ -30,7 +30,7 @@ import picosoft.biz.arcep.repository.DemandeDeclaratifRepository;
 import picosoft.biz.arcep.service.criteria.DemandeDeclaratifCriteria;
 import picosoft.biz.arcep.domain.declaratif.enumeration.*;
 import picosoft.biz.arcep.service.dto.DemandeDeclaratifDTO;
-import picosoft.biz.arcep.service.dto.PersonneDeclaratifDTO;
+import picosoft.biz.arcep.service.dto.ApplicantDTO;
 import picosoft.biz.arcep.domain.declaratif.enumeration.TypeCouverture;
 import picosoft.biz.arcep.domain.declaratif.enumeration.TypeEnregistrement;
 import picosoft.biz.arcep.domain.declaratif.enumeration.TypeServiceDeclare;
@@ -228,24 +228,21 @@ public class DemandeDeclaratifService {
         // Le formulaire marque les DEUX d'un asterisque. On exige donc le
         // correspondant de la declaration, et on signale separement l'absence
         // de celui du paiement plutot que de les confondre.
-        PersonneDeclaratifDTO r = (input.getPersonnes() == null) ? null
-                : input.getPersonnes().stream()
-                       .filter(p -> p != null && "DECLARATION".equals(p.getRole()))
-                       .findFirst().orElse(null);
-        boolean paiement = input.getPersonnes() != null
-                && input.getPersonnes().stream()
-                        .anyMatch(p -> p != null && "PAIEMENT".equals(p.getRole())
-                                && !estVide(p.getNom()));
-        if (!paiement) {
+        //
+        // Les personnes vivent desormais sur `applicant`, la table partagee, et
+        // se reconnaissent a leur ROLE. Le nom et les prenoms s'y fondent dans
+        // `applicantName`, comme chez ASI.
+        ApplicantDTO r = Acteurs.parRole(input.getApplicants(), Acteurs.DECLARATION);
+        if (!Acteurs.nomme(input.getApplicants(), Acteurs.PAIEMENT)) {
             manques.add("le correspondant relatif au paiement (rubrique 3)");
         }
         if (r == null) {
             manques.add("le correspondant relatif a la declaration (rubrique 2)");
         } else {
-            if (estVide(r.getNom()))      { manques.add("le correspondant de la declaration : le nom"); }
-            if (estVide(r.getPrenoms()))  { manques.add("le correspondant de la declaration : les prenoms"); }
-            if (estVide(r.getEmail()))    { manques.add("le correspondant de la declaration : l'adresse electronique"); }
-            if (estVide(r.getAdressePermanente())) {
+            if (estVide(r.getApplicantName())) { manques.add("le correspondant de la declaration : l'identite"); }
+            if (estVide(r.getQualification())) { manques.add("le correspondant de la declaration : la fonction"); }
+            if (estVide(r.getEmail()))         { manques.add("le correspondant de la declaration : l'adresse electronique"); }
+            if (estVide(r.getAddress())) {
                 manques.add("le correspondant de la declaration : l'adresse permanente");
             }
         }
@@ -614,8 +611,8 @@ public class DemandeDeclaratifService {
         if (entity.getClient() != null) {
             entity.getClient().setDemandeDeclaratif(entity);
         }
-        if (entity.getPersonnes() != null) {
-            entity.getPersonnes().forEach(p -> p.setDemandeDeclaratif(entity));
+        if (entity.getApplicants() != null) {
+            entity.getApplicants().forEach(a -> a.setDemandeDeclaratif(entity));
         }
         if (entity.getInfrastructures() != null) {
             entity.getInfrastructures().forEach(i -> i.setDemandeDeclaratif(entity));

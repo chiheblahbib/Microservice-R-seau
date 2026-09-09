@@ -30,7 +30,7 @@ import picosoft.biz.arcep.repository.DemandeNavireRepository;
 import picosoft.biz.arcep.service.criteria.DemandeNavireCriteria;
 import picosoft.biz.arcep.domain.navire.enumeration.*;
 import picosoft.biz.arcep.service.dto.DemandeNavireDTO;
-import picosoft.biz.arcep.service.dto.PersonneNavireDTO;
+import picosoft.biz.arcep.service.dto.ApplicantDTO;
 import picosoft.biz.arcep.service.dto.EquipementBordNavireDTO;
 import picosoft.biz.arcep.service.dto.DemandeNavireInputDTO;
 import picosoft.biz.arcep.service.dto.DemandeNavireOutputDTO;
@@ -224,17 +224,18 @@ public class DemandeNavireService {
         // « a ne renseigner que si le demandeur indique ci-dessus n'est pas le
         // proprietaire ». Le reclamer refuserait le cas le plus courant, celui
         // ou l'armateur depose pour son propre navire.
-        PersonneNavireDTO r = (input.getPersonnes() == null) ? null
-                : input.getPersonnes().stream()
-                       .filter(p -> p != null && "DEMANDEUR".equals(p.getRole()))
-                       .findFirst().orElse(null);
+        //
+        // Les personnes vivent desormais sur `applicant`, la table partagee, et
+        // se reconnaissent a leur ROLE. Le nom et les prenoms s'y fondent dans
+        // `applicantName`, comme chez ASI.
+        ApplicantDTO r = Acteurs.parRole(input.getApplicants(), Acteurs.DEMANDEUR);
         if (r == null) {
             manques.add("le demandeur de l'autorisation");
         } else {
-            if (estVide(r.getNom()))      { manques.add("le demandeur : le nom"); }
-            if (estVide(r.getPrenoms()))  { manques.add("le demandeur : les prenoms"); }
-            if (estVide(r.getEmail()))    { manques.add("le demandeur : l'adresse electronique"); }
-            if (estVide(r.getAdressePermanente())) {
+            if (estVide(r.getApplicantName())) { manques.add("le demandeur : l'identite"); }
+            if (estVide(r.getQualification())) { manques.add("le demandeur : la fonction"); }
+            if (estVide(r.getEmail()))         { manques.add("le demandeur : l'adresse electronique"); }
+            if (estVide(r.getAddress())) {
                 manques.add("le demandeur : l'adresse permanente");
             }
         }
@@ -606,8 +607,8 @@ public class DemandeNavireService {
         if (entity.getClient() != null) {
             entity.getClient().setDemandeNavire(entity);
         }
-        if (entity.getPersonnes() != null) {
-            entity.getPersonnes().forEach(p -> p.setDemandeNavire(entity));
+        if (entity.getApplicants() != null) {
+            entity.getApplicants().forEach(a -> a.setDemandeNavire(entity));
         }
         if (entity.getAutorisationsAnterieures() != null) {
             entity.getAutorisationsAnterieures().forEach(a -> a.setDemandeNavire(entity));

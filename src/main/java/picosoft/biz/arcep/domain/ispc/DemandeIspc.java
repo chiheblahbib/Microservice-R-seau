@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import picosoft.biz.arcep.configuration.audit.Auditable;
+import picosoft.biz.arcep.domain.shared.Applicant;
 import picosoft.biz.arcep.domain.shared.RapportTechnique;
 import picosoft.biz.arcep.domain.ispc.enumeration.*;
 import picosoft.biz.arcep.client.kernel.model.acl.AclObjectIdentity;
@@ -44,11 +45,10 @@ import java.util.UUID;
  * POURQUOI LE DEMANDEUR N'A QU'UNE PERSONNE A CONTACTER
  *
  * La rubrique 5 dit « Personne a contacter » et rien de plus : ni fonction, ni
- * nationalite, ni adresse propre. PersonneIspc en porte pourtant, parce que
- * c'est la forme partagee par tout le module ; l'ecran de saisie n'en propose
- * que le nom, le telephone et le courriel. Les colonnes en trop restent
- * vides -- les retirer aurait fait diverger cette entite de ses huit soeurs
- * pour une economie de trois colonnes.
+ * nationalite, ni adresse propre. `Applicant`, la table partagee ou vit
+ * desormais cette personne, en porte pourtant : c'est la forme d'ASI et
+ * d'homologation. L'ecran de saisie n'en propose que le nom, le telephone et
+ * le courriel ; les colonnes en trop restent vides.
  *
  *
  * L'ENGAGEMENT SUR L'HONNEUR N'EST PAS SAISI
@@ -233,11 +233,20 @@ public class DemandeIspc extends Auditable implements Serializable {
     private Client client;
 
     /**
-     * La personne a contacter, rubrique 5. Une seule, d'ou le un-a-un.
+     * TOUTES les personnes physiques du dossier, quel que soit leur role.
+     *
+     * `Applicant` est la table partagee, celle d'ASI et d'homologation. Le role
+     * -- REQUERANT, RESPONSABLE, REPRESENTANT... -- est porte par la LIGNE, non
+     * par une relation : une personne de plus dans une rubrique n'oblige alors
+     * ni a une colonne ni a une migration.
+     *
+     * Le nom et les prenoms s'y fondent dans `applicantName`, comme chez ASI :
+     * les tables partagees n'ont pas de champ de prenom, et c'est le contrat que
+     * le front suit deja pour le demandeur.
      */
-    @OneToOne(mappedBy = "demandeIspc", fetch = FetchType.LAZY,
-              cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
-    private PersonneIspc contact;
+    @OneToMany(mappedBy = "demandeIspc", fetch = FetchType.LAZY,
+               cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<Applicant> applicants;
 
     /** Rubrique 6 : les fonctions cochees, cumulables. */
     @OneToMany(mappedBy = "demandeIspc", fetch = FetchType.LAZY,

@@ -73,8 +73,21 @@ public class DemandeImplantation extends Auditable implements Serializable {
     @OneToOne(mappedBy = "demandeImplantation", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
     private Client client;
 
-    @OneToOne(mappedBy = "demandeImplantation", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
-    private Applicant applicant;
+    /**
+     * TOUTES les personnes physiques du dossier, quel que soit leur role.
+     *
+     * `Applicant` est la table partagee, celle d'ASI et d'homologation. Le role
+     * -- REQUERANT, RESPONSABLE, REPRESENTANT... -- est porte par la LIGNE, non
+     * par une relation : une personne de plus dans une rubrique n'oblige alors
+     * ni a une colonne ni a une migration.
+     *
+     * Le nom et les prenoms s'y fondent dans `applicantName`, comme chez ASI :
+     * les tables partagees n'ont pas de champ de prenom, et c'est le contrat que
+     * le front suit deja pour le demandeur.
+     */
+    @OneToMany(mappedBy = "demandeImplantation", fetch = FetchType.LAZY,
+               cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<Applicant> applicants;
 
     /**
      * LA station du dossier. Une autorisation d'implantation en vise une seule.

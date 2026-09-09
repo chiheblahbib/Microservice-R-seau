@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import picosoft.biz.arcep.configuration.audit.Auditable;
+import picosoft.biz.arcep.domain.shared.Applicant;
 import picosoft.biz.arcep.domain.shared.RapportTechnique;
 import picosoft.biz.arcep.domain.declaratif.enumeration.*;
 import picosoft.biz.arcep.client.kernel.model.acl.AclObjectIdentity;
@@ -246,16 +247,20 @@ public class DemandeDeclaratif extends Auditable implements Serializable {
     private Client client;
 
     /**
-     * Les correspondants obligatoires, rubriques 2 et 3.
+     * TOUTES les personnes physiques du dossier, quel que soit leur role.
      *
-     * DEUX, et le formulaire marque les deux d'un asterisque : celui de la
-     * DECLARATION et celui du PAIEMENT. Une collection portant un role, comme
-     * le dossier de navire -- deux relations un-a-un auraient fige dans le
-     * schema une distinction que le metier peut faire evoluer.
+     * `Applicant` est la table partagee, celle d'ASI et d'homologation. Le role
+     * -- REQUERANT, RESPONSABLE, REPRESENTANT... -- est porte par la LIGNE, non
+     * par une relation : une personne de plus dans une rubrique n'oblige alors
+     * ni a une colonne ni a une migration.
+     *
+     * Le nom et les prenoms s'y fondent dans `applicantName`, comme chez ASI :
+     * les tables partagees n'ont pas de champ de prenom, et c'est le contrat que
+     * le front suit deja pour le demandeur.
      */
     @OneToMany(mappedBy = "demandeDeclaratif", fetch = FetchType.LAZY,
                cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
-    private List<PersonneDeclaratif> personnes;
+    private List<Applicant> applicants;
 
     /** Rubrique 7 : les services declares, avec leur calendrier. */
     @OneToMany(mappedBy = "demandeDeclaratif", fetch = FetchType.LAZY,

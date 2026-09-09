@@ -56,7 +56,7 @@ public class DemandeImplantationInputDTO implements Serializable {
     private ClientDTO client;
 
     @Valid
-    private ApplicantDTO applicant;
+    private List<ApplicantDTO> applicants;
 
     @Valid
     /** LA station du dossier : une autorisation en vise une seule. */

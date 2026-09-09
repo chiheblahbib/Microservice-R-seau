@@ -12,7 +12,7 @@ import picosoft.biz.arcep.service.dto.DemandeInstallateurDTO;
 
 /** Mapper de {@link DemandeInstallateur} et de son DTO {@link DemandeInstallateurDTO}. */
 @Mapper(componentModel = "spring",
-        uses = {ClientMapper.class, PersonneInstallateurMapper.class, QualiteDemandeeMapper.class, TechnicienSpecialisteMapper.class,
+        uses = {ClientMapper.class, ApplicantMapper.class, QualiteDemandeeMapper.class, TechnicienSpecialisteMapper.class,
                 OutillageDeclareMapper.class,
                 AttestationMapper.class, RapportTechniqueMapper.class},
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

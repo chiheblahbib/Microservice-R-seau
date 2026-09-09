@@ -30,7 +30,7 @@ import picosoft.biz.arcep.domain.reseau.enumeration.*;
 import picosoft.biz.arcep.service.dto.ApplicantDTO;
 import picosoft.biz.arcep.service.dto.ClientDTO;
 import picosoft.biz.arcep.service.dto.DemandeReseauDTO;
-import picosoft.biz.arcep.service.dto.PersonneReseauDTO;
+
 import picosoft.biz.arcep.service.dto.SiteReseauDTO;
 import picosoft.biz.arcep.service.dto.TypeReseauDeclareDTO;
 import picosoft.biz.arcep.service.dto.DemandeReseauInputDTO;
@@ -223,7 +223,7 @@ public class DemandeReseauService {
         // Rubriques 1 et 3 : deux personnes distinctes, et le formulaire les
         // separe parce que l'instruction a besoin de savoir qui repond du reseau.
         exigerDemandeur(input, manques);
-        exigerPersonne(input, RolePersonne.RESPONSABLE, "le responsable du reseau", manques);
+        exigerActeur(input, Acteurs.RESPONSABLE, "le responsable du reseau", manques);
 
         if (input.getTypesReseau() == null || input.getTypesReseau().isEmpty()) {
             manques.add("au moins un type de reseau a exploiter");
@@ -282,7 +282,7 @@ public class DemandeReseauService {
      */
     private void exigerDemandeur(DemandeReseauInputDTO input, List<String> manques) {
         ClientDTO c = input.getClient();
-        ApplicantDTO a = input.getApplicant();
+        ApplicantDTO a = Acteurs.parRole(input.getApplicants(), Acteurs.REQUERANT);
 
         // L'identite du titulaire est deja exigee plus haut, et de facon plus
         // juste : `company` OU `clientName`, un particulier ayant le droit de
@@ -307,19 +307,16 @@ public class DemandeReseauService {
      * La PIECE D'IDENTITE n'est plus exigee ici : `Applicant` ne la porte pas,
      * et on ne l'a pas ajoutee. Le document reste demande comme piece jointe.
      */
-    private void exigerPersonne(DemandeReseauInputDTO input, RolePersonne role,
-                                String libelle, List<String> manques) {
-        PersonneReseauDTO p = input.getPersonnes() == null ? null
-                : input.getPersonnes().stream()
-                       .filter(x -> x != null && x.getRole() == role)
-                       .findFirst().orElse(null);
+    private void exigerActeur(DemandeReseauInputDTO input, String role,
+                              String libelle, List<String> manques) {
+        ApplicantDTO p = Acteurs.parRole(input.getApplicants(), role);
         if (p == null) {
             manques.add(libelle);
             return;
         }
-        if (estVide(p.getNom()))        { manques.add(libelle + " : le nom"); }
-        if (estVide(p.getFonction()))   { manques.add(libelle + " : la fonction"); }
-        if (estVide(p.getEmail()))      { manques.add(libelle + " : l'adresse electronique"); }
+        if (estVide(p.getApplicantName())) { manques.add(libelle + " : l'identite"); }
+        if (estVide(p.getQualification())) { manques.add(libelle + " : la fonction"); }
+        if (estVide(p.getEmail()))         { manques.add(libelle + " : l'adresse electronique"); }
     }
 
     private void exigerPiecesObligatoires(DemandeReseauInputDTO input, AclClass aclClass) {
@@ -603,11 +600,8 @@ public class DemandeReseauService {
         if (entity.getClient() != null) {
             entity.getClient().setDemandeReseau(entity);
         }
-        if (entity.getApplicant() != null) {
-            entity.getApplicant().setDemandeReseau(entity);
-        }
-        if (entity.getPersonnes() != null) {
-            entity.getPersonnes().forEach(p -> p.setDemandeReseau(entity));
+        if (entity.getApplicants() != null) {
+            entity.getApplicants().forEach(a -> a.setDemandeReseau(entity));
         }
         if (entity.getTypesReseau() != null) {
             entity.getTypesReseau().forEach(t -> t.setDemandeReseau(entity));

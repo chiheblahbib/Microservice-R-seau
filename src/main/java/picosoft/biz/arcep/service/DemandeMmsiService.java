@@ -30,7 +30,7 @@ import picosoft.biz.arcep.repository.DemandeMmsiRepository;
 import picosoft.biz.arcep.service.criteria.DemandeMmsiCriteria;
 import picosoft.biz.arcep.domain.mmsi.enumeration.*;
 import picosoft.biz.arcep.service.dto.DemandeMmsiDTO;
-import picosoft.biz.arcep.service.dto.PersonneMmsiDTO;
+import picosoft.biz.arcep.service.dto.ApplicantDTO;
 import picosoft.biz.arcep.domain.mmsi.enumeration.CategorieStation;
 import picosoft.biz.arcep.service.dto.BesoinMmsiDTO;
 import picosoft.biz.arcep.service.dto.DemandeMmsiInputDTO;
@@ -222,16 +222,18 @@ public class DemandeMmsiService {
         // Rubriques 1 et 3 : deux personnes distinctes, et le formulaire les
         // separe parce que l'instruction a besoin de savoir qui repond du reseau.
         // ----- le representant, rubrique 2
-        PersonneMmsiDTO r = input.getRepresentant();
+        //
+        // Il vit desormais sur `applicant`, la table partagee, et se reconnait a
+        // son ROLE. Le nom et les prenoms s'y fondent dans `applicantName`,
+        // comme chez ASI : les tables partagees n'ont pas de champ de prenom.
+        ApplicantDTO r = Acteurs.parRole(input.getApplicants(), Acteurs.REPRESENTANT);
         if (r == null) {
             manques.add("le representant de l'operateur");
         } else {
-            if (estVide(r.getNom()))      { manques.add("le representant : le nom"); }
-            if (estVide(r.getPrenoms()))  { manques.add("le representant : les prenoms"); }
-            if (estVide(r.getEmail()))    { manques.add("le representant : l'adresse electronique"); }
-            if (estVide(r.getAdressePermanente())) {
-                manques.add("le representant : l'adresse permanente");
-            }
+            if (estVide(r.getApplicantName())) { manques.add("le representant : l'identite"); }
+            if (estVide(r.getQualification())) { manques.add("le representant : la fonction"); }
+            if (estVide(r.getEmail()))         { manques.add("le representant : l'adresse electronique"); }
+            if (estVide(r.getAddress()))       { manques.add("le representant : l'adresse permanente"); }
         }
 
         // ----- la nature de la demande, rubrique 3
@@ -602,8 +604,8 @@ public class DemandeMmsiService {
         if (entity.getClient() != null) {
             entity.getClient().setDemandeMmsi(entity);
         }
-        if (entity.getRepresentant() != null) {
-            entity.getRepresentant().setDemandeMmsi(entity);
+        if (entity.getApplicants() != null) {
+            entity.getApplicants().forEach(a -> a.setDemandeMmsi(entity));
         }
         if (entity.getBesoins() != null) {
             entity.getBesoins().forEach(e -> e.setDemandeMmsi(entity));

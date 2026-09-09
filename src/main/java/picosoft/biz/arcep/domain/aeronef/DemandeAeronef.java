@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import picosoft.biz.arcep.configuration.audit.Auditable;
+import picosoft.biz.arcep.domain.shared.Applicant;
 import picosoft.biz.arcep.domain.shared.RapportTechnique;
 import picosoft.biz.arcep.domain.aeronef.enumeration.*;
 import picosoft.biz.arcep.client.kernel.model.acl.AclObjectIdentity;
@@ -33,10 +34,12 @@ import java.util.UUID;
  * DEUX ACTEURS
  *
  *   - l'OPERATEUR ou EXPLOITANT -> Client, table partagee avec homologation ;
- *   - son REPRESENTANT, une personne physique -> PersonneAeronef, un-a-un.
+ *   - son REPRESENTANT, une personne physique -> Applicant, table partagee,
+ *     reconnaissable a son role REPRESENTANT.
  *
  * Le formulaire n'en demande qu'un seul, a la difference du reseau qui
- * distingue requerant et responsable. La relation est donc un-a-un, et non une
+ * distingue requerant et responsable. Depuis le 09/09/2026 la relation est
+ * neanmoins une COLLECTION, comme partout : c'est le role qui distingue, et
  * collection : une collection aurait laisse croire qu'on peut en saisir
  * plusieurs, et il aurait fallu inventer un role pour les distinguer.
  *
@@ -210,11 +213,20 @@ public class DemandeAeronef extends Auditable implements Serializable {
     private Client client;
 
     /**
-     * Le representant de l'operateur, rubrique 2. Un seul, d'ou le un-a-un.
+     * TOUTES les personnes physiques du dossier, quel que soit leur role.
+     *
+     * `Applicant` est la table partagee, celle d'ASI et d'homologation. Le role
+     * -- REQUERANT, RESPONSABLE, REPRESENTANT... -- est porte par la LIGNE, non
+     * par une relation : une personne de plus dans une rubrique n'oblige alors
+     * ni a une colonne ni a une migration.
+     *
+     * Le nom et les prenoms s'y fondent dans `applicantName`, comme chez ASI :
+     * les tables partagees n'ont pas de champ de prenom, et c'est le contrat que
+     * le front suit deja pour le demandeur.
      */
-    @OneToOne(mappedBy = "demandeAeronef", fetch = FetchType.LAZY,
-              cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
-    private PersonneAeronef representant;
+    @OneToMany(mappedBy = "demandeAeronef", fetch = FetchType.LAZY,
+               cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<Applicant> applicants;
 
     /** Rubrique 5 : le tableau des equipements de bord. */
     @OneToMany(mappedBy = "demandeAeronef", fetch = FetchType.LAZY,

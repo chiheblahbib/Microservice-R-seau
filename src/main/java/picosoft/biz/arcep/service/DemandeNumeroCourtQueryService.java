@@ -16,7 +16,7 @@ import picosoft.biz.arcep.client.kernel.model.acl.*;
 import picosoft.biz.arcep.client.kernel.model.acl.repository.AclSidRepository;
 import picosoft.biz.arcep.domain.numerocourt.DemandeNumeroCourt;
 import picosoft.biz.arcep.domain.numerocourt.DemandeNumeroCourt_;
-import picosoft.biz.arcep.domain.numerocourt.PersonneNumeroCourt_;
+import picosoft.biz.arcep.domain.shared.Applicant_;
 import picosoft.biz.arcep.domain.shared.Client_;
 import picosoft.biz.arcep.repository.DemandeNumeroCourtRepository;
 import picosoft.biz.arcep.service.criteria.DemandeNumeroCourtCriteria;
@@ -194,17 +194,28 @@ public class DemandeNumeroCourtQueryService extends QueryService<DemandeNumeroCo
         // responsable, distinguees par leur role. On cherche sur leur nom.
         if (criteria.getPersonneNom() != null) {
             specification = specification.and(buildSpecification(criteria.getPersonneNom(),
-                    root -> root.join(DemandeNumeroCourt_.representant, JoinType.LEFT).get(PersonneNumeroCourt_.nom)));
+                    root -> root.join(DemandeNumeroCourt_.applicants, JoinType.LEFT).get(Applicant_.applicantName)));
+        
+            // La jointure est vers-PLUSIEURS depuis que les personnes vivent
+            // sur `applicant` : sans cela, un dossier dont deux personnes
+            // repondent au terme sortirait deux fois.
+            specification = specification.and((root, query, cb) -> {
+                query.distinct(true);
+                return null;
+            });
         }
 
         // ---- recherche libre : un seul terme, plusieurs colonnes ----
         if (criteria.getSearch() != null && criteria.getSearch().getContains() != null) {
             String terme = "%" + criteria.getSearch().getContains().toLowerCase() + "%";
-            specification = specification.and((root, query, cb) -> cb.or(
+            specification = specification.and((root, query, cb) -> {
+                query.distinct(true);   // jointures vers-plusieurs : voir plus haut
+                return cb.or(
                     cb.like(cb.lower(root.get(DemandeNumeroCourt_.reference)), terme),
                     cb.like(cb.lower(root.get(DemandeNumeroCourt_.typeDossier)), terme),
                     cb.like(cb.lower(root.join(DemandeNumeroCourt_.client, JoinType.LEFT).get(Client_.clientName)), terme),
-                    cb.like(cb.lower(root.join(DemandeNumeroCourt_.representant, JoinType.LEFT).get(PersonneNumeroCourt_.nom)), terme)));
+                    cb.like(cb.lower(root.join(DemandeNumeroCourt_.applicants, JoinType.LEFT).get(Applicant_.applicantName)), terme));
+            });
         }
 
         return specification;
@@ -296,7 +307,7 @@ public class DemandeNumeroCourtQueryService extends QueryService<DemandeNumeroCo
             if (property.startsWith("client.")) {
                 specification = specification.and((root, query, cb) -> { root.join(DemandeNumeroCourt_.client, JoinType.LEFT); return null; });
             } else if (property.startsWith("personnes.")) {
-                specification = specification.and((root, query, cb) -> { root.join(DemandeNumeroCourt_.representant, JoinType.LEFT); query.distinct(true); return null; });
+                specification = specification.and((root, query, cb) -> { root.join(DemandeNumeroCourt_.applicants, JoinType.LEFT); query.distinct(true); return null; });
             } else if (property.startsWith("sites.")) {
             }
         }

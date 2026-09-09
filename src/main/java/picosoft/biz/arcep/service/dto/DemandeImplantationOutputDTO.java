@@ -43,7 +43,7 @@ public class DemandeImplantationOutputDTO implements Serializable {
 
     private ClientDTO client;
 
-    private ApplicantDTO applicant;
+    private List<ApplicantDTO> applicants;
 
     /** LA station du dossier : une autorisation en vise une seule. */
     private StationDTO station;

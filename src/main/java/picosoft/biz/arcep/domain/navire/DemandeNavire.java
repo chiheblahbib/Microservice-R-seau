@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import picosoft.biz.arcep.configuration.audit.Auditable;
+import picosoft.biz.arcep.domain.shared.Applicant;
 import picosoft.biz.arcep.domain.shared.RapportTechnique;
 import picosoft.biz.arcep.domain.navire.enumeration.*;
 import picosoft.biz.arcep.client.kernel.model.acl.AclObjectIdentity;
@@ -46,7 +47,8 @@ import java.util.UUID;
  * DEUX ACTEURS
  *
  *   - l'OPERATEUR ou EXPLOITANT -> Client, table partagee avec homologation ;
- *   - les PERSONNES PHYSIQUES du dossier -> PersonneNavire, une collection.
+ *   - les PERSONNES PHYSIQUES du dossier -> Applicant, table partagee, une
+ *     collection ou chacune porte son role.
  *
  * Une collection et non deux relations un-a-un : le demandeur (rubrique 1) et
  * le proprietaire (rubrique 2) ont exactement les memes champs, et la seconde
@@ -304,19 +306,20 @@ public class DemandeNavire extends Auditable implements Serializable {
     private Client client;
 
     /**
-     * Les personnes physiques du dossier, rubriques 1 et 2.
+     * TOUTES les personnes physiques du dossier, quel que soit leur role.
      *
-     * Une collection et non deux relations un-a-un : le formulaire demande le
-     * DEMANDEUR (rubrique 1) et, seulement s'il n'est pas le proprietaire, le
-     * PROPRIETAIRE du navire (rubrique 2). Les deux ont exactement les memes
-     * champs. Deux relations distinctes auraient duplique la table ; une
-     * collection portant un `role` -- DEMANDEUR ou PROPRIETAIRE -- dit la
-     * meme chose sans la duplication, et laisse la rubrique 2 vide quand elle
-     * n'a pas lieu d'etre.
+     * `Applicant` est la table partagee, celle d'ASI et d'homologation. Le role
+     * -- REQUERANT, RESPONSABLE, REPRESENTANT... -- est porte par la LIGNE, non
+     * par une relation : une personne de plus dans une rubrique n'oblige alors
+     * ni a une colonne ni a une migration.
+     *
+     * Le nom et les prenoms s'y fondent dans `applicantName`, comme chez ASI :
+     * les tables partagees n'ont pas de champ de prenom, et c'est le contrat que
+     * le front suit deja pour le demandeur.
      */
     @OneToMany(mappedBy = "demandeNavire", fetch = FetchType.LAZY,
                cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
-    private List<PersonneNavire> personnes;
+    private List<Applicant> applicants;
 
     /**
      * Rubrique 4 : les autorisations deja obtenues, une par ligne.

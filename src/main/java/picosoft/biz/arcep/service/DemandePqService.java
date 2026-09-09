@@ -30,7 +30,7 @@ import picosoft.biz.arcep.repository.DemandePqRepository;
 import picosoft.biz.arcep.service.criteria.DemandePqCriteria;
 import picosoft.biz.arcep.domain.pq.enumeration.*;
 import picosoft.biz.arcep.service.dto.DemandePqDTO;
-import picosoft.biz.arcep.service.dto.PersonnePqDTO;
+import picosoft.biz.arcep.service.dto.ApplicantDTO;
 import picosoft.biz.arcep.domain.pq.enumeration.TypeOperationPq;
 import picosoft.biz.arcep.service.dto.BlocNumerosDTO;
 import picosoft.biz.arcep.service.dto.DemandePqInputDTO;
@@ -222,16 +222,18 @@ public class DemandePqService {
         // Rubriques 1 et 3 : deux personnes distinctes, et le formulaire les
         // separe parce que l'instruction a besoin de savoir qui repond du reseau.
         // ----- le representant, rubrique 2
-        PersonnePqDTO r = input.getRepresentant();
+        //
+        // Il vit desormais sur `applicant`, la table partagee, et se reconnait a
+        // son ROLE. Le nom et les prenoms s'y fondent dans `applicantName`,
+        // comme chez ASI : les tables partagees n'ont pas de champ de prenom.
+        ApplicantDTO r = Acteurs.parRole(input.getApplicants(), Acteurs.REPRESENTANT);
         if (r == null) {
             manques.add("le representant de l'operateur");
         } else {
-            if (estVide(r.getNom()))      { manques.add("le representant : le nom"); }
-            if (estVide(r.getPrenoms()))  { manques.add("le representant : les prenoms"); }
-            if (estVide(r.getEmail()))    { manques.add("le representant : l'adresse electronique"); }
-            if (estVide(r.getAdressePermanente())) {
-                manques.add("le representant : l'adresse permanente");
-            }
+            if (estVide(r.getApplicantName())) { manques.add("le representant : l'identite"); }
+            if (estVide(r.getQualification())) { manques.add("le representant : la fonction"); }
+            if (estVide(r.getEmail()))         { manques.add("le representant : l'adresse electronique"); }
+            if (estVide(r.getAddress()))       { manques.add("le representant : l'adresse permanente"); }
         }
 
         // ----- la nature de la demande, rubrique 3
@@ -582,8 +584,8 @@ public class DemandePqService {
         if (entity.getClient() != null) {
             entity.getClient().setDemandePq(entity);
         }
-        if (entity.getRepresentant() != null) {
-            entity.getRepresentant().setDemandePq(entity);
+        if (entity.getApplicants() != null) {
+            entity.getApplicants().forEach(a -> a.setDemandePq(entity));
         }
         if (entity.getBlocs() != null) {
             entity.getBlocs().forEach(e -> e.setDemandePq(entity));

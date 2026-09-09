@@ -30,7 +30,7 @@ import picosoft.biz.arcep.repository.DemandeInstallateurRepository;
 import picosoft.biz.arcep.service.criteria.DemandeInstallateurCriteria;
 import picosoft.biz.arcep.domain.installateur.enumeration.*;
 import picosoft.biz.arcep.service.dto.DemandeInstallateurDTO;
-import picosoft.biz.arcep.service.dto.PersonneInstallateurDTO;
+import picosoft.biz.arcep.service.dto.ApplicantDTO;
 import picosoft.biz.arcep.domain.installateur.enumeration.EtendueActivite;
 import picosoft.biz.arcep.domain.installateur.enumeration.TypeAutorisation;
 import picosoft.biz.arcep.service.dto.TechnicienSpecialisteDTO;
@@ -227,17 +227,18 @@ public class DemandeInstallateurService {
         // Le REQUERANT n'est pas exige : le formulaire porte « remplir cette
         // partie si l'identite du requerant differe de celle du
         // representant ». Le reclamer refuserait le cas le plus courant.
-        PersonneInstallateurDTO r = (input.getPersonnes() == null) ? null
-                : input.getPersonnes().stream()
-                       .filter(p -> p != null && "REPRESENTANT".equals(p.getRole()))
-                       .findFirst().orElse(null);
+        //
+        // Les personnes vivent desormais sur `applicant`, la table partagee, et
+        // se reconnaissent a leur ROLE. Le nom et les prenoms s'y fondent dans
+        // `applicantName`, comme chez ASI.
+        ApplicantDTO r = Acteurs.parRole(input.getApplicants(), Acteurs.REPRESENTANT);
         if (r == null) {
             manques.add("le representant legal de l'entreprise");
         } else {
-            if (estVide(r.getNom()))      { manques.add("le representant : le nom"); }
-            if (estVide(r.getPrenoms()))  { manques.add("le representant : les prenoms"); }
-            if (estVide(r.getEmail()))    { manques.add("le representant : l'adresse electronique"); }
-            if (estVide(r.getAdressePermanente())) {
+            if (estVide(r.getApplicantName())) { manques.add("le representant : l'identite"); }
+            if (estVide(r.getQualification())) { manques.add("le representant : la fonction"); }
+            if (estVide(r.getEmail()))         { manques.add("le representant : l'adresse electronique"); }
+            if (estVide(r.getAddress())) {
                 manques.add("le representant : l'adresse permanente");
             }
         }
@@ -268,11 +269,7 @@ public class DemandeInstallateurService {
         //
         // C'est lui qui repond techniquement de l'activite autorisee : un
         // dossier qui ne le nomme pas ne dit pas qui en repond.
-        boolean responsable = input.getPersonnes() != null
-                && input.getPersonnes().stream()
-                        .anyMatch(p -> p != null && "RESPONSABLE".equals(p.getRole())
-                                && !estVide(p.getNom()));
-        if (!responsable) {
+        if (!Acteurs.nomme(input.getApplicants(), Acteurs.RESPONSABLE)) {
             manques.add("le responsable de l'activite sollicitee (rubrique 4)");
         }
 
@@ -662,8 +659,8 @@ public class DemandeInstallateurService {
         if (entity.getClient() != null) {
             entity.getClient().setDemandeInstallateur(entity);
         }
-        if (entity.getPersonnes() != null) {
-            entity.getPersonnes().forEach(p -> p.setDemandeInstallateur(entity));
+        if (entity.getApplicants() != null) {
+            entity.getApplicants().forEach(a -> a.setDemandeInstallateur(entity));
         }
         if (entity.getTechniciens() != null) {
             entity.getTechniciens().forEach(t -> t.setDemandeInstallateur(entity));

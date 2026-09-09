@@ -12,7 +12,7 @@ import picosoft.biz.arcep.service.dto.DemandeMmsiInputDTO;
 
 /** Mapper de {@link DemandeMmsi} et de son DTO {@link DemandeMmsiInputDTO}. */
 @Mapper(componentModel = "spring",
-        uses = {ClientMapper.class, PersonneMmsiMapper.class, BesoinMmsiMapper.class,
+        uses = {ClientMapper.class, ApplicantMapper.class, BesoinMmsiMapper.class,
                 RapportTechniqueMapper.class},
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public abstract class DemandeMmsiInputMapper implements EntityMapper<DemandeMmsiInputDTO, DemandeMmsi> {

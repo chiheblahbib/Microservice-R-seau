@@ -85,9 +85,8 @@ public class DemandeUssdInputDTO implements Serializable {
     @Valid
     private ClientDTO client;
 
-    /** Rubrique 2 : le representant, un seul par dossier. */
     @Valid
-    private PersonneUssdDTO representant;
+    private List<ApplicantDTO> applicants;
 
     /** Rubrique 5 : les equipements de bord. */
     @Valid

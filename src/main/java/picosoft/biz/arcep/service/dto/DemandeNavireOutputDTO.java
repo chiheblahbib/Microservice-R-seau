@@ -118,9 +118,8 @@ public class DemandeNavireOutputDTO implements Serializable {
     @Valid
     private ClientDTO client;
 
-    /** Rubriques 1 et 2 : le demandeur, et le proprietaire s'il differe. */
     @Valid
-    private List<PersonneNavireDTO> personnes;
+    private List<ApplicantDTO> applicants;
 
     /** Rubrique 4 : les autorisations deja obtenues, une par ligne. */
     @Valid

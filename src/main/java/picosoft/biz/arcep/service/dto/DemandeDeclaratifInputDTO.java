@@ -104,9 +104,8 @@ public class DemandeDeclaratifInputDTO implements Serializable {
     @Valid
     private ClientDTO client;
 
-    /** Rubrique 2 : le representant, un seul par dossier. */
     @Valid
-    private List<PersonneDeclaratifDTO> personnes;
+    private List<ApplicantDTO> applicants;
 
     /** Rubrique 5 : les equipements de bord. */
     @Valid

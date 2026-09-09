@@ -40,7 +40,6 @@ public abstract class DemandeImplantationMapper implements EntityMapper<DemandeI
      * par la cle etrangere de l'enfant. On les fusionne ici, en place.
      */
     @Mapping(target = "client", ignore = true)
-    @Mapping(target = "applicant", ignore = true)
     @Mapping(target = "station", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     public abstract void partialUpdate(@MappingTarget DemandeImplantation entity, DemandeImplantationDTO dto);
@@ -52,13 +51,6 @@ public abstract class DemandeImplantationMapper implements EntityMapper<DemandeI
                 entity.setClient(clientMapper.toEntity(dto.getClient()));
             } else {
                 clientMapper.partialUpdate(entity.getClient(), dto.getClient());
-            }
-        }
-        if (dto.getApplicant() != null) {
-            if (entity.getApplicant() == null) {
-                entity.setApplicant(applicantMapper.toEntity(dto.getApplicant()));
-            } else {
-                applicantMapper.partialUpdate(entity.getApplicant(), dto.getApplicant());
             }
         }
         if (dto.getStation() != null) {

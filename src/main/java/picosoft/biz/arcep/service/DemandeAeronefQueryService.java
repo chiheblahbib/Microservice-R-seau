@@ -16,7 +16,7 @@ import picosoft.biz.arcep.client.kernel.model.acl.*;
 import picosoft.biz.arcep.client.kernel.model.acl.repository.AclSidRepository;
 import picosoft.biz.arcep.domain.aeronef.DemandeAeronef;
 import picosoft.biz.arcep.domain.aeronef.DemandeAeronef_;
-import picosoft.biz.arcep.domain.aeronef.PersonneAeronef_;
+import picosoft.biz.arcep.domain.shared.Applicant_;
 import picosoft.biz.arcep.domain.shared.Client_;
 import picosoft.biz.arcep.repository.DemandeAeronefRepository;
 import picosoft.biz.arcep.service.criteria.DemandeAeronefCriteria;
@@ -194,17 +194,28 @@ public class DemandeAeronefQueryService extends QueryService<DemandeAeronef> {
         // responsable, distinguees par leur role. On cherche sur leur nom.
         if (criteria.getPersonneNom() != null) {
             specification = specification.and(buildSpecification(criteria.getPersonneNom(),
-                    root -> root.join(DemandeAeronef_.representant, JoinType.LEFT).get(PersonneAeronef_.nom)));
+                    root -> root.join(DemandeAeronef_.applicants, JoinType.LEFT).get(Applicant_.applicantName)));
+        
+            // La jointure est vers-PLUSIEURS depuis que les personnes vivent
+            // sur `applicant` : sans cela, un dossier dont deux personnes
+            // repondent au terme sortirait deux fois.
+            specification = specification.and((root, query, cb) -> {
+                query.distinct(true);
+                return null;
+            });
         }
 
         // ---- recherche libre : un seul terme, plusieurs colonnes ----
         if (criteria.getSearch() != null && criteria.getSearch().getContains() != null) {
             String terme = "%" + criteria.getSearch().getContains().toLowerCase() + "%";
-            specification = specification.and((root, query, cb) -> cb.or(
+            specification = specification.and((root, query, cb) -> {
+                query.distinct(true);   // jointures vers-plusieurs : voir plus haut
+                return cb.or(
                     cb.like(cb.lower(root.get(DemandeAeronef_.reference)), terme),
                     cb.like(cb.lower(root.get(DemandeAeronef_.typeDossier)), terme),
                     cb.like(cb.lower(root.join(DemandeAeronef_.client, JoinType.LEFT).get(Client_.clientName)), terme),
-                    cb.like(cb.lower(root.join(DemandeAeronef_.representant, JoinType.LEFT).get(PersonneAeronef_.nom)), terme)));
+                    cb.like(cb.lower(root.join(DemandeAeronef_.applicants, JoinType.LEFT).get(Applicant_.applicantName)), terme));
+            });
         }
 
         return specification;
@@ -296,7 +307,7 @@ public class DemandeAeronefQueryService extends QueryService<DemandeAeronef> {
             if (property.startsWith("client.")) {
                 specification = specification.and((root, query, cb) -> { root.join(DemandeAeronef_.client, JoinType.LEFT); return null; });
             } else if (property.startsWith("personnes.")) {
-                specification = specification.and((root, query, cb) -> { root.join(DemandeAeronef_.representant, JoinType.LEFT); query.distinct(true); return null; });
+                specification = specification.and((root, query, cb) -> { root.join(DemandeAeronef_.applicants, JoinType.LEFT); query.distinct(true); return null; });
             } else if (property.startsWith("sites.")) {
             }
         }

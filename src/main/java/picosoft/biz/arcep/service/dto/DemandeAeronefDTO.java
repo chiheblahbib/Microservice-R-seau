@@ -101,9 +101,8 @@ public class DemandeAeronefDTO implements Serializable {
     @Valid
     private ClientDTO client;
 
-    /** Rubrique 2 : le representant, un seul par dossier. */
     @Valid
-    private PersonneAeronefDTO representant;
+    private List<ApplicantDTO> applicants;
 
     /** Rubrique 5 : les equipements de bord. */
     @Valid

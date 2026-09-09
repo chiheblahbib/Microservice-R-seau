@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import picosoft.biz.arcep.configuration.audit.Auditable;
+import picosoft.biz.arcep.domain.shared.Applicant;
 import picosoft.biz.arcep.domain.shared.RapportTechnique;
 import picosoft.biz.arcep.domain.installateur.enumeration.*;
 import picosoft.biz.arcep.client.kernel.model.acl.AclObjectIdentity;
@@ -252,17 +253,20 @@ public class DemandeInstallateur extends Auditable implements Serializable {
     private Client client;
 
     /**
-     * Les personnes du dossier : le REPRESENTANT legal, le REQUERANT s'il en
-     * differe, et le RESPONSABLE de l'activite sollicitee (rubrique 4).
+     * TOUTES les personnes physiques du dossier, quel que soit leur role.
      *
-     * Trois roles possibles, deux facultatifs -- le formulaire porte
-     * explicitement « remplir cette partie si l'identite du requerant differe
-     * de celle du representant ». Une collection portant un role, comme le
-     * navire et le declaratif.
+     * `Applicant` est la table partagee, celle d'ASI et d'homologation. Le role
+     * -- REQUERANT, RESPONSABLE, REPRESENTANT... -- est porte par la LIGNE, non
+     * par une relation : une personne de plus dans une rubrique n'oblige alors
+     * ni a une colonne ni a une migration.
+     *
+     * Le nom et les prenoms s'y fondent dans `applicantName`, comme chez ASI :
+     * les tables partagees n'ont pas de champ de prenom, et c'est le contrat que
+     * le front suit deja pour le demandeur.
      */
     @OneToMany(mappedBy = "demandeInstallateur", fetch = FetchType.LAZY,
                cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
-    private List<PersonneInstallateur> personnes;
+    private List<Applicant> applicants;
 
     /** Rubrique 1 : les qualites demandees, cumulables. */
     @OneToMany(mappedBy = "demandeInstallateur", fetch = FetchType.LAZY,

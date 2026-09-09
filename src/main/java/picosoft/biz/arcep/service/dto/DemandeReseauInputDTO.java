@@ -67,12 +67,8 @@ public class DemandeReseauInputDTO implements Serializable {
     @Valid
     private ClientDTO client;
 
-    /** Le requerant, rubrique 1 -- porte par la table partagee, comme ASI. */
     @Valid
-    private ApplicantDTO applicant;
-
-    @Valid
-    private List<PersonneReseauDTO> personnes;
+    private List<ApplicantDTO> applicants;
 
     @Valid
     private List<TypeReseauDeclareDTO> typesReseau;

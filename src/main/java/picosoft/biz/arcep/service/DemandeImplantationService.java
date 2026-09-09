@@ -189,7 +189,7 @@ public class DemandeImplantationService {
         if (input.getClient() == null || estVide(input.getClient().getCompany())) {
             manques.add("la raison sociale de l'operateur");
         }
-        if (input.getApplicant() == null || estVide(input.getApplicant().getApplicantName())) {
+        if (!Acteurs.nomme(input.getApplicants(), Acteurs.REQUERANT)) {
             manques.add("le nom du demandeur");
         }
 
@@ -477,8 +477,8 @@ public class DemandeImplantationService {
         if (entity.getClient() != null) {
             entity.getClient().setDemandeImplantation(entity);
         }
-        if (entity.getApplicant() != null) {
-            entity.getApplicant().setDemandeImplantation(entity);
+        if (entity.getApplicants() != null) {
+            entity.getApplicants().forEach(a -> a.setDemandeImplantation(entity));
         }
         Station station = entity.getStation();
         if (station != null) {

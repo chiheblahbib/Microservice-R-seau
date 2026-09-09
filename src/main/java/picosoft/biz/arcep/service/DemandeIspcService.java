@@ -30,7 +30,7 @@ import picosoft.biz.arcep.repository.DemandeIspcRepository;
 import picosoft.biz.arcep.service.criteria.DemandeIspcCriteria;
 import picosoft.biz.arcep.domain.ispc.enumeration.*;
 import picosoft.biz.arcep.service.dto.DemandeIspcDTO;
-import picosoft.biz.arcep.service.dto.PersonneIspcDTO;
+import picosoft.biz.arcep.service.dto.ApplicantDTO;
 import picosoft.biz.arcep.domain.ispc.enumeration.FonctionSemaphore;
 import picosoft.biz.arcep.service.dto.FonctionPointSemaphoreDTO;
 import picosoft.biz.arcep.service.dto.DemandeIspcInputDTO;
@@ -222,16 +222,18 @@ public class DemandeIspcService {
         // Rubriques 1 et 3 : deux personnes distinctes, et le formulaire les
         // separe parce que l'instruction a besoin de savoir qui repond du reseau.
         // ----- le representant, rubrique 2
-        PersonneIspcDTO r = input.getContact();
+        //
+        // Il vit desormais sur `applicant`, la table partagee, et se reconnait a
+        // son ROLE. Le nom et les prenoms s'y fondent dans `applicantName`,
+        // comme chez ASI : les tables partagees n'ont pas de champ de prenom.
+        ApplicantDTO r = Acteurs.parRole(input.getApplicants(), Acteurs.CONTACT);
         if (r == null) {
             manques.add("la personne a contacter");
         } else {
-            if (estVide(r.getNom()))      { manques.add("la personne a contacter : le nom"); }
-            if (estVide(r.getPrenoms()))  { manques.add("la personne a contacter : les prenoms"); }
-            if (estVide(r.getEmail()))    { manques.add("la personne a contacter : l'adresse electronique"); }
-            if (estVide(r.getAdressePermanente())) {
-                manques.add("la personne a contacter : l'adresse permanente");
-            }
+            if (estVide(r.getApplicantName())) { manques.add("le contact : l'identite"); }
+            if (estVide(r.getQualification())) { manques.add("le contact : la fonction"); }
+            if (estVide(r.getEmail()))         { manques.add("le contact : l'adresse electronique"); }
+            if (estVide(r.getAddress()))       { manques.add("le contact : l'adresse permanente"); }
         }
 
         // ----- la nature de la demande, rubrique 3
@@ -598,8 +600,8 @@ public class DemandeIspcService {
         if (entity.getClient() != null) {
             entity.getClient().setDemandeIspc(entity);
         }
-        if (entity.getContact() != null) {
-            entity.getContact().setDemandeIspc(entity);
+        if (entity.getApplicants() != null) {
+            entity.getApplicants().forEach(a -> a.setDemandeIspc(entity));
         }
         if (entity.getFonctions() != null) {
             entity.getFonctions().forEach(fn -> fn.setDemandeIspc(entity));

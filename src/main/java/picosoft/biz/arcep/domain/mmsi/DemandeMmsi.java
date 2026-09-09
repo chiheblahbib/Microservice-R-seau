@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import picosoft.biz.arcep.configuration.audit.Auditable;
+import picosoft.biz.arcep.domain.shared.Applicant;
 import picosoft.biz.arcep.domain.shared.RapportTechnique;
 import picosoft.biz.arcep.domain.mmsi.enumeration.*;
 import picosoft.biz.arcep.client.kernel.model.acl.AclObjectIdentity;
@@ -176,11 +177,20 @@ public class DemandeMmsi extends Auditable implements Serializable {
     private Client client;
 
     /**
-     * Le representant de l'operateur, rubrique 2. Un seul, d'ou le un-a-un.
+     * TOUTES les personnes physiques du dossier, quel que soit leur role.
+     *
+     * `Applicant` est la table partagee, celle d'ASI et d'homologation. Le role
+     * -- REQUERANT, RESPONSABLE, REPRESENTANT... -- est porte par la LIGNE, non
+     * par une relation : une personne de plus dans une rubrique n'oblige alors
+     * ni a une colonne ni a une migration.
+     *
+     * Le nom et les prenoms s'y fondent dans `applicantName`, comme chez ASI :
+     * les tables partagees n'ont pas de champ de prenom, et c'est le contrat que
+     * le front suit deja pour le demandeur.
      */
-    @OneToOne(mappedBy = "demandeMmsi", fetch = FetchType.LAZY,
-              cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
-    private PersonneMmsi representant;
+    @OneToMany(mappedBy = "demandeMmsi", fetch = FetchType.LAZY,
+               cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<Applicant> applicants;
 
     /** Rubrique 3 : les cases cochees, dans le bloc de la categorie. */
     @OneToMany(mappedBy = "demandeMmsi", fetch = FetchType.LAZY,

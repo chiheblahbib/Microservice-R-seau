@@ -61,6 +61,35 @@ la **station** — onze clés vers un dossier, une douzième vers la station.
 > nulles de plus. `ddl-auto=update` ajoute, il n'enlève jamais, et le service
 > homologation ne lit aucune de ces colonnes.
 
+**Toute personne est un `Client` ou un `Applicant`.** Les onze tables
+`personne_<x>` ont disparu — quarante-quatre fichiers avec elles.
+
+L'objection qui les avait fait naître était que `client` et `applicant`
+décrivent une STRUCTURE — raison sociale, registre de commerce — quand l'imprimé
+demande une personne, et que ni l'une ni l'autre ne porte de champ de **prénom**.
+La réponse est celle d'ASI, qui n'en porte pas davantage : le nom et les prénoms
+se fondent dans `applicantName`. Le reste se retrouve champ pour champ.
+
+| `personne_<x>` | `applicant` |
+|---|---|
+| `nom` + `prenoms` | `applicantName` |
+| `fonction` | `qualification` |
+| `adressePermanente` | `address` |
+| `telephone` | `phone` |
+| `nationalite`, `nationaliteComplet`, `email` | à l'identique |
+
+La forme : **une seule colonne `demande_<x>_id`, en plusieurs-à-un**, plus un
+`role` porté par la ligne — REQUERANT, RESPONSABLE, REPRESENTANT, DECLARATION,
+PAIEMENT, DEMANDEUR, CONTACT. Chaque imprimé garde SES libellés : deux imprimés
+n'appellent pas la même chose du même nom. [`Acteurs`](src/main/java/picosoft/biz/arcep/service/Acteurs.java)
+les retrouve.
+
+> Deux conséquences à connaître. Le prénom n'est plus exigé séparément à la
+> soumission — un seul contrôle d'identité le remplace. Et la jointure vers la
+> personne est devenue **vers-plusieurs** : `query.distinct(true)` est posé sur
+> les deux recherches, sans quoi un dossier dont deux personnes répondent au
+> terme sortirait deux fois, et le compte total avec.
+
 **Un seul `KernelService`**, assemblé depuis les douze : 42 rôles, 15 séquences,
 14 classes ACL. Les noms de rôles sont repris **mot pour mot** — `aeronef_can_read_aeronef`
 reste tel quel, renommer aurait invalidé des habilitations déjà posées en base.
@@ -529,9 +558,10 @@ n'y ajoute rien. Le document reste exigé comme pièce jointe.
    tables des douze formulaires, et **ajoutera** aux trois tables partagées du
    schéma `homologation` les colonnes de clés étrangères décrites plus haut.
    C'est une écriture réelle : à déclencher sciemment.
-3. **Les personnes ne sont pas encore toutes sur `client` et `applicant`.** Dix
-   formulaires gardent une table `personne_<x>` propre. Elle doit disparaître au
-   profit des deux tables partagées, avec un rôle porté par la ligne.
+3. **Les écrans n'ont pas suivi le passage des personnes sur `applicant`.**
+   Le back n'envoie plus `personnes` ni `representant` mais `applicants`, chaque
+   ligne portant son `role` ; les formulaires Angular parlent encore l'ancien
+   contrat.
 4. **`reseau-back` reste sur le disque** et doit être supprimé. Il était tenu par
    l'IDE au moment de la fusion, d'où une copie plutôt qu'un renommage.
 5. **Les onze dépôts d'origine** ne sont plus la source de vérité. Ils gardent

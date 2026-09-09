@@ -119,9 +119,8 @@ public class DemandeIspcDTO implements Serializable {
     @Valid
     private ClientDTO client;
 
-    /** Rubrique 5 : la personne a contacter, une seule par dossier. */
     @Valid
-    private PersonneIspcDTO contact;
+    private List<ApplicantDTO> applicants;
 
     /** Rubrique 5 : les equipements de bord. */
     @Valid

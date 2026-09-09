@@ -35,10 +35,13 @@ import java.util.UUID;
  *   - le REQUERANT, personne physique qui depose ;
  *   - le RESPONSABLE du reseau, personne physique qui en repond.
  *
- * Les deux personnes vivent dans PersonneReseau et non dans la table partagee
- * `applicant` : le formulaire exige d'elles une piece d'identite -- type et
- * numero -- que cette table ne porte pas, et l'y ajouter modifierait une
- * structure qu'homologation partage.
+ * Les deux vivent desormais dans `applicant`, la table partagee, et se
+ * distinguent par leur ROLE -- REQUERANT, RESPONSABLE.
+ *
+ * Elles y ont longtemps echappe pour une raison qui ne tient plus : le
+ * formulaire exige d'elles une PIECE D'IDENTITE, type et numero, que la table
+ * partagee ne porte pas. On ne l'y a pas ajoutee -- le document reste demande
+ * comme piece jointe, mais son type et son numero ne sont plus saisis.
  */
 @Getter
 @Setter
@@ -154,33 +157,20 @@ public class DemandeReseau extends Auditable implements Serializable {
     private Client client;
 
     /**
-     * Le REQUERANT, rubrique 1 -- la personne qui demande.
+     * TOUTES les personnes physiques du dossier, quel que soit leur role.
      *
-     * Porte par `Applicant`, la table partagee, comme le fait ASI pour son
-     * demandeur et l'implantation pour le sien. La rubrique 1 du formulaire
-     * et celle d'ASI demandent la meme chose : qui demande, en quelle
-     * qualite, et comment le joindre.
+     * `Applicant` est la table partagee, celle d'ASI et d'homologation. Le role
+     * -- REQUERANT, RESPONSABLE, REPRESENTANT... -- est porte par la LIGNE, non
+     * par une relation : une personne de plus dans une rubrique n'oblige alors
+     * ni a une colonne ni a une migration.
      *
-     * Le formulaire demande en plus la NATURE ET LE NUMERO DE SA PIECE
-     * D'IDENTITE. `Applicant` ne les porte pas, et on n'ajoute rien aux
-     * tables partagees : le document reste exige comme PIECE JOINTE -- il
-     * figure a la liste des pieces du dossier -- mais son type et son numero
-     * ne sont plus saisis.
-     */
-    @OneToOne(mappedBy = "demandeReseau", fetch = FetchType.LAZY,
-              cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
-    private Applicant applicant;
-
-    /**
-     * Le RESPONSABLE DU RESEAU, rubrique 3.
-     *
-     * Reste une `PersonneReseau` : ce n'est pas le demandeur mais un tiers,
-     * qui repond techniquement du reseau. La collection garde son role pour
-     * que la rubrique 1, desormais portee par `Applicant`, n'y figure plus.
+     * Le nom et les prenoms s'y fondent dans `applicantName`, comme chez ASI :
+     * les tables partagees n'ont pas de champ de prenom, et c'est le contrat que
+     * le front suit deja pour le demandeur.
      */
     @OneToMany(mappedBy = "demandeReseau", fetch = FetchType.LAZY,
                cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
-    private List<PersonneReseau> personnes;
+    private List<Applicant> applicants;
 
     @OneToMany(mappedBy = "demandeReseau", fetch = FetchType.LAZY,
                cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)

@@ -10,6 +10,7 @@ import lombok.Setter;
 import picosoft.biz.arcep.domain.implantation.enumeration.*;
 
 import java.io.Serializable;
+import java.util.List;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
@@ -61,7 +62,7 @@ public class DemandeImplantationDTO implements Serializable {
     private ClientDTO client;
 
     @Valid
-    private ApplicantDTO applicant;
+    private List<ApplicantDTO> applicants;
 
     @Valid
     /** LA station du dossier : une autorisation en vise une seule. */

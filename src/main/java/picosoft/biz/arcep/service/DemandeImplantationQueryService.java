@@ -191,17 +191,27 @@ public class DemandeImplantationQueryService extends QueryService<DemandeImplant
         }
         if (criteria.getApplicantName() != null) {
             specification = specification.and(buildSpecification(criteria.getApplicantName(),
-                    root -> root.join(DemandeImplantation_.applicant, JoinType.LEFT).get(Applicant_.applicantName)));
+                    root -> root.join(DemandeImplantation_.applicants, JoinType.LEFT).get(Applicant_.applicantName)));
+            // La jointure est vers-PLUSIEURS depuis que les personnes vivent sur
+            // `applicant` : sans cela, un dossier dont deux personnes repondent
+            // au terme sortirait deux fois.
+            specification = specification.and((root, query, cb) -> {
+                query.distinct(true);
+                return null;
+            });
         }
 
         // ---- recherche libre : un seul terme, plusieurs colonnes ----
         if (criteria.getSearch() != null && criteria.getSearch().getContains() != null) {
             String terme = "%" + criteria.getSearch().getContains().toLowerCase() + "%";
-            specification = specification.and((root, query, cb) -> cb.or(
+            specification = specification.and((root, query, cb) -> {
+                query.distinct(true);   // jointures vers-plusieurs : voir plus haut
+                return cb.or(
                     cb.like(cb.lower(root.get(DemandeImplantation_.reference)), terme),
                     cb.like(cb.lower(root.get(DemandeImplantation_.typeDossier)), terme),
                     cb.like(cb.lower(root.join(DemandeImplantation_.client, JoinType.LEFT).get(Client_.clientName)), terme),
-                    cb.like(cb.lower(root.join(DemandeImplantation_.applicant, JoinType.LEFT).get(Applicant_.applicantName)), terme)));
+                    cb.like(cb.lower(root.join(DemandeImplantation_.applicants, JoinType.LEFT).get(Applicant_.applicantName)), terme));
+            });
         }
 
         return specification;
@@ -245,7 +255,7 @@ public class DemandeImplantationQueryService extends QueryService<DemandeImplant
             if (property.startsWith("client.")) {
                 specification = specification.and((root, query, cb) -> { root.join(DemandeImplantation_.client, JoinType.LEFT); return null; });
             } else if (property.startsWith("applicant.")) {
-                specification = specification.and((root, query, cb) -> { root.join(DemandeImplantation_.applicant, JoinType.LEFT); return null; });
+                specification = specification.and((root, query, cb) -> { root.join(DemandeImplantation_.applicants, JoinType.LEFT); query.distinct(true); return null; });
             } else if (property.startsWith("station.")) {
                 // Jointure a valeur unique : pas de distinct, il n'y a pas de
                 // doublon possible a eliminer.
