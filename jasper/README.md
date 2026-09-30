@@ -33,6 +33,9 @@ Pour chaque modèle :
   comme l'ASI. Une image absente laisse sa place vide sans faire échouer le rapport.
 - `AutorisationReseauPrive` n'a besoin d'aucune ressource : son logo et son filigrane sont intégrés.
 
+Sur ARCEP-DEV, les trois premiers modèles sont déclarés sous les id 33, 34 et 35. Leur code
+est celui de ce dossier, recopié le 30/09/2026.
+
 ## Données attendues
 
 La racine du JSON est le dossier : `DemandeReseauOutputDTO`, tel que le moteur le pose dans la
@@ -141,16 +144,17 @@ redéployée en v24.
 - **Décharge, à la Numérotation, comme l'ASI :**
   - fait (v25 du 30/09/2026) : `Flow_accepter` (« Accepter ») appelle
     `${createEvent._execute(execution,'DechargeReseau')}`, comme l'ASI appelle `Decharge` ;
-  - reste à déclarer au kernel l'événement `DechargeReseau`, sur le modèle de l'événement ASI
-    `Decharge` (id 43) :
+  - fait (30/09/2026) : l'événement `DechargeReseau` est déclaré au kernel ARCEP-DEV (id 52), sur
+    le modèle de l'événement ASI `Decharge` (id 43) :
     - alias et nom : `DechargeReseau` ;
     - classe : `DemandeReseau` (`picosoft.biz.arcep.domain.reseau.DemandeReseau`) ;
-    - modèle de rapport : `DechargeReseau` (id 33).
+    - modèle de rapport : `DechargeReseau` (id 33), valable depuis le 30/09/2026 ;
+    - ni courriel ni notification, comme l'ASI.
 
-    Tant qu'il n'existe pas, l'appel est seulement journalisé et le circuit continue ;
+    Sur un kernel où il n'existe pas, l'appel est seulement journalisé et le circuit continue ;
   - optionnellement, déclarer `sendDechargeReseau` pour l'envoi par courriel, comme
     `sendDechargeAsi` ;
-  - ajouter le bouton « Visualiser décharge » au front, qui lit `jrxml-events`.
+  - fait : le bouton « Visualiser décharge » du front lit `jrxml-events`.
 - **Rapport technique, pendant l'Étude Technique, comme l'ASI :**
   - le front génère le PDF avec `jrxmlTemplateTest?templateName=RapportTechniqueReseau` ;
   - il le dépose en pièce jointe. Faute d'entité `RapportTechnique` pour le réseau, la pièce va
