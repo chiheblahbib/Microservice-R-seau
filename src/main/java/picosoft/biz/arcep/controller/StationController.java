@@ -95,6 +95,7 @@ public class StationController {
         return stationService.byId(id);
     }
 
+    @PreAuthorize("hasAuthority(@kernelService.station_role_canEditStation())")
     @DeleteMapping("/stations/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         stationService.delete(id);

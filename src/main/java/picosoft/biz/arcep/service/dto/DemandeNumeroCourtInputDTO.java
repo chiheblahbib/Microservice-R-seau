@@ -1,7 +1,5 @@
 package picosoft.biz.arcep.service.dto;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +26,6 @@ public class DemandeNumeroCourtInputDTO implements Serializable {
 
     private Boolean web;
 
-    @Size(max = 25)
     private String reference;
 
     private ZonedDateTime createdDate;
@@ -36,7 +33,6 @@ public class DemandeNumeroCourtInputDTO implements Serializable {
 
     private String approvedBy;
 
-    @Size(max = 32)
     private String statutDossier;
 
     /**
@@ -44,7 +40,6 @@ public class DemandeNumeroCourtInputDTO implements Serializable {
      * L'omettre enverrait tous les dossiers sur la branche par defaut, sans
      * erreur ni message.
      */
-    @Size(max = 50)
     private String typeDossier;
 
     private NatureDemande natureDemande;
@@ -52,13 +47,11 @@ public class DemandeNumeroCourtInputDTO implements Serializable {
     // ---------------- rubrique 3
     private NatureActivite natureActivite;
 
-    @Size(max = 255)
     private String natureActivitePrecision;
 
     private PorteeReseau porteeReseau;
 
     /** Texte libre : duree, echeance ou dates, le formulaire ne tranche pas. */
-    @Size(max = 255)
     private String periodeAttribution;
 
     // ---------------- rubrique 4
@@ -66,11 +59,9 @@ public class DemandeNumeroCourtInputDTO implements Serializable {
     private TypeNumeroCourt typeNumero;
 
     /** Absent des rubriques ; facultatif -- voir DemandeNumeroCourt. */
-    @Size(max = 16)
     private String numeroSouhaite;
 
     /** Attribue par l'ARCEP, vide au depot. */
-    @Size(max = 16)
     private String numeroAttribue;
 
     private TypeExploitation typeExploitation;
@@ -85,23 +76,17 @@ public class DemandeNumeroCourtInputDTO implements Serializable {
     private Boolean traficSms;
     private Boolean traficAutres;
 
-    @Size(max = 255)
     private String traficAutresPrecision;
 
     /** Le point focal : quatre champs, a plat -- voir DemandeNumeroCourt. */
-    @Size(max = 100)
     private String pointFocalNom;
 
-    @Size(max = 100)
     private String pointFocalPrenoms;
 
-    @Size(max = 100)
     private String pointFocalEmail;
 
-    @Size(max = 20)
     private String pointFocalTelephone;
 
-    @Size(max = 25)
     private String referenceAutorisationAnterieure;
 
     /** Le seul montant du formulaire ; fraisDossier reste vide. */
@@ -109,24 +94,19 @@ public class DemandeNumeroCourtInputDTO implements Serializable {
 
     private BigDecimal fraisDossier;
 
-    @Size(max = 8)
     private String deviseFrais;
 
-    @Valid
     private ClientDTO client;
 
-    @Valid
     private ApplicantDTO applicant;
 
     /** Rubrique 5 : les equipements de bord. */
-    @Valid
     private List<NumeroRattachementCourtDTO> numerosRattachement;
 
     /**
      * Le rapport d'instruction. Renseigne par l'ARCEP, jamais par le
      * demandeur -- voir RapportTechnique.
      */
-    @Valid
     private RapportTechniqueDTO rapportTechnique;
 
     // ------------------------- workflow / ACL -------------------------

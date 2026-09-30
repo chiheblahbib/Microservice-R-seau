@@ -7,7 +7,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import picosoft.biz.arcep.domain.installateur.enumeration.TypeOutillage;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 /** Un instrument declare, rubrique 7-2. */
@@ -26,12 +25,11 @@ public class OutillageDeclare implements Serializable {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type_outillage", length = 24)
+    @Column(name = "type_outillage")
     private TypeOutillage typeOutillage;
 
     /** La designation saisie, quand typeOutillage vaut AUTRE. */
-    @Column(name = "designation", length = 200)
-    @Size(max = 200)
+    @Column(name = "designation")
     private String designation;
 
     @ManyToOne(fetch = FetchType.LAZY)

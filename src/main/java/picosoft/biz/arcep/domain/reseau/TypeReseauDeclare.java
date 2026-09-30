@@ -9,7 +9,6 @@ import picosoft.biz.arcep.configuration.audit.Auditable;
 import picosoft.biz.arcep.domain.reseau.enumeration.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 /**
@@ -34,11 +33,10 @@ public class TypeReseauDeclare extends Auditable implements Serializable {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type", length = 24)
+    @Column(name = "type")
     private TypeReseau type;
 
-    @Column(name = "precision_autre", length = 255)
-    @Size(max = 255)
+    @Column(name = "precision_autre")
     private String precisionAutre;
 
     @ManyToOne(fetch = FetchType.LAZY)

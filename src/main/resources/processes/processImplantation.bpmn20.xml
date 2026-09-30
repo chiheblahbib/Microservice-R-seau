@@ -62,6 +62,16 @@
   contraint leurs valeurs. Une faute de frappe sur 'COMMERCE' enverra silencieusement
   le dossier au Chef Centre, sans erreur. Si ce risque doit etre ferme, ajouter un
   controle des valeurs acceptees a l'entree du service.
+
+  CE QUI A CHANGE
+  ~~~~~~~~~~~~~~~
+  1. Les FREQUENCES se saisissent ici, a la completude, avec la station et le site.
+     Elles n'etaient ouvertes que par le circuit enfant, qui redemandait alors la
+     station et le site deja saisis. Une seule saisie, au seul endroit ou l'usager
+     depose son dossier.
+  2. Le circuit enfant ne s'ouvre plus a la sortie de l'etude technique mais A LA
+     SIGNATURE. Tant que le dossier n'est pas signe, aucun titre n'a a etre prepare.
+     L'appel est ${stationService.ouvrirTitre(data.id)} sur les deux flux de fin.
   ============================================================================================
 -->
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" targetNamespace="http://flowable.org/test">
@@ -110,7 +120,9 @@
               <flowable:entry key="SectionDemandeur">WRITE</flowable:entry>
               <flowable:entry key="SectionStation">WRITE</flowable:entry>
               <flowable:entry key="SectionSite">WRITE</flowable:entry>
+              <flowable:entry key="SectionFrequence">WRITE</flowable:entry>
               <flowable:entry key="SectionAttachment">WRITE</flowable:entry>
+              <flowable:entry key="ActiveSection">SectionDemandeur,SectionStation,SectionSite,SectionFrequence,SectionAttachment</flowable:entry>
             </flowable:map>
           </flowable:inputParameter>
         </flowable:inputOutput>
@@ -126,7 +138,9 @@
               <flowable:entry key="SectionDemandeur">WRITE</flowable:entry>
               <flowable:entry key="SectionStation">WRITE</flowable:entry>
               <flowable:entry key="SectionSite">WRITE</flowable:entry>
+              <flowable:entry key="SectionFrequence">WRITE</flowable:entry>
               <flowable:entry key="SectionAttachment">WRITE</flowable:entry>
+              <flowable:entry key="ActiveSection">SectionDemandeur,SectionStation,SectionSite,SectionFrequence,SectionAttachment</flowable:entry>
             </flowable:map>
           </flowable:inputParameter>
         </flowable:inputOutput>
@@ -142,7 +156,9 @@
               <flowable:entry key="SectionDemandeur">READ</flowable:entry>
               <flowable:entry key="SectionStation">READ</flowable:entry>
               <flowable:entry key="SectionSite">READ</flowable:entry>
+              <flowable:entry key="SectionFrequence">READ</flowable:entry>
               <flowable:entry key="SectionAttachment">READ</flowable:entry>
+              <flowable:entry key="ActiveSection">SectionDemandeur,SectionStation,SectionSite,SectionFrequence,SectionAttachment</flowable:entry>
             </flowable:map>
           </flowable:inputParameter>
         </flowable:inputOutput>
@@ -158,7 +174,9 @@
               <flowable:entry key="SectionDemandeur">WRITE</flowable:entry>
               <flowable:entry key="SectionStation">WRITE</flowable:entry>
               <flowable:entry key="SectionSite">WRITE</flowable:entry>
+              <flowable:entry key="SectionFrequence">WRITE</flowable:entry>
               <flowable:entry key="SectionAttachment">WRITE</flowable:entry>
+              <flowable:entry key="ActiveSection">SectionDemandeur,SectionStation,SectionSite,SectionFrequence,SectionAttachment</flowable:entry>
             </flowable:map>
           </flowable:inputParameter>
         </flowable:inputOutput>
@@ -174,7 +192,9 @@
               <flowable:entry key="SectionDemandeur">READ</flowable:entry>
               <flowable:entry key="SectionStation">READ</flowable:entry>
               <flowable:entry key="SectionSite">READ</flowable:entry>
+              <flowable:entry key="SectionFrequence">READ</flowable:entry>
               <flowable:entry key="SectionAttachment">READ</flowable:entry>
+              <flowable:entry key="ActiveSection">SectionDemandeur,SectionStation,SectionSite,SectionFrequence,SectionAttachment</flowable:entry>
             </flowable:map>
           </flowable:inputParameter>
         </flowable:inputOutput>
@@ -190,7 +210,9 @@
               <flowable:entry key="SectionDemandeur">WRITE</flowable:entry>
               <flowable:entry key="SectionStation">WRITE</flowable:entry>
               <flowable:entry key="SectionSite">WRITE</flowable:entry>
+              <flowable:entry key="SectionFrequence">WRITE</flowable:entry>
               <flowable:entry key="SectionAttachment">WRITE</flowable:entry>
+              <flowable:entry key="ActiveSection">SectionDemandeur,SectionStation,SectionSite,SectionFrequence,SectionAttachment</flowable:entry>
             </flowable:map>
           </flowable:inputParameter>
         </flowable:inputOutput>
@@ -205,7 +227,9 @@
               <flowable:entry key="SectionDemandeur">READ</flowable:entry>
               <flowable:entry key="SectionStation">READ</flowable:entry>
               <flowable:entry key="SectionSite">READ</flowable:entry>
+              <flowable:entry key="SectionFrequence">READ</flowable:entry>
               <flowable:entry key="SectionAttachment">READ</flowable:entry>
+              <flowable:entry key="ActiveSection">SectionDemandeur,SectionStation,SectionSite,SectionFrequence,SectionAttachment</flowable:entry>
             </flowable:map>
           </flowable:inputParameter>
         </flowable:inputOutput>
@@ -221,7 +245,9 @@
               <flowable:entry key="SectionDemandeur">READ</flowable:entry>
               <flowable:entry key="SectionStation">READ</flowable:entry>
               <flowable:entry key="SectionSite">READ</flowable:entry>
+              <flowable:entry key="SectionFrequence">READ</flowable:entry>
               <flowable:entry key="SectionAttachment">READ</flowable:entry>
+              <flowable:entry key="ActiveSection">SectionDemandeur,SectionStation,SectionSite,SectionFrequence,SectionAttachment</flowable:entry>
             </flowable:map>
           </flowable:inputParameter>
         </flowable:inputOutput>
@@ -236,7 +262,9 @@
               <flowable:entry key="SectionDemandeur">READ</flowable:entry>
               <flowable:entry key="SectionStation">READ</flowable:entry>
               <flowable:entry key="SectionSite">READ</flowable:entry>
+              <flowable:entry key="SectionFrequence">READ</flowable:entry>
               <flowable:entry key="SectionAttachment">READ</flowable:entry>
+              <flowable:entry key="ActiveSection">SectionDemandeur,SectionStation,SectionSite,SectionFrequence,SectionAttachment</flowable:entry>
             </flowable:map>
           </flowable:inputParameter>
         </flowable:inputOutput>
@@ -307,7 +335,6 @@
     <sequenceFlow id="Flow_vers_gw_etude" sourceRef="Task_etude" targetRef="Gw_retour_etude" />
     <sequenceFlow id="Flow_pour_validation" name="Pour Validation" sourceRef="Gw_retour_etude" targetRef="Task_validation_rapport">
       <extensionElements>
-        <flowable:executionListener expression="${stationService.initFromDemande(data.id)}" event="take" />
         <flowable:properties>
           <flowable:property name="ordre" value="0" />
           <flowable:property name="color" value="bg-green-600 hover:bg-green-700 text-white" />
@@ -370,6 +397,7 @@
     </sequenceFlow>
     <sequenceFlow id="Flow_commerce_fin" name="Confirmer" sourceRef="Task_signature_commerce" targetRef="End_implantation">
       <extensionElements>
+        <flowable:executionListener expression="${stationService.ouvrirTitre(data.id)}" event="take" />
         <flowable:properties>
           <flowable:property name="ordre" value="0" />
           <flowable:property name="color" value="bg-green-600 hover:bg-green-700 text-white" />
@@ -380,6 +408,7 @@
     </sequenceFlow>
     <sequenceFlow id="Flow_chef_fin" name="Confirmer" sourceRef="Task_signature_chef" targetRef="End_implantation">
       <extensionElements>
+        <flowable:executionListener expression="${stationService.ouvrirTitre(data.id)}" event="take" />
         <flowable:properties>
           <flowable:property name="ordre" value="0" />
           <flowable:property name="color" value="bg-green-600 hover:bg-green-700 text-white" />

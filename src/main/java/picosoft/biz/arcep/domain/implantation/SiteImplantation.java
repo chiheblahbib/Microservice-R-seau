@@ -9,7 +9,6 @@ import picosoft.biz.arcep.configuration.audit.Auditable;
 import picosoft.biz.arcep.domain.implantation.enumeration.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 @Getter
@@ -27,20 +26,16 @@ public class SiteImplantation extends Auditable implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nom_site", length = 100)
-    @Size(max = 100)
+    @Column(name = "nom_site")
     private String nomSite;
 
-    @Column(name = "province", length = 100)
-    @Size(max = 100)
+    @Column(name = "province")
     private String province;
 
-    @Column(name = "ville_quartier", length = 100)
-    @Size(max = 100)
+    @Column(name = "ville_quartier")
     private String villeQuartier;
 
-    @Column(name = "departement_canton_village", length = 100)
-    @Size(max = 100)
+    @Column(name = "departement_canton_village")
     private String departementCantonVillage;
 
     // ------------------------ coordonnees ----------------------------
@@ -57,13 +52,11 @@ public class SiteImplantation extends Auditable implements Serializable {
     // les distances de protection.
 
     /** N ou S. Faute d'indication, on lit le nord. */
-    @Column(name = "latitude_sens", length = 1)
-    @Size(max = 1)
+    @Column(name = "latitude_sens")
     private String latitudeSens;
 
     /** E ou W. Faute d'indication, on lit l'est. */
-    @Column(name = "longitude_sens", length = 1)
-    @Size(max = 1)
+    @Column(name = "longitude_sens")
     private String longitudeSens;
 
     @Column(name = "longitude_degres")
@@ -87,8 +80,7 @@ public class SiteImplantation extends Auditable implements Serializable {
     @Column(name = "altitude")
     private Double altitude;
 
-    @Column(name = "description", length = 500)
-    @Size(max = 500)
+    @Column(name = "description")
     private String description;
 
     // ------------- etablissements sensibles a moins de 100 m ---------
@@ -105,8 +97,7 @@ public class SiteImplantation extends Auditable implements Serializable {
     @Column(name = "sensible_autres")
     private Boolean sensibleAutres = false;
 
-    @Column(name = "sensible_autres_precision", length = 255)
-    @Size(max = 255)
+    @Column(name = "sensible_autres_precision")
     private String sensibleAutresPrecision;
 
     // ---------------------- zone protegee ----------------------------
@@ -126,8 +117,7 @@ public class SiteImplantation extends Auditable implements Serializable {
     @Column(name = "zone_autres")
     private Boolean zoneAutres = false;
 
-    @Column(name = "zone_autres_precision", length = 255)
-    @Size(max = 255)
+    @Column(name = "zone_autres_precision")
     private String zoneAutresPrecision;
 
     // ------------------ pylone a moins de 500 m ----------------------
@@ -135,8 +125,7 @@ public class SiteImplantation extends Auditable implements Serializable {
     @Column(name = "pylone_present")
     private Boolean pylonePresent = false;
 
-    @Column(name = "pylone_raison_sociale", length = 100)
-    @Size(max = 100)
+    @Column(name = "pylone_raison_sociale")
     private String pyloneRaisonSociale;
 
     @Column(name = "pylone_latitude")
@@ -152,6 +141,6 @@ public class SiteImplantation extends Auditable implements Serializable {
     private Double pyloneAltitudeSite;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "station_id", nullable = true, unique = true)
+    @JoinColumn(name = "station_id", nullable = true)
     private Station station;
 }

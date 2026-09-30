@@ -27,7 +27,7 @@ public class Frequence extends Auditable implements Serializable {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "sens", length = 16)
+    @Column(name = "sens")
     private SensFrequence sens;
 
     @Column(name = "frequence_centrale_mhz")

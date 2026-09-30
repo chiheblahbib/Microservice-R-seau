@@ -105,69 +105,69 @@ public class WorkflowService {
      */
     public BpmJob startProcessInstance(String currentUserSid, String processKey, Object objet) throws Exception {
 
-          // initiate variables
-          Map<String, Object> variables = new HashMap<>();
+        // initiate variables
+        Map<String, Object> variables = new HashMap<>();
 
-          variables.put("initiator", currentUserSid);
+        variables.put("initiator", currentUserSid);
 
-          variables.put("processKey", processKey);
+        variables.put("processKey", processKey);
 
-          variables.put("data", objet);
+        variables.put("data", objet);
 
-          variables.put("sids", currentUser.getSid());
+        variables.put("sids", currentUser.getSid());
 
-          variables.put("token", currentUser.getToken());
-          variables.put("currentUser", currentUser);
-          variables.put("dueDate", ZonedDateTime.now());
+        variables.put("token", currentUser.getToken());
+        variables.put("currentUser", currentUser);
+        variables.put("dueDate", ZonedDateTime.now());
 
-          // create new process instance using the process key and list of variables
-          ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(variables.get("processKey").toString(), variables);
+        // create new process instance using the process key and list of variables
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(variables.get("processKey").toString(), variables);
 
-          // recuperate the first task of instance
-          Task task = taskService.createTaskQuery().processInstanceId(processInstance.getProcessInstanceId()).active().singleResult();
-          if (task == null) {
-              for (int i = 0; i < 10 && task == null; i++) {
-                  try { Thread.sleep(100); } catch (InterruptedException ignored) {}
-                  task = taskService.createTaskQuery().processInstanceId(processInstance.getProcessInstanceId()).active().singleResult();
-              }
-          }
+        // recuperate the first task of instance
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getProcessInstanceId()).active().singleResult();
+        if (task == null) {
+            for (int i = 0; i < 10 && task == null; i++) {
+                try { Thread.sleep(100); } catch (InterruptedException ignored) {}
+                task = taskService.createTaskQuery().processInstanceId(processInstance.getProcessInstanceId()).active().singleResult();
+            }
+        }
 
-          //DISPLAYNAME OF USER AUTHENTIFIED
-          if (task != null) {
-              runtimeService.setVariable(task.getProcessInstanceId(), task.getId() + " :authentifier", currentUser.getDisplayName());
-          } else {
-              runtimeService.setVariable(processInstance.getProcessInstanceId(), "authentifier", currentUser.getDisplayName());
-          }
+        //DISPLAYNAME OF USER AUTHENTIFIED
+        if (task != null) {
+            runtimeService.setVariable(task.getProcessInstanceId(), task.getId() + " :authentifier", currentUser.getDisplayName());
+        } else {
+            runtimeService.setVariable(processInstance.getProcessInstanceId(), "authentifier", currentUser.getDisplayName());
+        }
 
-          //DISPLAYNAME OF EFFECTIVE USER
-          if(currentUser.getEffectiveUser()!=null && currentUser.getEffectiveUser().getDisplayName()!=null)
-              if (task != null) {
-                  runtimeService.setVariable(task.getProcessInstanceId(), task.getId() + " :effectiveUser", currentUser.getEffectiveUser().getDisplayName());
-              } else {
-                  runtimeService.setVariable(processInstance.getProcessInstanceId(), "effectiveUser", currentUser.getEffectiveUser().getDisplayName());
-              }
+        //DISPLAYNAME OF EFFECTIVE USER
+        if(currentUser.getEffectiveUser()!=null && currentUser.getEffectiveUser().getDisplayName()!=null)
+            if (task != null) {
+                runtimeService.setVariable(task.getProcessInstanceId(), task.getId() + " :effectiveUser", currentUser.getEffectiveUser().getDisplayName());
+            } else {
+                runtimeService.setVariable(processInstance.getProcessInstanceId(), "effectiveUser", currentUser.getEffectiveUser().getDisplayName());
+            }
 
-          // recuperate list of authors
-          List<String> listAuthors = task != null ? _getCandidateGroups(task.getId()) : new ArrayList<>();
+        // recuperate list of authors
+        List<String> listAuthors = task != null ? _getCandidateGroups(task.getId()) : new ArrayList<>();
 
-          // recuperate list of readers
-          List<String> listReaders = task != null ? _getCandidateUsers(task.getId()) : new ArrayList<>();
+        // recuperate list of readers
+        List<String> listReaders = task != null ? _getCandidateUsers(task.getId()) : new ArrayList<>();
 
-          // calculate BpmJob data case instance unfinished
-          BpmJob bpmJob = new BpmJob(new JSONObject(), task != null ? task.getName() : null, task != null ? task.getAssignee() : null, false, processInstance.getProcessInstanceId(), null, null);
+        // calculate BpmJob data case instance unfinished
+        BpmJob bpmJob = new BpmJob(new JSONObject(), task != null ? task.getName() : null, task != null ? task.getAssignee() : null, false, processInstance.getProcessInstanceId(), null, null);
 
-          bpmJob.setProcessName(processInstance.getProcessDefinitionName());
+        bpmJob.setProcessName(processInstance.getProcessDefinitionName());
 
-          bpmJob.setProcessID(processInstance.getProcessInstanceId());
+        bpmJob.setProcessID(processInstance.getProcessInstanceId());
 
-          bpmJob.setDataObject(task != null ? taskService.getVariable(task.getId(), "data") : objet);
+        bpmJob.setDataObject(task != null ? taskService.getVariable(task.getId(), "data") : objet);
 
-          bpmJob.setAuthors(listAuthors);
+        bpmJob.setAuthors(listAuthors);
 
-          bpmJob.setReaders(listReaders);
+        bpmJob.setReaders(listReaders);
 
-          return bpmJob;
-      }
+        return bpmJob;
+    }
 
     /**
      *
@@ -208,44 +208,44 @@ public class WorkflowService {
                                 for(ExtensionElement extensionElementChild: extensionElement.getChildElements().get("property")) {
                                     int i = 0;
                                     if(extensionElementChild.getAttributes().size() > 0)
-                                    for(i = 0; i < extensionElementChild.getAttributes().get("name").size(); i++){
+                                        for(i = 0; i < extensionElementChild.getAttributes().get("name").size(); i++){
 
-                                        if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("hidden")){
-                                            String expressionFM = extensionElementChild.getAttributes().get("value").get(i).getValue();
+                                            if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("hidden")){
+                                                String expressionFM = extensionElementChild.getAttributes().get("value").get(i).getValue();
 
-                                            Map<String, Object> variables=taskService.getVariables(task.getId());
-                                            variables.put("currentUser", currentUser);
-                                            Template t = new Template(null, expressionFM, config);
-                                            //result must be true
-                                            try {
-                                                String result = FreeMarkerTemplateUtils.processTemplateIntoString(t, variables);
-                                                hidden=Boolean.parseBoolean(result.trim());
+                                                Map<String, Object> variables=taskService.getVariables(task.getId());
+                                                variables.put("currentUser", currentUser);
+                                                Template t = new Template(null, expressionFM, config);
+                                                //result must be true
+                                                try {
+                                                    String result = FreeMarkerTemplateUtils.processTemplateIntoString(t, variables);
+                                                    hidden=Boolean.parseBoolean(result.trim());
+                                                }
+                                                catch (Exception e)
+                                                {
+
+                                                }
+                                            }else if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("ordre")){
+                                                if(extensionElementChild.getAttributes().get("value").size() > i && extensionElementChild.getAttributes().get("value").get(i) != null && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
+                                                    ordre = Integer.valueOf(extensionElementChild.getAttributes().get("value").get(i).getValue().trim());
+                                            }else if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("icon")){
+                                                if(extensionElementChild.getAttributes().get("value").size() > i && extensionElementChild.getAttributes().get("value").get(i) != null && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
+                                                    icon = String.valueOf(extensionElementChild.getAttributes().get("value").get(i).getValue().trim());
+                                            }else if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("color")){
+                                                if(extensionElementChild.getAttributes().get("value").size() > i && extensionElementChild.getAttributes().get("value").get(i) != null && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
+                                                    color = String.valueOf(extensionElementChild.getAttributes().get("value").get(i).getValue().trim());
+                                            }else if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("decisionComponentAlert")){
+                                                if(extensionElementChild.getAttributes().get("value").size() > i && extensionElementChild.getAttributes().get("value").get(i) != null && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
+                                                    decisionComponentAlert = String.valueOf(extensionElementChild.getAttributes().get("value").get(i).getValue().trim());
                                             }
-                                            catch (Exception e)
-                                            {
-
+                                            else if (extensionElementChild.getAttributes().get("name").get(i).getValue().equals("decisionMessageConfirmation")) { // 🟢 [NOUVEAU]
+                                                if (extensionElementChild.getAttributes().get("value").size() > i
+                                                        && extensionElementChild.getAttributes().get("value").get(i) != null
+                                                        && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
+                                                    decisionMessageConfirmation = extensionElementChild.getAttributes().get("value").get(i).getValue().trim(); // 🟢 [NOUVEAU]
                                             }
-                                        }else if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("ordre")){
-                                            if(extensionElementChild.getAttributes().get("value").size() > i && extensionElementChild.getAttributes().get("value").get(i) != null && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
-                                                ordre = Integer.valueOf(extensionElementChild.getAttributes().get("value").get(i).getValue().trim());
-                                        }else if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("icon")){
-                                            if(extensionElementChild.getAttributes().get("value").size() > i && extensionElementChild.getAttributes().get("value").get(i) != null && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
-                                                icon = String.valueOf(extensionElementChild.getAttributes().get("value").get(i).getValue().trim());
-                                        }else if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("color")){
-                                            if(extensionElementChild.getAttributes().get("value").size() > i && extensionElementChild.getAttributes().get("value").get(i) != null && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
-                                                color = String.valueOf(extensionElementChild.getAttributes().get("value").get(i).getValue().trim());
-                                        }else if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("decisionComponentAlert")){
-                                            if(extensionElementChild.getAttributes().get("value").size() > i && extensionElementChild.getAttributes().get("value").get(i) != null && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
-                                                decisionComponentAlert = String.valueOf(extensionElementChild.getAttributes().get("value").get(i).getValue().trim());
-                                        }
-                                        else if (extensionElementChild.getAttributes().get("name").get(i).getValue().equals("decisionMessageConfirmation")) { // 🟢 [NOUVEAU]
-                                            if (extensionElementChild.getAttributes().get("value").size() > i
-                                                    && extensionElementChild.getAttributes().get("value").get(i) != null
-                                                    && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
-                                                decisionMessageConfirmation = extensionElementChild.getAttributes().get("value").get(i).getValue().trim(); // 🟢 [NOUVEAU]
-                                        }
 
-                                    }
+                                        }
                                 }
                             }
                             JSONObject json = new JSONObject();
@@ -289,44 +289,44 @@ public class WorkflowService {
                                 for(ExtensionElement extensionElementChild: extensionElement.getChildElements().get("property")) {
                                     int i = 0;
                                     if(extensionElementChild.getAttributes().size() > 0)
-                                    for(i = 0; i < extensionElementChild.getAttributes().get("name").size(); i++){
+                                        for(i = 0; i < extensionElementChild.getAttributes().get("name").size(); i++){
 
-                                        if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("hidden")){
-                                            String expressionFM = extensionElementChild.getAttributes().get("value").get(i).getValue();
+                                            if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("hidden")){
+                                                String expressionFM = extensionElementChild.getAttributes().get("value").get(i).getValue();
 
-                                            Map<String, Object> variables=taskService.getVariables(task.getId());
-                                            variables.put("currentUser", currentUser);
-                                            Template t = new Template(null, expressionFM, config);
-                                            //result must be true
-                                            try {
-                                                String result = FreeMarkerTemplateUtils.processTemplateIntoString(t, variables);
-                                                hidden=Boolean.parseBoolean(result.trim());
+                                                Map<String, Object> variables=taskService.getVariables(task.getId());
+                                                variables.put("currentUser", currentUser);
+                                                Template t = new Template(null, expressionFM, config);
+                                                //result must be true
+                                                try {
+                                                    String result = FreeMarkerTemplateUtils.processTemplateIntoString(t, variables);
+                                                    hidden=Boolean.parseBoolean(result.trim());
+                                                }
+                                                catch (Exception e)
+                                                {
+
+                                                }
+                                            }else if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("ordre")){
+                                                if(extensionElementChild.getAttributes().get("value").size() > i && extensionElementChild.getAttributes().get("value").get(i) != null && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
+                                                    ordre = Integer.valueOf(extensionElementChild.getAttributes().get("value").get(i).getValue().trim());
+                                            }else if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("icon")){
+                                                if(extensionElementChild.getAttributes().get("value").size() > i && extensionElementChild.getAttributes().get("value").get(i) != null && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
+                                                    icon = String.valueOf(extensionElementChild.getAttributes().get("value").get(i).getValue().trim());
+                                            }else if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("color")){
+                                                if(extensionElementChild.getAttributes().get("value").size() > i && extensionElementChild.getAttributes().get("value").get(i) != null && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
+                                                    color = String.valueOf(extensionElementChild.getAttributes().get("value").get(i).getValue().trim());
+                                            }else if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("decisionComponentAlert")){
+                                                if(extensionElementChild.getAttributes().get("value").size() > i && extensionElementChild.getAttributes().get("value").get(i) != null && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
+                                                    decisionComponentAlert = String.valueOf(extensionElementChild.getAttributes().get("value").get(i).getValue().trim());
                                             }
-                                            catch (Exception e)
-                                            {
-
+                                            else if (extensionElementChild.getAttributes().get("name").get(i).getValue().equals("decisionMessageConfirmation")) { // 🟢 [NOUVEAU]
+                                                if (extensionElementChild.getAttributes().get("value").size() > i
+                                                        && extensionElementChild.getAttributes().get("value").get(i) != null
+                                                        && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
+                                                    decisionMessageConfirmation = extensionElementChild.getAttributes().get("value").get(i).getValue().trim(); // 🟢 [NOUVEAU]
                                             }
-                                        }else if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("ordre")){
-                                            if(extensionElementChild.getAttributes().get("value").size() > i && extensionElementChild.getAttributes().get("value").get(i) != null && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
-                                                ordre = Integer.valueOf(extensionElementChild.getAttributes().get("value").get(i).getValue().trim());
-                                        }else if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("icon")){
-                                            if(extensionElementChild.getAttributes().get("value").size() > i && extensionElementChild.getAttributes().get("value").get(i) != null && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
-                                                icon = String.valueOf(extensionElementChild.getAttributes().get("value").get(i).getValue().trim());
-                                        }else if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("color")){
-                                            if(extensionElementChild.getAttributes().get("value").size() > i && extensionElementChild.getAttributes().get("value").get(i) != null && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
-                                                color = String.valueOf(extensionElementChild.getAttributes().get("value").get(i).getValue().trim());
-                                        }else if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("decisionComponentAlert")){
-                                            if(extensionElementChild.getAttributes().get("value").size() > i && extensionElementChild.getAttributes().get("value").get(i) != null && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
-                                                decisionComponentAlert = String.valueOf(extensionElementChild.getAttributes().get("value").get(i).getValue().trim());
-                                        }
-                                        else if (extensionElementChild.getAttributes().get("name").get(i).getValue().equals("decisionMessageConfirmation")) { // 🟢 [NOUVEAU]
-                                            if (extensionElementChild.getAttributes().get("value").size() > i
-                                                    && extensionElementChild.getAttributes().get("value").get(i) != null
-                                                    && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
-                                                decisionMessageConfirmation = extensionElementChild.getAttributes().get("value").get(i).getValue().trim(); // 🟢 [NOUVEAU]
-                                        }
 
-                                    }
+                                        }
                                 }
                             }
                             if(sequenceFlowTemp.getName() != null) {
@@ -364,44 +364,44 @@ public class WorkflowService {
                                                 for(ExtensionElement extensionElementChild: extensionElement.getChildElements().get("property")) {
                                                     int i = 0;
                                                     if(extensionElementChild.getAttributes().size() > 0)
-                                                    for(i = 0; i < extensionElementChild.getAttributes().get("name").size(); i++){
+                                                        for(i = 0; i < extensionElementChild.getAttributes().get("name").size(); i++){
 
-                                                        if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("hidden")){
-                                                            String expressionFM = extensionElementChild.getAttributes().get("value").get(i).getValue();
+                                                            if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("hidden")){
+                                                                String expressionFM = extensionElementChild.getAttributes().get("value").get(i).getValue();
 
-                                                            Map<String, Object> variables=taskService.getVariables(task.getId());
-                                                            variables.put("currentUser", currentUser);
-                                                            Template t = new Template(null, expressionFM, config);
-                                                            //result must be true
-                                                            try {
-                                                                String result = FreeMarkerTemplateUtils.processTemplateIntoString(t, variables);
-                                                                hidden=Boolean.parseBoolean(result.trim());
+                                                                Map<String, Object> variables=taskService.getVariables(task.getId());
+                                                                variables.put("currentUser", currentUser);
+                                                                Template t = new Template(null, expressionFM, config);
+                                                                //result must be true
+                                                                try {
+                                                                    String result = FreeMarkerTemplateUtils.processTemplateIntoString(t, variables);
+                                                                    hidden=Boolean.parseBoolean(result.trim());
+                                                                }
+                                                                catch (Exception e)
+                                                                {
+
+                                                                }
+                                                            }else if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("ordre")){
+                                                                if(extensionElementChild.getAttributes().get("value").size() > i && extensionElementChild.getAttributes().get("value").get(i) != null && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
+                                                                    ordre = Integer.valueOf(extensionElementChild.getAttributes().get("value").get(i).getValue().trim());
+                                                            }else if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("icon")){
+                                                                if(extensionElementChild.getAttributes().get("value").size() > i && extensionElementChild.getAttributes().get("value").get(i) != null && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
+                                                                    icon = String.valueOf(extensionElementChild.getAttributes().get("value").get(i).getValue().trim());
+                                                            }else if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("color")){
+                                                                if(extensionElementChild.getAttributes().get("value").size() > i && extensionElementChild.getAttributes().get("value").get(i) != null && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
+                                                                    color = String.valueOf(extensionElementChild.getAttributes().get("value").get(i).getValue().trim());
+                                                            }else if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("decisionComponentAlert")){
+                                                                if(extensionElementChild.getAttributes().get("value").size() > i && extensionElementChild.getAttributes().get("value").get(i) != null && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
+                                                                    decisionComponentAlert = String.valueOf(extensionElementChild.getAttributes().get("value").get(i).getValue().trim());
                                                             }
-                                                            catch (Exception e)
-                                                            {
-
+                                                            else if (extensionElementChild.getAttributes().get("name").get(i).getValue().equals("decisionMessageConfirmation")) { // 🟢 [NOUVEAU]
+                                                                if (extensionElementChild.getAttributes().get("value").size() > i
+                                                                        && extensionElementChild.getAttributes().get("value").get(i) != null
+                                                                        && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
+                                                                    decisionMessageConfirmation = extensionElementChild.getAttributes().get("value").get(i).getValue().trim(); // 🟢 [NOUVEAU]
                                                             }
-                                                        }else if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("ordre")){
-                                                            if(extensionElementChild.getAttributes().get("value").size() > i && extensionElementChild.getAttributes().get("value").get(i) != null && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
-                                                                ordre = Integer.valueOf(extensionElementChild.getAttributes().get("value").get(i).getValue().trim());
-                                                        }else if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("icon")){
-                                                            if(extensionElementChild.getAttributes().get("value").size() > i && extensionElementChild.getAttributes().get("value").get(i) != null && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
-                                                                icon = String.valueOf(extensionElementChild.getAttributes().get("value").get(i).getValue().trim());
-                                                        }else if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("color")){
-                                                            if(extensionElementChild.getAttributes().get("value").size() > i && extensionElementChild.getAttributes().get("value").get(i) != null && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
-                                                                color = String.valueOf(extensionElementChild.getAttributes().get("value").get(i).getValue().trim());
-                                                        }else if(extensionElementChild.getAttributes().get("name").get(i).getValue().equals("decisionComponentAlert")){
-                                                            if(extensionElementChild.getAttributes().get("value").size() > i && extensionElementChild.getAttributes().get("value").get(i) != null && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
-                                                                decisionComponentAlert = String.valueOf(extensionElementChild.getAttributes().get("value").get(i).getValue().trim());
-                                                        }
-                                                        else if (extensionElementChild.getAttributes().get("name").get(i).getValue().equals("decisionMessageConfirmation")) { // 🟢 [NOUVEAU]
-                                                            if (extensionElementChild.getAttributes().get("value").size() > i
-                                                                    && extensionElementChild.getAttributes().get("value").get(i) != null
-                                                                    && extensionElementChild.getAttributes().get("value").get(i).getValue() != null)
-                                                                decisionMessageConfirmation = extensionElementChild.getAttributes().get("value").get(i).getValue().trim(); // 🟢 [NOUVEAU]
-                                                        }
 
-                                                    }
+                                                        }
                                                 }
                                             }
                                             if (!hidden) {
@@ -500,135 +500,135 @@ public class WorkflowService {
 
 
     /**
-      *
-      * @param processInstanceId
-      *     A String of {@link String} : process instance id.
-      * @return
-      *     A respnse of {@link ArrayList} : Return historic instance list.
-      */
-     public List<HistoricProcessInstance> findAllHistoricProcessInstance(Pageable page, String processInstanceId) {
-       if(!processInstanceId.equals("null")) {
-         return historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).list();
-       }else{
-         return historyService.createHistoricProcessInstanceQuery().orderByProcessInstanceStartTime().desc().list();
-       }
-     }
+     *
+     * @param processInstanceId
+     *     A String of {@link String} : process instance id.
+     * @return
+     *     A respnse of {@link ArrayList} : Return historic instance list.
+     */
+    public List<HistoricProcessInstance> findAllHistoricProcessInstance(Pageable page, String processInstanceId) {
+        if(!processInstanceId.equals("null")) {
+            return historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).list();
+        }else{
+            return historyService.createHistoricProcessInstanceQuery().orderByProcessInstanceStartTime().desc().list();
+        }
+    }
 
-     /**
-      *
-      * @param processInstanceId
-      *     A String of {@link String} : process instance id.
-      * @return
-      *     A respnse of {@link ArrayList} : Return historic instance list.
-      */
-     public Object getInput(String processInstanceId, String name, String type) {
+    /**
+     *
+     * @param processInstanceId
+     *     A String of {@link String} : process instance id.
+     * @return
+     *     A respnse of {@link ArrayList} : Return historic instance list.
+     */
+    public Object getInput(String processInstanceId, String name, String type) {
 
-         HistoricActivityInstance act = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).orderByHistoricActivityInstanceEndTime().desc().list().get(0);
+        HistoricActivityInstance act = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).orderByHistoricActivityInstanceEndTime().desc().list().get(0);
 
-         Process process = repositoryService.getBpmnModel(act.getProcessDefinitionId()).getMainProcess();
+        Process process = repositoryService.getBpmnModel(act.getProcessDefinitionId()).getMainProcess();
 
-         // extract list of flow sequences from process model
-         if (act.getActivityType().equals("endEvent")) {
-             List<EndEvent> activities = process.findFlowElementsOfType(EndEvent.class);
-             for (EndEvent activity : activities) {
-                 if (activity.getId().equals(act.getActivityId())) {
-                     if (activity.getExtensionElements().size() != 0) {
-                         if (activity.getExtensionElements().containsKey("inputOutput")) {
-                             for (ExtensionElement extensionElement : activity.getExtensionElements().get("inputOutput")) {
-                                 for (ExtensionElement extensionElementChild : extensionElement.getChildElements().get("inputParameter")) {
-                                     if (extensionElementChild.getAttributes().get("name").get(0).getValue().equals(name)) {
-                                         if (extensionElementChild.getChildElements().get(type) != null) {
-                                             if (type.equals("map")) {
-                                                 Map<String, String> result = new HashMap<String, String>();
-                                                 for (ExtensionElement extensionElementChild2 : extensionElementChild.getChildElements().get(type).get(0).getChildElements().get("entry")) {
+        // extract list of flow sequences from process model
+        if (act.getActivityType().equals("endEvent")) {
+            List<EndEvent> activities = process.findFlowElementsOfType(EndEvent.class);
+            for (EndEvent activity : activities) {
+                if (activity.getId().equals(act.getActivityId())) {
+                    if (activity.getExtensionElements().size() != 0) {
+                        if (activity.getExtensionElements().containsKey("inputOutput")) {
+                            for (ExtensionElement extensionElement : activity.getExtensionElements().get("inputOutput")) {
+                                for (ExtensionElement extensionElementChild : extensionElement.getChildElements().get("inputParameter")) {
+                                    if (extensionElementChild.getAttributes().get("name").get(0).getValue().equals(name)) {
+                                        if (extensionElementChild.getChildElements().get(type) != null) {
+                                            if (type.equals("map")) {
+                                                Map<String, String> result = new HashMap<String, String>();
+                                                for (ExtensionElement extensionElementChild2 : extensionElementChild.getChildElements().get(type).get(0).getChildElements().get("entry")) {
 
-                                                     result.put(extensionElementChild2.getAttributes().get("key").get(0).getValue(), extensionElementChild2.getElementText());
+                                                    result.put(extensionElementChild2.getAttributes().get("key").get(0).getValue(), extensionElementChild2.getElementText());
 
-                                                 }
-                                                 return result;
-                                             } else if (type.equals("list")) {
-                                                 List<String> result = new ArrayList<>();
-                                                 for (ExtensionElement extensionElementChild2 : extensionElementChild.getChildElements().get(type).get(0).getChildElements().get("value")) {
+                                                }
+                                                return result;
+                                            } else if (type.equals("list")) {
+                                                List<String> result = new ArrayList<>();
+                                                for (ExtensionElement extensionElementChild2 : extensionElementChild.getChildElements().get(type).get(0).getChildElements().get("value")) {
 
-                                                     result.add(extensionElementChild2.getElementText());
+                                                    result.add(extensionElementChild2.getElementText());
 
-                                                 }
-                                                 return result;
+                                                }
+                                                return result;
 
-                                             }
-
-
-                                         } else if (type.equals("string")) {
-                                             String result = extensionElementChild.getElementText();
-                                             return result;
-                                         }
-                                     }
+                                            }
 
 
-                                 }
-                             }
-                         }
-                     }
-                 }
-             }
-         } else {
-             List<Activity> activities = process.findFlowElementsOfType(Activity.class);
-             for (Activity activity : activities) {
-                 if (activity.getId().equals(act.getActivityId())) {
-                     if (activity.getExtensionElements().size() != 0) {
-                         if (activity.getExtensionElements().containsKey("inputOutput")) {
-                             for (ExtensionElement extensionElement : activity.getExtensionElements().get("inputOutput")) {
-                                 for (ExtensionElement extensionElementChild : extensionElement.getChildElements().get("inputParameter")) {
-                                     if (extensionElementChild.getAttributes().get("name").get(0).getValue().equals(name)) {
-                                         if (extensionElementChild.getChildElements().get(type) != null) {
-                                             if (type.equals("map")) {
-                                                 Map<String, String> result = new HashMap<String, String>();
-                                                 for (ExtensionElement extensionElementChild2 : extensionElementChild.getChildElements().get(type).get(0).getChildElements().get("entry")) {
-
-                                                     result.put(extensionElementChild2.getAttributes().get("key").get(0).getValue(), extensionElementChild2.getElementText());
-
-                                                 }
-                                                 return result;
-                                             } else if (type.equals("list")) {
-                                                 List<String> result = new ArrayList<>();
-                                                 for (ExtensionElement extensionElementChild2 : extensionElementChild.getChildElements().get(type).get(0).getChildElements().get("value")) {
-
-                                                     result.add(extensionElementChild2.getElementText());
-
-                                                 }
-                                                 return result;
-
-                                             }
+                                        } else if (type.equals("string")) {
+                                            String result = extensionElementChild.getElementText();
+                                            return result;
+                                        }
+                                    }
 
 
-                                         } else if (type.equals("string")) {
-                                             String result = extensionElementChild.getElementText();
-                                             return result;
-                                         }
-                                     }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            List<Activity> activities = process.findFlowElementsOfType(Activity.class);
+            for (Activity activity : activities) {
+                if (activity.getId().equals(act.getActivityId())) {
+                    if (activity.getExtensionElements().size() != 0) {
+                        if (activity.getExtensionElements().containsKey("inputOutput")) {
+                            for (ExtensionElement extensionElement : activity.getExtensionElements().get("inputOutput")) {
+                                for (ExtensionElement extensionElementChild : extensionElement.getChildElements().get("inputParameter")) {
+                                    if (extensionElementChild.getAttributes().get("name").get(0).getValue().equals(name)) {
+                                        if (extensionElementChild.getChildElements().get(type) != null) {
+                                            if (type.equals("map")) {
+                                                Map<String, String> result = new HashMap<String, String>();
+                                                for (ExtensionElement extensionElementChild2 : extensionElementChild.getChildElements().get(type).get(0).getChildElements().get("entry")) {
+
+                                                    result.put(extensionElementChild2.getAttributes().get("key").get(0).getValue(), extensionElementChild2.getElementText());
+
+                                                }
+                                                return result;
+                                            } else if (type.equals("list")) {
+                                                List<String> result = new ArrayList<>();
+                                                for (ExtensionElement extensionElementChild2 : extensionElementChild.getChildElements().get(type).get(0).getChildElements().get("value")) {
+
+                                                    result.add(extensionElementChild2.getElementText());
+
+                                                }
+                                                return result;
+
+                                            }
 
 
-                                 }
-                             }
-                         }
-                     }
-                 }
-             }
-         }
+                                        } else if (type.equals("string")) {
+                                            String result = extensionElementChild.getElementText();
+                                            return result;
+                                        }
+                                    }
 
 
-         return null;
-     }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        return null;
+    }
 
 
     /**
-       *
-       * @param processInstanceId
-       *     A String of {@link String} : process instance id.
-       * @return
-       *     A respnse of {@link ArrayList} : Return historic instance list.
-       */
-      public List<HistoricWF> getHistoricProcess(String processInstanceId) {
+     *
+     * @param processInstanceId
+     *     A String of {@link String} : process instance id.
+     * @return
+     *     A respnse of {@link ArrayList} : Return historic instance list.
+     */
+    public List<HistoricWF> getHistoricProcess(String processInstanceId) {
 
         // initialize the return list of historics
         List<HistoricWF> his = new ArrayList<HistoricWF>();
@@ -642,36 +642,36 @@ public class WorkflowService {
 
         // iterate query result and push to the temp list
         for (int d = 0; d < taskQuery.list().size(); d++)
-          copietasks.add(taskQuery.list().get(d));
+            copietasks.add(taskQuery.list().get(d));
 
         List<HistoricTaskInstance> tasks = copietasks;
 
         // iterate historic and build the return list
         for (HistoricTaskInstance taskk : tasks) {
-          NativeHistoricVariableInstanceQuery historicQuery = historyService.createNativeHistoricVariableInstanceQuery();
+            NativeHistoricVariableInstanceQuery historicQuery = historyService.createNativeHistoricVariableInstanceQuery();
             String decision = "";
-          if(historicQuery.sql("SELECT TEXT_ FROM act_hi_varinst WHERE NAME_ = '" + taskk.getId() + " :decision" + "'").list().size() > 0) {
-              HistoricVariableInstance decisionVariable = historicQuery.sql("SELECT TEXT_ FROM act_hi_varinst WHERE NAME_ = '" + taskk.getId() + " :decision" + "'").list().get(0);
-               decision = (decisionVariable != null) ? (String.valueOf(decisionVariable).substring(String.valueOf(decisionVariable).lastIndexOf("=") + 1, String.valueOf(decisionVariable).lastIndexOf("]"))) : "";
-          }else{
-              decision = "Automatique";
-          }
-          String description = "";
-          try {
-            HistoricVariableInstance descriptionVariable = historicQuery.sql("SELECT TEXT_ FROM act_hi_varinst WHERE NAME_ = '" + taskk.getId() + " :description" + "'").list().get(0);
-            description = String.valueOf(descriptionVariable).substring(String.valueOf(descriptionVariable).lastIndexOf("=") + 1, String.valueOf(descriptionVariable).lastIndexOf("]"));
-          } catch (Exception e) { }
+            if(historicQuery.sql("SELECT TEXT_ FROM act_hi_varinst WHERE NAME_ = '" + taskk.getId() + " :decision" + "'").list().size() > 0) {
+                HistoricVariableInstance decisionVariable = historicQuery.sql("SELECT TEXT_ FROM act_hi_varinst WHERE NAME_ = '" + taskk.getId() + " :decision" + "'").list().get(0);
+                decision = (decisionVariable != null) ? (String.valueOf(decisionVariable).substring(String.valueOf(decisionVariable).lastIndexOf("=") + 1, String.valueOf(decisionVariable).lastIndexOf("]"))) : "";
+            }else{
+                decision = "Automatique";
+            }
+            String description = "";
+            try {
+                HistoricVariableInstance descriptionVariable = historicQuery.sql("SELECT TEXT_ FROM act_hi_varinst WHERE NAME_ = '" + taskk.getId() + " :description" + "'").list().get(0);
+                description = String.valueOf(descriptionVariable).substring(String.valueOf(descriptionVariable).lastIndexOf("=") + 1, String.valueOf(descriptionVariable).lastIndexOf("]"));
+            } catch (Exception e) { }
 
-          String authentifier = "";
-          if(historicQuery.sql("SELECT TEXT_ FROM act_hi_varinst WHERE NAME_ = '" + taskk.getId() + " :authentifier" + "'").list().size() > 0) {
-              try {
-                  HistoricVariableInstance authentifierVariable = historicQuery.sql("SELECT TEXT_ FROM act_hi_varinst WHERE NAME_ = '" + taskk.getId() + " :authentifier" + "'").list().get(0);
-                  authentifier = String.valueOf(authentifierVariable).substring(String.valueOf(authentifierVariable).lastIndexOf("=") + 1, String.valueOf(authentifierVariable).lastIndexOf("]"));
-              } catch (Exception e) {
-              }
-          }else{
-              authentifier = "Systeme";
-          }
+            String authentifier = "";
+            if(historicQuery.sql("SELECT TEXT_ FROM act_hi_varinst WHERE NAME_ = '" + taskk.getId() + " :authentifier" + "'").list().size() > 0) {
+                try {
+                    HistoricVariableInstance authentifierVariable = historicQuery.sql("SELECT TEXT_ FROM act_hi_varinst WHERE NAME_ = '" + taskk.getId() + " :authentifier" + "'").list().get(0);
+                    authentifier = String.valueOf(authentifierVariable).substring(String.valueOf(authentifierVariable).lastIndexOf("=") + 1, String.valueOf(authentifierVariable).lastIndexOf("]"));
+                } catch (Exception e) {
+                }
+            }else{
+                authentifier = "Systeme";
+            }
             String effectiveUser = "";
             try {
                 HistoricVariableInstance effectiveUserVariable = historicQuery.sql("SELECT TEXT_ FROM act_hi_varinst WHERE NAME_ = '" + taskk.getId() + " :effectiveUser" + "'").list().get(0);
@@ -710,189 +710,189 @@ public class WorkflowService {
 
         // return likst of historic
         return his;
-      }
+    }
 
 
-     /**
-      * @return A respnse of {@link JSONObject} : Return historic instance list.
-      * @Param A hash map of {@link Map} : contains a list of variables
-      */
-      public BpmJob _nextTask(String processInstanceId, String decision, String wfComment, Object data, AclClass aclClass) throws Exception {
+    /**
+     * @return A respnse of {@link JSONObject} : Return historic instance list.
+     * @Param A hash map of {@link Map} : contains a list of variables
+     */
+    public BpmJob _nextTask(String processInstanceId, String decision, String wfComment, Object data, AclClass aclClass) throws Exception {
 
-          // initialize the set of variables to send it to flowable
-          Map<String, Object> variables = new HashMap<>();
+        // initialize the set of variables to send it to flowable
+        Map<String, Object> variables = new HashMap<>();
 
-          variables.put("Decision", decision);
+        variables.put("Decision", decision);
 
-          variables.put("description", wfComment);
+        variables.put("description", wfComment);
 
-          variables.put("data", data);
+        variables.put("data", data);
 
-          variables.put("sids", currentUser.getSid());
+        variables.put("sids", currentUser.getSid());
 
-          // recuperate the current task before rooting
-          Task task = taskService.createTaskQuery().processInstanceId(processInstanceId).active().singleResult();
+        // recuperate the current task before rooting
+        Task task = taskService.createTaskQuery().processInstanceId(processInstanceId).active().singleResult();
 
-          // complete the current instance
-          _finishTask(task.getId(), variables);
+        // complete the current instance
+        _finishTask(task.getId(), variables);
 
-          HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
 
-          JSONObject object = new JSONObject();
+        JSONObject object = new JSONObject();
 
-          if(processInstance.getEndTime() != null) {
+        if(processInstance.getEndTime() != null) {
 
-              HistoricActivityInstance activityInstance = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).activityId(processInstance.getEndActivityId()).singleResult();
+            HistoricActivityInstance activityInstance = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).activityId(processInstance.getEndActivityId()).singleResult();
 
-              Object dataObj = historyService.createHistoricVariableInstanceQuery().variableName("data").processInstanceId(processInstance.getId()).list().get(0).getValue();
+            Object dataObj = historyService.createHistoricVariableInstanceQuery().variableName("data").processInstanceId(processInstance.getId()).list().get(0).getValue();
 
-              String endActivityName = activityInstance != null ? activityInstance.getActivityName() : task.getName();
+            String endActivityName = activityInstance != null ? activityInstance.getActivityName() : task.getName();
 
-              BpmJob bpmJob = new BpmJob(new JSONObject(), endActivityName, task.getAssignee(), false, task.getProcessInstanceId(), null, null);
+            BpmJob bpmJob = new BpmJob(new JSONObject(), endActivityName, task.getAssignee(), false, task.getProcessInstanceId(), null, null);
 
-              bpmJob.setProcessName(processInstance.getProcessDefinitionName());
+            bpmJob.setProcessName(processInstance.getProcessDefinitionName());
 
-              bpmJob.setEndProcess(true);
+            bpmJob.setEndProcess(true);
 
-              bpmJob.setProcessID(processInstance.getId());
+            bpmJob.setProcessID(processInstance.getId());
 
-              bpmJob.setDataObject(dataObj);
+            bpmJob.setDataObject(dataObj);
 
-              bpmJob.setAuthors(new ArrayList<>());
+            bpmJob.setAuthors(new ArrayList<>());
 
-              bpmJob.setReaders(new ArrayList<>());
+            bpmJob.setReaders(new ArrayList<>());
 
-              return bpmJob;
+            return bpmJob;
 
-          }else {
+        }else {
 
-              task = taskService.createTaskQuery().processInstanceId(processInstanceId).active().singleResult();
+            task = taskService.createTaskQuery().processInstanceId(processInstanceId).active().singleResult();
 
-              Object dataObj = taskService.getVariable(task.getId(), "data");
+            Object dataObj = taskService.getVariable(task.getId(), "data");
 
-              // recuperate list of authors
-              List<String> listAuthors = _getCandidateGroups(task.getId());
+            // recuperate list of authors
+            List<String> listAuthors = _getCandidateGroups(task.getId());
 
-              // recuperate list of readers
-              List<String> listReaders = _getCandidateUsers(task.getId());
+            // recuperate list of readers
+            List<String> listReaders = _getCandidateUsers(task.getId());
 
-              BpmJob bpmJob = new BpmJob(new JSONObject(), task.getName(), task.getAssignee(), false, task.getProcessInstanceId(), null, null);
+            BpmJob bpmJob = new BpmJob(new JSONObject(), task.getName(), task.getAssignee(), false, task.getProcessInstanceId(), null, null);
 
-              bpmJob.setProcessName(processInstance.getProcessDefinitionName());
+            bpmJob.setProcessName(processInstance.getProcessDefinitionName());
 
-              bpmJob.setProcessID(processInstance.getId());
+            bpmJob.setProcessID(processInstance.getId());
 
-              bpmJob.setDataObject(dataObj);
+            bpmJob.setDataObject(dataObj);
 
-              bpmJob.setAuthors(listAuthors);
+            bpmJob.setAuthors(listAuthors);
 
-              bpmJob.setReaders(listReaders);
+            bpmJob.setReaders(listReaders);
 
-              return bpmJob;
-          }
-
-
-
-      }
+            return bpmJob;
+        }
 
 
-     /**
-      * @return A respnse of {@link JSONObject} : Return historic instance list.
-      * @Param A hash map of {@link Map} : contains a list of variables
-      */
-      public BpmJob _initAndNextTask(String processKey, String decision, String wfComment, Object data, AclClass aclClass) throws Exception {
 
-          // initialize the set of variables to send it to flowable
-          Map<String, Object> variables = new HashMap<>();
+    }
 
-          variables.put("Decision", decision);
 
-          variables.put("description", wfComment);
+    /**
+     * @return A respnse of {@link JSONObject} : Return historic instance list.
+     * @Param A hash map of {@link Map} : contains a list of variables
+     */
+    public BpmJob _initAndNextTask(String processKey, String decision, String wfComment, Object data, AclClass aclClass) throws Exception {
 
-          variables.put("data", data);
+        // initialize the set of variables to send it to flowable
+        Map<String, Object> variables = new HashMap<>();
 
-          variables.put("sids", currentUser.getSid());
+        variables.put("Decision", decision);
 
-          variables.put("processKey", processKey);
+        variables.put("description", wfComment);
 
-          variables.put("initiator", currentUser.getEmployeSid());
+        variables.put("data", data);
 
-          ProcessInstance startedProcessInstance = runtimeService.startProcessInstanceByKey(variables.get("processKey").toString(), variables);
+        variables.put("sids", currentUser.getSid());
 
-          // recuperate the current task before rooting
-          Task task = taskService.createTaskQuery().processInstanceId(startedProcessInstance.getProcessInstanceId()).active().singleResult();
+        variables.put("processKey", processKey);
 
-          if (task != null) {
+        variables.put("initiator", currentUser.getEmployeSid());
+
+        ProcessInstance startedProcessInstance = runtimeService.startProcessInstanceByKey(variables.get("processKey").toString(), variables);
+
+        // recuperate the current task before rooting
+        Task task = taskService.createTaskQuery().processInstanceId(startedProcessInstance.getProcessInstanceId()).active().singleResult();
+
+        if (task != null) {
             _finishTask(task.getId(), variables);
-          }
+        }
 
-          HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(startedProcessInstance.getProcessInstanceId()).singleResult();
-
-
-          if(processInstance.getEndTime() != null) {
-
-              Object dataObj = historyService.createHistoricVariableInstanceQuery().variableName("data").processInstanceId(processInstance.getId()).list().get(0).getValue();
-
-              HistoricActivityInstance activityInstance = historyService.createHistoricActivityInstanceQuery().processInstanceId(startedProcessInstance.getProcessInstanceId()).activityId(processInstance.getEndActivityId()).singleResult();
-              String endActivityName = activityInstance != null ? activityInstance.getActivityName() : task.getName();
-
-              BpmJob bpmJob =  new BpmJob(new JSONObject(), endActivityName, task.getAssignee(), false, task.getProcessInstanceId(), null, null);
-
-              bpmJob.setProcessName(processInstance.getProcessDefinitionName());
-
-              bpmJob.setEndProcess(true);
-
-              bpmJob.setProcessID(processInstance.getId());
-
-              bpmJob.setDataObject(dataObj);
-
-              bpmJob.setAuthors(new ArrayList<>());
-
-              bpmJob.setReaders(new ArrayList<>());
-
-              return bpmJob;
-
-          }else {
-
-              task = taskService.createTaskQuery().processInstanceId(startedProcessInstance.getProcessInstanceId()).active().singleResult();
-
-              Object dataObj = task != null ? taskService.getVariable(task.getId(), "data") : historyService.createHistoricVariableInstanceQuery().variableName("data").processInstanceId(processInstance.getId()).singleResult().getValue();
-
-              // recuperate list of authors
-              List<String> listAuthors = task != null ? _getCandidateGroups(task.getId()) : new ArrayList<>();
-
-              // recuperate list of readers
-              List<String> listReaders = task != null ? _getCandidateUsers(task.getId()) : new ArrayList<>();
-
-              BpmJob bpmJob =  new BpmJob(new JSONObject(), task.getName(), task.getAssignee(), false, task.getProcessInstanceId(), null, null);
-
-              bpmJob.setProcessName(processInstance.getProcessDefinitionName());
-
-              bpmJob.setEndProcess(false);
-
-              bpmJob.setProcessID(processInstance.getId());
-
-              bpmJob.setDataObject(dataObj);
-
-              bpmJob.setAuthors(listAuthors);
-
-              bpmJob.setReaders(listReaders);
-
-              return bpmJob;
-          }
+        HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(startedProcessInstance.getProcessInstanceId()).singleResult();
 
 
+        if(processInstance.getEndTime() != null) {
 
-      }
+            Object dataObj = historyService.createHistoricVariableInstanceQuery().variableName("data").processInstanceId(processInstance.getId()).list().get(0).getValue();
 
-      /**
-       *
-       * @param taskId
-       *     A String of {@link Task} : current activity instance id.
-       * @return
-       *     A respnse of {@link ArrayList} : Return list of authors.
-       */
-      public List<String> _getCandidateGroups(String taskId) {
+            HistoricActivityInstance activityInstance = historyService.createHistoricActivityInstanceQuery().processInstanceId(startedProcessInstance.getProcessInstanceId()).activityId(processInstance.getEndActivityId()).singleResult();
+            String endActivityName = activityInstance != null ? activityInstance.getActivityName() : task.getName();
+
+            BpmJob bpmJob =  new BpmJob(new JSONObject(), endActivityName, task.getAssignee(), false, task.getProcessInstanceId(), null, null);
+
+            bpmJob.setProcessName(processInstance.getProcessDefinitionName());
+
+            bpmJob.setEndProcess(true);
+
+            bpmJob.setProcessID(processInstance.getId());
+
+            bpmJob.setDataObject(dataObj);
+
+            bpmJob.setAuthors(new ArrayList<>());
+
+            bpmJob.setReaders(new ArrayList<>());
+
+            return bpmJob;
+
+        }else {
+
+            task = taskService.createTaskQuery().processInstanceId(startedProcessInstance.getProcessInstanceId()).active().singleResult();
+
+            Object dataObj = task != null ? taskService.getVariable(task.getId(), "data") : historyService.createHistoricVariableInstanceQuery().variableName("data").processInstanceId(processInstance.getId()).singleResult().getValue();
+
+            // recuperate list of authors
+            List<String> listAuthors = task != null ? _getCandidateGroups(task.getId()) : new ArrayList<>();
+
+            // recuperate list of readers
+            List<String> listReaders = task != null ? _getCandidateUsers(task.getId()) : new ArrayList<>();
+
+            BpmJob bpmJob =  new BpmJob(new JSONObject(), task.getName(), task.getAssignee(), false, task.getProcessInstanceId(), null, null);
+
+            bpmJob.setProcessName(processInstance.getProcessDefinitionName());
+
+            bpmJob.setEndProcess(false);
+
+            bpmJob.setProcessID(processInstance.getId());
+
+            bpmJob.setDataObject(dataObj);
+
+            bpmJob.setAuthors(listAuthors);
+
+            bpmJob.setReaders(listReaders);
+
+            return bpmJob;
+        }
+
+
+
+    }
+
+    /**
+     *
+     * @param taskId
+     *     A String of {@link Task} : current activity instance id.
+     * @return
+     *     A respnse of {@link ArrayList} : Return list of authors.
+     */
+    public List<String> _getCandidateGroups(String taskId) {
 
         // initialize a new list of groups
         List<String> Groups = new ArrayList<String>();
@@ -903,28 +903,28 @@ public class WorkflowService {
         // iterate the extracted list of actors
         for (IdentityLinkInfo identityLink : identityLinks) {
 
-          // check the type of actor (is a candidate & and is a group)
-          if (IdentityLinkType.CANDIDATE.equals(identityLink.getType()) && identityLink.getGroupId() != null) {
+            // check the type of actor (is a candidate & and is a group)
+            if (IdentityLinkType.CANDIDATE.equals(identityLink.getType()) && identityLink.getGroupId() != null) {
 
-            // pushed to the result list
-            Groups.add(identityLink.getGroupId());
+                // pushed to the result list
+                Groups.add(identityLink.getGroupId());
 
-          }
+            }
         }
 
         // return the list of candidate groups
         return  Groups;
-      }
+    }
 
 
-      /**
-       *
-       * @param taskId
-       *     A String of {@link Task} : current activity instance id.
-       * @return
-       *     A respnse of {@link ArrayList} : Return list of readers.
-       */
-      public List<String> _getCandidateUsers(String taskId) {
+    /**
+     *
+     * @param taskId
+     *     A String of {@link Task} : current activity instance id.
+     * @return
+     *     A respnse of {@link ArrayList} : Return list of readers.
+     */
+    public List<String> _getCandidateUsers(String taskId) {
 
         // initialize a new list of groups
         List<String> users = new ArrayList<String>();
@@ -935,113 +935,113 @@ public class WorkflowService {
         // iterate the extracted list of actors
         for (IdentityLinkInfo identityLink : identityLinks) {
 
-          // check the type of actor (is a candidate & and is a user)
-          if (IdentityLinkType.CANDIDATE.equals(identityLink.getType()) && identityLink.getUserId() != null) {
+            // check the type of actor (is a candidate & and is a user)
+            if (IdentityLinkType.CANDIDATE.equals(identityLink.getType()) && identityLink.getUserId() != null) {
 
-            // pushed to the result list
-            users.add(identityLink.getUserId());
+                // pushed to the result list
+                users.add(identityLink.getUserId());
 
-          }
+            }
         }
 
         // return the list of candidate groups
         return  users;
-      }
+    }
 
 
-      /**
-       *
-       * @param processInstanceId
-       *     A String of {@link String} : process instance id.
-       * @return
-       *     A respnse of {@link Task} : Return task Object.
-       */
-      public Task getActifTaskOfProcessInstance(String processInstanceId){
+    /**
+     *
+     * @param processInstanceId
+     *     A String of {@link String} : process instance id.
+     * @return
+     *     A respnse of {@link Task} : Return task Object.
+     */
+    public Task getActifTaskOfProcessInstance(String processInstanceId){
         try {
-          return taskService.createTaskQuery().processInstanceId(processInstanceId).active().list().get(0);
+            return taskService.createTaskQuery().processInstanceId(processInstanceId).active().list().get(0);
         }catch(Exception e){
-          return null;
+            return null;
         }
-      }
+    }
 
-      public void jumpToTask(String processInstanceId, String targetTaskDefinitionKey) {
+    public void jumpToTask(String processInstanceId, String targetTaskDefinitionKey) {
         int tries = 0;
         while (tries < 5) {
-          try {
-            List<Task> activeTasks = taskService.createTaskQuery().processInstanceId(processInstanceId).active().list();
-            java.util.Set<String> sourceActivityIds = new java.util.HashSet<>();
-            if (activeTasks != null && !activeTasks.isEmpty()) {
-              for (Task t : activeTasks) {
-                if (t.getTaskDefinitionKey() != null) sourceActivityIds.add(t.getTaskDefinitionKey());
-              }
-            } else {
-              // No active user tasks yet: use active activity ids of root execution
-              org.flowable.engine.runtime.Execution root =
-                  runtimeService.createExecutionQuery().processInstanceId(processInstanceId).onlyProcessInstanceExecutions().singleResult();
-              if (root != null) {
-                List<String> actives = runtimeService.getActiveActivityIds(root.getId());
-                if (actives != null) sourceActivityIds.addAll(actives);
-              }
+            try {
+                List<Task> activeTasks = taskService.createTaskQuery().processInstanceId(processInstanceId).active().list();
+                java.util.Set<String> sourceActivityIds = new java.util.HashSet<>();
+                if (activeTasks != null && !activeTasks.isEmpty()) {
+                    for (Task t : activeTasks) {
+                        if (t.getTaskDefinitionKey() != null) sourceActivityIds.add(t.getTaskDefinitionKey());
+                    }
+                } else {
+                    // No active user tasks yet: use active activity ids of root execution
+                    org.flowable.engine.runtime.Execution root =
+                            runtimeService.createExecutionQuery().processInstanceId(processInstanceId).onlyProcessInstanceExecutions().singleResult();
+                    if (root != null) {
+                        List<String> actives = runtimeService.getActiveActivityIds(root.getId());
+                        if (actives != null) sourceActivityIds.addAll(actives);
+                    }
+                }
+                if (sourceActivityIds.isEmpty()) {
+                    tries++;
+                    try { Thread.sleep(100L * (tries + 1)); } catch (InterruptedException ignored) {}
+                    continue;
+                }
+                org.flowable.engine.runtime.ChangeActivityStateBuilder builder =
+                        runtimeService.createChangeActivityStateBuilder().processInstanceId(processInstanceId);
+                builder.moveActivityIdsToSingleActivityId(new java.util.ArrayList<>(sourceActivityIds), targetTaskDefinitionKey).changeState();
+                // wait a moment for the target user task to be created
+                Task t = null;
+                for (int i = 0; i < 10 && t == null; i++) {
+                    try { Thread.sleep(100); } catch (InterruptedException ignored) {}
+                    t = taskService.createTaskQuery().processInstanceId(processInstanceId).active().singleResult();
+                }
+                return;
+            } catch (FlowableOptimisticLockingException e) {
+                try { Thread.sleep(150L * (tries + 1)); } catch (InterruptedException ignored) {}
+                tries++;
+            } catch (Exception ignored) {
+                return;
             }
-            if (sourceActivityIds.isEmpty()) {
-              tries++;
-              try { Thread.sleep(100L * (tries + 1)); } catch (InterruptedException ignored) {}
-              continue;
-            }
-            org.flowable.engine.runtime.ChangeActivityStateBuilder builder =
-                runtimeService.createChangeActivityStateBuilder().processInstanceId(processInstanceId);
-            builder.moveActivityIdsToSingleActivityId(new java.util.ArrayList<>(sourceActivityIds), targetTaskDefinitionKey).changeState();
-            // wait a moment for the target user task to be created
-            Task t = null;
-            for (int i = 0; i < 10 && t == null; i++) {
-              try { Thread.sleep(100); } catch (InterruptedException ignored) {}
-              t = taskService.createTaskQuery().processInstanceId(processInstanceId).active().singleResult();
-            }
-            return;
-          } catch (FlowableOptimisticLockingException e) {
-            try { Thread.sleep(150L * (tries + 1)); } catch (InterruptedException ignored) {}
-            tries++;
-          } catch (Exception ignored) {
-            return;
-          }
         }
-      }
+    }
 
-      public BpmJob jumpToTaskAndBuildJob(String processInstanceId, String targetTaskDefinitionKey) {
+    public BpmJob jumpToTaskAndBuildJob(String processInstanceId, String targetTaskDefinitionKey) {
         Object dataObj = null;
         try {
-          dataObj = runtimeService.getVariable(processInstanceId, "data");
+            dataObj = runtimeService.getVariable(processInstanceId, "data");
         } catch (Exception ignored) {}
         Task current = taskService.createTaskQuery().processInstanceId(processInstanceId).active().singleResult();
         if (dataObj != null) {
-          try {
-            runtimeService.setVariable(processInstanceId, "data", dataObj);
-            if (current != null) {
-              runtimeService.setVariable(current.getExecutionId(), "data", dataObj);
-              taskService.setVariable(current.getId(), "data", dataObj);
-              taskService.setVariableLocal(current.getId(), "data", dataObj);
-              runtimeService.setVariableLocal(processInstanceId, "data", dataObj);
-            }
-          } catch (Exception ignored) {}
+            try {
+                runtimeService.setVariable(processInstanceId, "data", dataObj);
+                if (current != null) {
+                    runtimeService.setVariable(current.getExecutionId(), "data", dataObj);
+                    taskService.setVariable(current.getId(), "data", dataObj);
+                    taskService.setVariableLocal(current.getId(), "data", dataObj);
+                    runtimeService.setVariableLocal(processInstanceId, "data", dataObj);
+                }
+            } catch (Exception ignored) {}
         }
         jumpToTask(processInstanceId, targetTaskDefinitionKey);
         Task target = null;
         for (int i = 0; i < 10 && target == null; i++) {
-          try { Thread.sleep(100); } catch (InterruptedException ignored) {}
-          target = taskService.createTaskQuery().processInstanceId(processInstanceId).taskDefinitionKey(targetTaskDefinitionKey).active().singleResult();
+            try { Thread.sleep(100); } catch (InterruptedException ignored) {}
+            target = taskService.createTaskQuery().processInstanceId(processInstanceId).taskDefinitionKey(targetTaskDefinitionKey).active().singleResult();
         }
         if (target == null) {
-          target = taskService.createTaskQuery().processInstanceId(processInstanceId).active().singleResult();
+            target = taskService.createTaskQuery().processInstanceId(processInstanceId).active().singleResult();
         }
         HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
         if (dataObj == null && target != null) {
-          try { dataObj = taskService.getVariable(target.getId(), "data"); } catch (Exception ignored) {}
+            try { dataObj = taskService.getVariable(target.getId(), "data"); } catch (Exception ignored) {}
         }
         List<String> authors = new ArrayList<>();
         List<String> readers = new ArrayList<>();
         if (target != null) {
-          try { authors = _getCandidateGroups(target.getId()); } catch (Exception ignored) {}
-          try { readers = _getCandidateUsers(target.getId()); } catch (Exception ignored) {}
+            try { authors = _getCandidateGroups(target.getId()); } catch (Exception ignored) {}
+            try { readers = _getCandidateUsers(target.getId()); } catch (Exception ignored) {}
         }
         BpmJob bpmJob = new BpmJob(new JSONObject(), target != null ? target.getName() : null, target != null ? target.getAssignee() : null, false, processInstanceId, null, null);
         bpmJob.setProcessName(processInstance != null ? processInstance.getProcessDefinitionName() : null);
@@ -1050,18 +1050,18 @@ public class WorkflowService {
         bpmJob.setAuthors(authors != null ? authors : new ArrayList<>());
         bpmJob.setReaders(readers != null ? readers : new ArrayList<>());
         return bpmJob;
-      }
+    }
 
-      /**
-       *
-       * @param taskId
-       *     A String of {@link String} : current activity instance id.
-       * @param variable
-       *     A String of {@link Map} : list of params to passed to workflow.
-       * @return
-       *     A respnse of {@link Void} : Return task Object.
-       */
-      public void _finishTask(String taskId, Map<String, Object> variable) throws JSONException, ParseException {
+    /**
+     *
+     * @param taskId
+     *     A String of {@link String} : current activity instance id.
+     * @param variable
+     *     A String of {@link Map} : list of params to passed to workflow.
+     * @return
+     *     A respnse of {@link Void} : Return task Object.
+     */
+    public void _finishTask(String taskId, Map<String, Object> variable) throws JSONException, ParseException {
 
         //persist the decision in workflow variables
         taskService.setVariable(taskId, taskId + " :decision", variable.get("Decision"));
@@ -1069,12 +1069,12 @@ public class WorkflowService {
         //persist the commetaskService.setVariable(taskId, data.taskDtoList, task
         taskService.setVariable(taskId, taskId + " :description", variable.get("description"));
 
-          // ajouter par ameni à modifer par displayname ofUser
+        // ajouter par ameni à modifer par displayname ofUser
         taskService.setVariable(taskId, taskId + " :authentifier", currentUser.getDisplayName());
 
         taskService.setVariable(taskId, "authentifier", currentUser.getDisplayName());
 
-          //initialize variables to to passing them to workflow
+        //initialize variables to to passing them to workflow
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
         LocalDateTime localDateTime=LocalDateTime.now();
         String formattedString = localDateTime.format(formatter);
@@ -1083,17 +1083,17 @@ public class WorkflowService {
 
         // finish th current task
         taskService.complete(taskId, variable);
-      }
+    }
 
-      /**
-       * @param processInstanceId A String of {@link String} : current activity instance id.
-       * @return A respnse of {@link Date} : Return task Object.
-       */
-      public Date getDueDateInstance(String processInstanceId) throws JSONException, ParseException {
+    /**
+     * @param processInstanceId A String of {@link String} : current activity instance id.
+     * @return A respnse of {@link Date} : Return task Object.
+     */
+    public Date getDueDateInstance(String processInstanceId) throws JSONException, ParseException {
 
-          Task task = taskService.createTaskQuery().processInstanceId(processInstanceId).active().singleResult();
-          return task.getDueDate();
-      }
+        Task task = taskService.createTaskQuery().processInstanceId(processInstanceId).active().singleResult();
+        return task.getDueDate();
+    }
 
     /**
      * @param processInstanceId A String of {@link String} : current activity instance id.
@@ -1159,84 +1159,84 @@ public class WorkflowService {
 
 
     /**
-       *
-       * @param task
-       *     A String of {@link Task} : current activity instance id.
-       * @return
-       *     A respnse of {@link ArrayList} : Return list of authors.
-       */
-      public List<String> getCandidateGroups(Task task) {
+     *
+     * @param task
+     *     A String of {@link Task} : current activity instance id.
+     * @return
+     *     A respnse of {@link ArrayList} : Return list of authors.
+     */
+    public List<String> getCandidateGroups(Task task) {
         List<String> Groups = new ArrayList<String>();
 
 
         try {
-          List<? extends IdentityLinkInfo> identityLinks = taskService.getIdentityLinksForTask(task.getId());
+            List<? extends IdentityLinkInfo> identityLinks = taskService.getIdentityLinksForTask(task.getId());
 
-          for (IdentityLinkInfo identityLink : identityLinks) {
-            String type = identityLink.getType();
-            String groupId = identityLink.getGroupId();
-            if (IdentityLinkType.CANDIDATE.equals(type) && groupId != null) {
-              Groups.add(groupId);
+            for (IdentityLinkInfo identityLink : identityLinks) {
+                String type = identityLink.getType();
+                String groupId = identityLink.getGroupId();
+                if (IdentityLinkType.CANDIDATE.equals(type) && groupId != null) {
+                    Groups.add(groupId);
+                }
             }
-          }
         }catch(Exception e){
             log.error("condidate group Not Fouwnd");
-    //      System.out.println("condidate group Not Fouwnd");
+            //      System.out.println("condidate group Not Fouwnd");
         }
 
         return  Groups;
-      }
+    }
 
-      /**
-       *
-       * @param taskId
-       *     A String of {@link Task} : current activity instance id.
-       * @return
-       *     A respnse of {@link ArrayList} : Return list of readers.
-       */
-      public List<String> getCandidateUsers(String taskId) {
+    /**
+     *
+     * @param taskId
+     *     A String of {@link Task} : current activity instance id.
+     * @return
+     *     A respnse of {@link ArrayList} : Return list of readers.
+     */
+    public List<String> getCandidateUsers(String taskId) {
 
         List<String> User = new ArrayList<String>();
         try{
-          List<? extends IdentityLinkInfo> identityLinks = taskService.getIdentityLinksForTask(taskId);
+            List<? extends IdentityLinkInfo> identityLinks = taskService.getIdentityLinksForTask(taskId);
 
-          for (IdentityLinkInfo identityLink : identityLinks) {
-            String type = identityLink.getType();
-            String userId = identityLink.getUserId();
-            if (IdentityLinkType.CANDIDATE.equals(type) && userId != null) {
-              User.add(userId);
+            for (IdentityLinkInfo identityLink : identityLinks) {
+                String type = identityLink.getType();
+                String userId = identityLink.getUserId();
+                if (IdentityLinkType.CANDIDATE.equals(type) && userId != null) {
+                    User.add(userId);
+                }
             }
-          }
         }catch(Exception e){
             log.error("condidate users Not Fouwnd");
         }
 
         return  User;
-      }
+    }
 
-      /**
-       *
-       * @param processInstance
-       *     A String of {@link String} : current activity instance id.
-       * @return
-       *     A respnse of {@link ArrayList} : Return list of readers.
-       */
-      public String getEndActivityName(String processInstance) {
+    /**
+     *
+     * @param processInstance
+     *     A String of {@link String} : current activity instance id.
+     * @return
+     *     A respnse of {@link ArrayList} : Return list of readers.
+     */
+    public String getEndActivityName(String processInstance) {
 
         NativeHistoricActivityInstanceQuery query = historyService.createNativeHistoricActivityInstanceQuery().sql("SELECT * FROM act_hi_actinst WHERE PROC_INST_ID_='" + processInstance + "' AND act_type_ = 'endEvent' ORDER BY START_TIME_ DESC");
         HistoricActivityInstance task = query.singleResult();
 
         return task.getActivityName();
-      }
+    }
 
-      /**
-       *
-       * @param taskid
-       *     A String of {@link String} : current activity instance id.
-       * @return
-       *     A respnse of {@link ArrayList} : Return the process definition id.
-       */
-      public String getprocessInstanceOftask(String taskid) {
+    /**
+     *
+     * @param taskid
+     *     A String of {@link String} : current activity instance id.
+     * @return
+     *     A respnse of {@link ArrayList} : Return the process definition id.
+     */
+    public String getprocessInstanceOftask(String taskid) {
         NativeTaskQuery query = taskService.createNativeTaskQuery().sql("SELECT * FROM act_hi_taskinst where ID_='" + taskid + "'");
         Task task = query.list().get(0);
         String processInstanceId = task.getProcessInstanceId();
@@ -1246,18 +1246,18 @@ public class WorkflowService {
 
         return processInstance.getProcessDefinitionId();
 
-      }
+    }
 
-      /**
-       *
-       * @param dob
-       *     A String of {@link LocalDateTime} : start date and time of activity .
-       * @param now
-       *     A String of {@link LocalDateTime} : current date and time .
-       * @return
-       *     A respnse of {@link String} : Return the due date.
-       */
-      public String getTime(LocalDateTime dob, LocalDateTime now) {
+    /**
+     *
+     * @param dob
+     *     A String of {@link LocalDateTime} : start date and time of activity .
+     * @param now
+     *     A String of {@link LocalDateTime} : current date and time .
+     * @return
+     *     A respnse of {@link String} : Return the due date.
+     */
+    public String getTime(LocalDateTime dob, LocalDateTime now) {
         LocalDateTime today = LocalDateTime.of(now.getYear(), now.getMonthValue(), now.getDayOfMonth(), dob.getHour(), dob.getMinute(), dob.getSecond());
         Duration duration = Duration.between(today, now);
         long seconds = duration.getSeconds();
@@ -1265,33 +1265,33 @@ public class WorkflowService {
         long minutes = ((seconds % Duration.ofHours(1).getSeconds()) / Duration.ofMinutes(1).getSeconds());
         long secs = (seconds % Duration.ofMinutes(1).getSeconds());
         return hours + "H " + minutes + "M " + secs + "S";
-      }
+    }
 
-      /**
-       *
-       * @param taskId
-       *     A String of {@link String} : current activity instance id.
-       * @return
-       *     A respnse of {@link ArrayList} : Return the process model.
-       */
-      public Process getProcess(String taskId) {
+    /**
+     *
+     * @param taskId
+     *     A String of {@link String} : current activity instance id.
+     * @return
+     *     A respnse of {@link ArrayList} : Return the process model.
+     */
+    public Process getProcess(String taskId) {
         Process process = repositoryService.getBpmnModel(getprocessInstanceOftask(taskId)).getMainProcess();
         return process;
-      }
+    }
 
-      public Process getProcessModel(String processInstanceId) {
+    public Process getProcessModel(String processInstanceId) {
         Process process = repositoryService.getBpmnModel(runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).list().get(0).getProcessDefinitionId()).getMainProcess();
         return process;
-      }
+    }
 
-      public Object initalizeProxy(Object obj) {
+    public Object initalizeProxy(Object obj) {
         if (obj instanceof HibernateProxy) {
-          return ((HibernateProxy) obj).getHibernateLazyInitializer().getImplementation();
+            return ((HibernateProxy) obj).getHibernateLazyInitializer().getImplementation();
         }
         return obj;
-      }
+    }
 
-      public List<String> get_activities_by_process(String processDefinitionKey) {
+    public List<String> get_activities_by_process(String processDefinitionKey) {
 
         List<String> activitys = new ArrayList<>();
 
@@ -1302,13 +1302,13 @@ public class WorkflowService {
         List<UserTask> tasks = process.findFlowElementsOfType(UserTask.class);
 
         for(UserTask userTask : tasks){
-          activitys.add(userTask.getName());
+            activitys.add(userTask.getName());
         }
 
         return  activitys;
-      }
+    }
 
-      public List getFirstActivityNameWithoutProcessInstance(String processId) throws FileNotFoundException {
+    public List getFirstActivityNameWithoutProcessInstance(String processId) throws FileNotFoundException {
 
         ProcessDefinitionQuery listprocess = repositoryService.createProcessDefinitionQuery().processDefinitionKey(processId).orderByProcessDefinitionVersion().desc();
 
@@ -1323,19 +1323,19 @@ public class WorkflowService {
 
 
         for (SequenceFlow sequenceFlow : sequenceFlows) {
-          if (sequenceFlow.getSourceFlowElement().getClass().equals(StartEvent.class)) {
-            activity.add(sequenceFlow.getTargetFlowElement().getName());
-          }
+            if (sequenceFlow.getSourceFlowElement().getClass().equals(StartEvent.class)) {
+                activity.add(sequenceFlow.getTargetFlowElement().getName());
+            }
         }
 
         return activity;
-      }
+    }
 
-      public List<Object> getInstanceEditorJson(String processInstance) throws Exception {
+    public List<Object> getInstanceEditorJson(String processInstance) throws Exception {
         BpmnModel bpmnModel = repositoryService.getBpmnModel(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance).list().get(0).getProcessDefinitionId());
         if (bpmnModel.getLocationMap().size() == 0) {
-          BpmnAutoLayout bpmnLayout = new BpmnAutoLayout(bpmnModel);
-          bpmnLayout.execute();
+            BpmnAutoLayout bpmnLayout = new BpmnAutoLayout(bpmnModel);
+            bpmnLayout.execute();
         }
         BpmnJsonConverter bpmnJsonConverter = new BpmnJsonConverter();
         ObjectNode modelNode = bpmnJsonConverter.convertToJson(bpmnModel);
@@ -1359,55 +1359,55 @@ public class WorkflowService {
 
         List<JSONObject> listFlows = new ArrayList<>();
         for(SequenceFlow sequenceFlow: sequenceFlows ){
-          JSONObject jsonObject = new JSONObject();
-          jsonObject.put("id",sequenceFlow.getId());
-          jsonObject.put("name",sequenceFlow.getName());
-          List<JSONObject> listProps = new ArrayList<>();
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("id",sequenceFlow.getId());
+            jsonObject.put("name",sequenceFlow.getName());
+            List<JSONObject> listProps = new ArrayList<>();
 
-          JSONObject jsonObjectTemp = new JSONObject();
-          for(HistoricActivityInstance historicActivityInstance : historicActInstances) {
-            if (sequenceFlow.getId().equals(historicActivityInstance.getActivityId())) {
-              jsonObjectTemp = new JSONObject();
-              jsonObjectTemp.put("name","Date Début");
-              String startDate = formatter.format(ZonedDateTime.ofInstant(historicActivityInstance.getStartTime().toInstant(), ZoneId.systemDefault()));
-              jsonObjectTemp.put("value",startDate);
-              listProps.add(jsonObjectTemp);
+            JSONObject jsonObjectTemp = new JSONObject();
+            for(HistoricActivityInstance historicActivityInstance : historicActInstances) {
+                if (sequenceFlow.getId().equals(historicActivityInstance.getActivityId())) {
+                    jsonObjectTemp = new JSONObject();
+                    jsonObjectTemp.put("name","Date Début");
+                    String startDate = formatter.format(ZonedDateTime.ofInstant(historicActivityInstance.getStartTime().toInstant(), ZoneId.systemDefault()));
+                    jsonObjectTemp.put("value",startDate);
+                    listProps.add(jsonObjectTemp);
+                }
             }
-          }
-          jsonObjectTemp = new JSONObject();
-          jsonObjectTemp.put("name","Condition expression");
-          jsonObjectTemp.put("value",sequenceFlow.getConditionExpression());
-          listProps.add(jsonObjectTemp);
-          jsonObject.put("properties",listProps);
-          jsonObject.put("sourceRef",sequenceFlow.getSourceRef());
-          jsonObject.put("targetRef",sequenceFlow.getTargetRef());
-          jsonObject.put("type","sequenceFlow");
-          List<JSONObject> jsonArrayTemp = new ArrayList<>();
-          List<Integer> list = sequenceFlow.getWaypoints();
-          for(int i = 0; i < list.size(); i = i + 2){
-            JSONObject jsonTemp = new JSONObject();
-            jsonTemp.put("x",list.get(i));
-            jsonTemp.put("y",list.get(i+1));
-            jsonArrayTemp.add(jsonTemp);
-          }
-          jsonObject.put("waypoints",jsonArrayTemp);
-          for(HistoricActivityInstance historicActivityInstance : historicActInstances) {
-            if (sequenceFlow.getId().equals(historicActivityInstance.getActivityId())) {
-              jsonObject.put("active", true);
+            jsonObjectTemp = new JSONObject();
+            jsonObjectTemp.put("name","Condition expression");
+            jsonObjectTemp.put("value",sequenceFlow.getConditionExpression());
+            listProps.add(jsonObjectTemp);
+            jsonObject.put("properties",listProps);
+            jsonObject.put("sourceRef",sequenceFlow.getSourceRef());
+            jsonObject.put("targetRef",sequenceFlow.getTargetRef());
+            jsonObject.put("type","sequenceFlow");
+            List<JSONObject> jsonArrayTemp = new ArrayList<>();
+            List<Integer> list = sequenceFlow.getWaypoints();
+            for(int i = 0; i < list.size(); i = i + 2){
+                JSONObject jsonTemp = new JSONObject();
+                jsonTemp.put("x",list.get(i));
+                jsonTemp.put("y",list.get(i+1));
+                jsonArrayTemp.add(jsonTemp);
             }
-          }
-          listFlows.add(jsonObject);
+            jsonObject.put("waypoints",jsonArrayTemp);
+            for(HistoricActivityInstance historicActivityInstance : historicActInstances) {
+                if (sequenceFlow.getId().equals(historicActivityInstance.getActivityId())) {
+                    jsonObject.put("active", true);
+                }
+            }
+            listFlows.add(jsonObject);
         }
         result.add(jsonObjectParsed);
         result.add(listFlows);
         return result;
-      }
+    }
 
-      public List<Object> getDefinitionEditorJson(String processDefinition) throws Exception {
+    public List<Object> getDefinitionEditorJson(String processDefinition) throws Exception {
         BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinition);
         if (bpmnModel.getLocationMap().size() == 0) {
-          BpmnAutoLayout bpmnLayout = new BpmnAutoLayout(bpmnModel);
-          bpmnLayout.execute();
+            BpmnAutoLayout bpmnLayout = new BpmnAutoLayout(bpmnModel);
+            bpmnLayout.execute();
         }
         BpmnJsonConverter bpmnJsonConverter = new BpmnJsonConverter();
         ObjectNode modelNode = bpmnJsonConverter.convertToJson(bpmnModel);
@@ -1422,196 +1422,196 @@ public class WorkflowService {
 
         List<JSONObject> listFlows = new ArrayList<>();
         for(SequenceFlow sequenceFlow: sequenceFlows ){
-          JSONObject jsonObject = new JSONObject();
-          jsonObject.put("id",sequenceFlow.getId());
-          jsonObject.put("name",sequenceFlow.getName());
-          List<JSONObject> listProps = new ArrayList<>();
-          JSONObject jsonObjectTemp = new JSONObject();
-          jsonObjectTemp.put("name","Condition expression");
-          jsonObjectTemp.put("value",sequenceFlow.getConditionExpression());
-          listProps.add(jsonObjectTemp);
-          jsonObject.put("properties",listProps);
-          jsonObject.put("sourceRef",sequenceFlow.getSourceRef());
-          jsonObject.put("targetRef",sequenceFlow.getTargetRef());
-          jsonObject.put("type","sequenceFlow");
-          List<JSONObject> jsonArrayTemp = new ArrayList<>();
-          List<Integer> list = sequenceFlow.getWaypoints();
-          for(int i = 0; i < list.size(); i = i + 2){
-            JSONObject jsonTemp = new JSONObject();
-            jsonTemp.put("x",list.get(i));
-            jsonTemp.put("y",list.get(i+1));
-            jsonArrayTemp.add(jsonTemp);
-          }
-          jsonObject.put("waypoints",jsonArrayTemp);
-          listFlows.add(jsonObject);
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("id",sequenceFlow.getId());
+            jsonObject.put("name",sequenceFlow.getName());
+            List<JSONObject> listProps = new ArrayList<>();
+            JSONObject jsonObjectTemp = new JSONObject();
+            jsonObjectTemp.put("name","Condition expression");
+            jsonObjectTemp.put("value",sequenceFlow.getConditionExpression());
+            listProps.add(jsonObjectTemp);
+            jsonObject.put("properties",listProps);
+            jsonObject.put("sourceRef",sequenceFlow.getSourceRef());
+            jsonObject.put("targetRef",sequenceFlow.getTargetRef());
+            jsonObject.put("type","sequenceFlow");
+            List<JSONObject> jsonArrayTemp = new ArrayList<>();
+            List<Integer> list = sequenceFlow.getWaypoints();
+            for(int i = 0; i < list.size(); i = i + 2){
+                JSONObject jsonTemp = new JSONObject();
+                jsonTemp.put("x",list.get(i));
+                jsonTemp.put("y",list.get(i+1));
+                jsonArrayTemp.add(jsonTemp);
+            }
+            jsonObject.put("waypoints",jsonArrayTemp);
+            listFlows.add(jsonObject);
         }
         result.add(jsonObjectParsed);
         result.add(listFlows);
         return result;
-      }
+    }
 
-      public List<JSONObject> addHistoricToJSON(List<JSONObject> jsonNode, List<HistoricTaskInstance> historicTaskInstances, List<HistoricActivityInstance> historicstartEventInstances, List<HistoricActivityInstance> historicendEventInstances, List<HistoricActivityInstance> historicexclusiveGatewayInstances){
+    public List<JSONObject> addHistoricToJSON(List<JSONObject> jsonNode, List<HistoricTaskInstance> historicTaskInstances, List<HistoricActivityInstance> historicstartEventInstances, List<HistoricActivityInstance> historicendEventInstances, List<HistoricActivityInstance> historicexclusiveGatewayInstances){
 
-            List<JSONObject> jsonNodeTemp = new ArrayList<>();
-            for (JSONObject objectNode : jsonNode) {
-                int index = 0;
-                if (((JSONObject) objectNode.get("stencil")).get("id").toString().equals("UserTask")) {
-                    for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
+        List<JSONObject> jsonNodeTemp = new ArrayList<>();
+        for (JSONObject objectNode : jsonNode) {
+            int index = 0;
+            if (((JSONObject) objectNode.get("stencil")).get("id").toString().equals("UserTask")) {
+                for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
 
-                        if (objectNode.get("resourceId").toString().equals(historicTaskInstance.getTaskDefinitionKey())) {
-                            JSONObject nodePropertiesOriginal = ((JSONObject) objectNode.get("properties"));
-                            JSONObject nodeProperties = new JSONObject();
+                    if (objectNode.get("resourceId").toString().equals(historicTaskInstance.getTaskDefinitionKey())) {
+                        JSONObject nodePropertiesOriginal = ((JSONObject) objectNode.get("properties"));
+                        JSONObject nodeProperties = new JSONObject();
 
-                            JSONObject nodePropertieUserTaskAssinment = new JSONObject();
-                            JSONObject nodePropertieUserTaskAssinmentAssignment =  new JSONObject();
+                        JSONObject nodePropertieUserTaskAssinment = new JSONObject();
+                        JSONObject nodePropertieUserTaskAssinmentAssignment =  new JSONObject();
 
-                            if(!nodePropertieUserTaskAssinmentAssignment.containsKey("Assignee")) {
-                                nodePropertieUserTaskAssinmentAssignment.put("Assignee",new ArrayList<>());
-                            }
-                            List<JSONObject> nodePropertieUserTaskAssinmentAssignmentAssignee = new ArrayList<>();
-                            JSONObject Assignee = new JSONObject();
-                            Assignee.put("value",historicTaskInstance.getAssignee());
-                            nodePropertieUserTaskAssinmentAssignmentAssignee.add(Assignee);
-                            nodePropertieUserTaskAssinmentAssignment.put("Assignee", nodePropertieUserTaskAssinmentAssignmentAssignee);
+                        if(!nodePropertieUserTaskAssinmentAssignment.containsKey("Assignee")) {
+                            nodePropertieUserTaskAssinmentAssignment.put("Assignee",new ArrayList<>());
+                        }
+                        List<JSONObject> nodePropertieUserTaskAssinmentAssignmentAssignee = new ArrayList<>();
+                        JSONObject Assignee = new JSONObject();
+                        Assignee.put("value",historicTaskInstance.getAssignee());
+                        nodePropertieUserTaskAssinmentAssignmentAssignee.add(Assignee);
+                        nodePropertieUserTaskAssinmentAssignment.put("Assignee", nodePropertieUserTaskAssinmentAssignmentAssignee);
 
-                            if(!nodePropertieUserTaskAssinmentAssignment.containsKey("actionaire")) {
-                                nodePropertieUserTaskAssinmentAssignment.put("actionaire",new ArrayList<>());
-                            }
-                            List<JSONObject> nodePropertieUserTaskAssinmentAssignmentActionaire = new ArrayList<>();
-                            JSONObject actionaire = new JSONObject();
-                            String actionnaire = "";
-                            if(historyService.createHistoricVariableInstanceQuery().variableName(historicTaskInstance.getId() + " :authentifier").list().size() > 0) {
-                                HistoricVariableInstance Actionaire = historyService.createHistoricVariableInstanceQuery().variableName(historicTaskInstance.getId() + " :authentifier").list().get(0);
-                                actionnaire = Actionaire != null? Actionaire.getValue().toString() : null;
-                            }
-                            actionaire.put("value", actionnaire);
-                            nodePropertieUserTaskAssinmentAssignmentActionaire.add(actionaire);
-                            nodePropertieUserTaskAssinmentAssignment.put("actionaire", nodePropertieUserTaskAssinmentAssignmentActionaire);
+                        if(!nodePropertieUserTaskAssinmentAssignment.containsKey("actionaire")) {
+                            nodePropertieUserTaskAssinmentAssignment.put("actionaire",new ArrayList<>());
+                        }
+                        List<JSONObject> nodePropertieUserTaskAssinmentAssignmentActionaire = new ArrayList<>();
+                        JSONObject actionaire = new JSONObject();
+                        String actionnaire = "";
+                        if(historyService.createHistoricVariableInstanceQuery().variableName(historicTaskInstance.getId() + " :authentifier").list().size() > 0) {
+                            HistoricVariableInstance Actionaire = historyService.createHistoricVariableInstanceQuery().variableName(historicTaskInstance.getId() + " :authentifier").list().get(0);
+                            actionnaire = Actionaire != null? Actionaire.getValue().toString() : null;
+                        }
+                        actionaire.put("value", actionnaire);
+                        nodePropertieUserTaskAssinmentAssignmentActionaire.add(actionaire);
+                        nodePropertieUserTaskAssinmentAssignment.put("actionaire", nodePropertieUserTaskAssinmentAssignmentActionaire);
 
-                            if(!nodePropertieUserTaskAssinmentAssignment.containsKey("startDate")) {
-                                nodePropertieUserTaskAssinmentAssignment.put("startDate",new ArrayList<>());
-                            }
-                            List<JSONObject> nodePropertieUserTaskAssinmentAssignmentStartDate = new ArrayList<>();
-                            JSONObject startDate = new JSONObject();
-                            String startDateVal = formatter.format(ZonedDateTime.ofInstant(historicTaskInstance.getCreateTime().toInstant(), ZoneId.systemDefault()));
-                            startDate.put("value", startDateVal);
-                            nodePropertieUserTaskAssinmentAssignmentStartDate.add(startDate);
-                            nodePropertieUserTaskAssinmentAssignment.put("startDate", nodePropertieUserTaskAssinmentAssignmentStartDate);
+                        if(!nodePropertieUserTaskAssinmentAssignment.containsKey("startDate")) {
+                            nodePropertieUserTaskAssinmentAssignment.put("startDate",new ArrayList<>());
+                        }
+                        List<JSONObject> nodePropertieUserTaskAssinmentAssignmentStartDate = new ArrayList<>();
+                        JSONObject startDate = new JSONObject();
+                        String startDateVal = formatter.format(ZonedDateTime.ofInstant(historicTaskInstance.getCreateTime().toInstant(), ZoneId.systemDefault()));
+                        startDate.put("value", startDateVal);
+                        nodePropertieUserTaskAssinmentAssignmentStartDate.add(startDate);
+                        nodePropertieUserTaskAssinmentAssignment.put("startDate", nodePropertieUserTaskAssinmentAssignmentStartDate);
 
-                            if(!nodePropertieUserTaskAssinmentAssignment.containsKey("endDate")) {
-                                nodePropertieUserTaskAssinmentAssignment.put("endDate",new ArrayList<>());
-                            }
-                            List<JSONObject> nodePropertieUserTaskAssinmentAssignmentEndDate = new ArrayList<>();
-                            JSONObject endDate = new JSONObject();
-                            String endDateVal = null;
-                            if(historicTaskInstance.getEndTime() != null) {
-                                endDateVal = formatter.format(ZonedDateTime.ofInstant(historicTaskInstance.getEndTime().toInstant(), ZoneId.systemDefault()));
-                            }
-                            endDate.put("value", endDateVal);
-                            nodePropertieUserTaskAssinmentAssignmentEndDate.add(endDate);
-                            nodePropertieUserTaskAssinmentAssignment.put("endDate", nodePropertieUserTaskAssinmentAssignmentEndDate);
+                        if(!nodePropertieUserTaskAssinmentAssignment.containsKey("endDate")) {
+                            nodePropertieUserTaskAssinmentAssignment.put("endDate",new ArrayList<>());
+                        }
+                        List<JSONObject> nodePropertieUserTaskAssinmentAssignmentEndDate = new ArrayList<>();
+                        JSONObject endDate = new JSONObject();
+                        String endDateVal = null;
+                        if(historicTaskInstance.getEndTime() != null) {
+                            endDateVal = formatter.format(ZonedDateTime.ofInstant(historicTaskInstance.getEndTime().toInstant(), ZoneId.systemDefault()));
+                        }
+                        endDate.put("value", endDateVal);
+                        nodePropertieUserTaskAssinmentAssignmentEndDate.add(endDate);
+                        nodePropertieUserTaskAssinmentAssignment.put("endDate", nodePropertieUserTaskAssinmentAssignmentEndDate);
 
 
-                            if(!nodePropertieUserTaskAssinmentAssignment.containsKey("candidateGroups")) {
-                                nodePropertieUserTaskAssinmentAssignment.put("candidateGroups",new ArrayList<>());
-                            }
-                            List<JSONObject> nodePropertieUserTaskAssinmentAssignmentCandidateGroups = new ArrayList<>();
-                            JSONObject candidateGroup = new JSONObject();
-                            try {
-                                List<HistoricIdentityLink> identitys = historyService.getHistoricIdentityLinksForTask(historicTaskInstance.getId());
-                                if (identitys != null)
-                                    for (HistoricIdentityLink grp : identitys) {
-                                        if (grp.getGroupId() != null && !grp.getGroupId().isEmpty()) {
-                                            candidateGroup.put("value", grp.getGroupId());
-                                            nodePropertieUserTaskAssinmentAssignmentCandidateGroups.add(candidateGroup);
-                                        }
+                        if(!nodePropertieUserTaskAssinmentAssignment.containsKey("candidateGroups")) {
+                            nodePropertieUserTaskAssinmentAssignment.put("candidateGroups",new ArrayList<>());
+                        }
+                        List<JSONObject> nodePropertieUserTaskAssinmentAssignmentCandidateGroups = new ArrayList<>();
+                        JSONObject candidateGroup = new JSONObject();
+                        try {
+                            List<HistoricIdentityLink> identitys = historyService.getHistoricIdentityLinksForTask(historicTaskInstance.getId());
+                            if (identitys != null)
+                                for (HistoricIdentityLink grp : identitys) {
+                                    if (grp.getGroupId() != null && !grp.getGroupId().isEmpty()) {
+                                        candidateGroup.put("value", grp.getGroupId());
+                                        nodePropertieUserTaskAssinmentAssignmentCandidateGroups.add(candidateGroup);
                                     }
-                            }catch (Exception e){
-                                log.error("condidate user Not Fouwnd");
-    //              System.out.println("condidate user Not Fouwnd");
-
-                            }
-                            nodePropertieUserTaskAssinmentAssignment.put("candidateGroups", nodePropertieUserTaskAssinmentAssignmentCandidateGroups);
-
-                            if(!nodePropertieUserTaskAssinmentAssignment.containsKey("candidateUsers")) {
-                                nodePropertieUserTaskAssinmentAssignment.put("candidateUsers",new ArrayList<>());
-                            }
-                            List<JSONObject> nodePropertieUserTaskAssinmentAssignmentCandidateUsers = new ArrayList<>();
-                            JSONObject candidateUser = new JSONObject();
-                            try{
-                                List<HistoricIdentityLink> identitys = historyService.getHistoricIdentityLinksForTask(historicTaskInstance.getId());
-                                if(identitys != null)
-                                    for(HistoricIdentityLink usr : identitys){
-                                        if(usr.getUserId() != null && !usr.getUserId().isEmpty()){
-                                            if(!candidateGroup.containsValue(usr.getUserId())) {
-                                                candidateUser.put("value", usr.getUserId());
-                                                nodePropertieUserTaskAssinmentAssignmentCandidateUsers.add(candidateUser);
-                                            }
-                                        }
-                                    }
-                            }catch (Exception e){
-                                log.error("condidate user Not Fouwnd");
-    //              System.out.println("condidate user Not Fouwnd");
-                            }
-                            nodePropertieUserTaskAssinmentAssignment.put("candidateUsers", nodePropertieUserTaskAssinmentAssignmentCandidateUsers);
-                            nodePropertieUserTaskAssinment.put("assignment", nodePropertieUserTaskAssinmentAssignment);
-                            nodeProperties.put("usertaskassignment", nodePropertieUserTaskAssinment);
-                            if (!nodePropertiesOriginal.containsKey("current") || (nodePropertiesOriginal.containsKey("current") && !((Boolean) nodePropertiesOriginal.get("current"))))
-                                if (historicTaskInstance.getEndTime() == null) {
-                                    nodePropertiesOriginal.put("current", true);
-                                } else {
-                                    nodePropertiesOriginal.put("current", false);
                                 }
-                            nodePropertiesOriginal.put("active",true);
-                            objectNode.put("properties", nodePropertiesOriginal);
-                            objectNode.put("properties"+index, nodeProperties);
-                            index++;
-                        }
+                        }catch (Exception e){
+                            log.error("condidate user Not Fouwnd");
+                            //              System.out.println("condidate user Not Fouwnd");
 
-                    }
-                    objectNode.put("childShapes", addHistoricToJSON((List<JSONObject>)objectNode.get("childShapes"), historicTaskInstances, historicstartEventInstances, historicendEventInstances, historicexclusiveGatewayInstances));
-                    jsonNodeTemp.add(objectNode);
-                }else if(((JSONObject)objectNode.get("stencil")).get("id").toString().equals("EndNoneEvent")){
-                    for(HistoricActivityInstance historicActivityInstance : historicendEventInstances){
-                        if(((JSONObject)objectNode.get("properties")).get("overrideid").toString().equals(historicActivityInstance.getActivityId())){
-                            JSONObject nodeProperties = ((JSONObject)objectNode.get("properties"));
-                            nodeProperties.put("active",true);
-                            objectNode.put("properties", nodeProperties);
                         }
-                    }
-                    objectNode.put("childShapes", addHistoricToJSON((List<JSONObject>)objectNode.get("childShapes"), historicTaskInstances, historicstartEventInstances, historicendEventInstances, historicexclusiveGatewayInstances));
-                    jsonNodeTemp.add(objectNode);
+                        nodePropertieUserTaskAssinmentAssignment.put("candidateGroups", nodePropertieUserTaskAssinmentAssignmentCandidateGroups);
 
-                }else if(((JSONObject)objectNode.get("stencil")).get("id").toString().equals("ExclusiveGateway")){
-                    for(HistoricActivityInstance historicActivityInstance : historicexclusiveGatewayInstances){
-                        if(((JSONObject)objectNode.get("properties")).get("overrideid").toString().equals(historicActivityInstance.getActivityId())){
-                            JSONObject nodeProperties = ((JSONObject)objectNode.get("properties"));
-                            nodeProperties.put("active",true);
-                            objectNode.put("properties", nodeProperties);
+                        if(!nodePropertieUserTaskAssinmentAssignment.containsKey("candidateUsers")) {
+                            nodePropertieUserTaskAssinmentAssignment.put("candidateUsers",new ArrayList<>());
                         }
+                        List<JSONObject> nodePropertieUserTaskAssinmentAssignmentCandidateUsers = new ArrayList<>();
+                        JSONObject candidateUser = new JSONObject();
+                        try{
+                            List<HistoricIdentityLink> identitys = historyService.getHistoricIdentityLinksForTask(historicTaskInstance.getId());
+                            if(identitys != null)
+                                for(HistoricIdentityLink usr : identitys){
+                                    if(usr.getUserId() != null && !usr.getUserId().isEmpty()){
+                                        if(!candidateGroup.containsValue(usr.getUserId())) {
+                                            candidateUser.put("value", usr.getUserId());
+                                            nodePropertieUserTaskAssinmentAssignmentCandidateUsers.add(candidateUser);
+                                        }
+                                    }
+                                }
+                        }catch (Exception e){
+                            log.error("condidate user Not Fouwnd");
+                            //              System.out.println("condidate user Not Fouwnd");
+                        }
+                        nodePropertieUserTaskAssinmentAssignment.put("candidateUsers", nodePropertieUserTaskAssinmentAssignmentCandidateUsers);
+                        nodePropertieUserTaskAssinment.put("assignment", nodePropertieUserTaskAssinmentAssignment);
+                        nodeProperties.put("usertaskassignment", nodePropertieUserTaskAssinment);
+                        if (!nodePropertiesOriginal.containsKey("current") || (nodePropertiesOriginal.containsKey("current") && !((Boolean) nodePropertiesOriginal.get("current"))))
+                            if (historicTaskInstance.getEndTime() == null) {
+                                nodePropertiesOriginal.put("current", true);
+                            } else {
+                                nodePropertiesOriginal.put("current", false);
+                            }
+                        nodePropertiesOriginal.put("active",true);
+                        objectNode.put("properties", nodePropertiesOriginal);
+                        objectNode.put("properties"+index, nodeProperties);
+                        index++;
                     }
-                    objectNode.put("childShapes", addHistoricToJSON((List<JSONObject>)objectNode.get("childShapes"), historicTaskInstances, historicstartEventInstances, historicendEventInstances, historicexclusiveGatewayInstances));
-                    jsonNodeTemp.add(objectNode);
 
-                }else if(((JSONObject)objectNode.get("stencil")).get("id").toString().equals("StartNoneEvent")){
-                    for(HistoricActivityInstance historicActivityInstance : historicstartEventInstances){
-                        if(((JSONObject)objectNode.get("properties")).get("overrideid").toString().equals(historicActivityInstance.getActivityId())){
-                            JSONObject nodeProperties = ((JSONObject)objectNode.get("properties"));
-                            nodeProperties.put("active",true);
-                            objectNode.put("properties", nodeProperties);
-                        }
-                    }
-                    objectNode.put("childShapes", addHistoricToJSON((List<JSONObject>)objectNode.get("childShapes"), historicTaskInstances, historicstartEventInstances, historicendEventInstances, historicexclusiveGatewayInstances));
-                    jsonNodeTemp.add(objectNode);
-                }else{
-                    objectNode.put("childShapes", addHistoricToJSON((List<JSONObject>)objectNode.get("childShapes"), historicTaskInstances, historicstartEventInstances, historicendEventInstances, historicexclusiveGatewayInstances));
-                    jsonNodeTemp.add(objectNode);
                 }
-            }
-            return jsonNodeTemp;
-        }
+                objectNode.put("childShapes", addHistoricToJSON((List<JSONObject>)objectNode.get("childShapes"), historicTaskInstances, historicstartEventInstances, historicendEventInstances, historicexclusiveGatewayInstances));
+                jsonNodeTemp.add(objectNode);
+            }else if(((JSONObject)objectNode.get("stencil")).get("id").toString().equals("EndNoneEvent")){
+                for(HistoricActivityInstance historicActivityInstance : historicendEventInstances){
+                    if(((JSONObject)objectNode.get("properties")).get("overrideid").toString().equals(historicActivityInstance.getActivityId())){
+                        JSONObject nodeProperties = ((JSONObject)objectNode.get("properties"));
+                        nodeProperties.put("active",true);
+                        objectNode.put("properties", nodeProperties);
+                    }
+                }
+                objectNode.put("childShapes", addHistoricToJSON((List<JSONObject>)objectNode.get("childShapes"), historicTaskInstances, historicstartEventInstances, historicendEventInstances, historicexclusiveGatewayInstances));
+                jsonNodeTemp.add(objectNode);
 
-      public void synchronizehistory(DelegateExecution execution) {
+            }else if(((JSONObject)objectNode.get("stencil")).get("id").toString().equals("ExclusiveGateway")){
+                for(HistoricActivityInstance historicActivityInstance : historicexclusiveGatewayInstances){
+                    if(((JSONObject)objectNode.get("properties")).get("overrideid").toString().equals(historicActivityInstance.getActivityId())){
+                        JSONObject nodeProperties = ((JSONObject)objectNode.get("properties"));
+                        nodeProperties.put("active",true);
+                        objectNode.put("properties", nodeProperties);
+                    }
+                }
+                objectNode.put("childShapes", addHistoricToJSON((List<JSONObject>)objectNode.get("childShapes"), historicTaskInstances, historicstartEventInstances, historicendEventInstances, historicexclusiveGatewayInstances));
+                jsonNodeTemp.add(objectNode);
+
+            }else if(((JSONObject)objectNode.get("stencil")).get("id").toString().equals("StartNoneEvent")){
+                for(HistoricActivityInstance historicActivityInstance : historicstartEventInstances){
+                    if(((JSONObject)objectNode.get("properties")).get("overrideid").toString().equals(historicActivityInstance.getActivityId())){
+                        JSONObject nodeProperties = ((JSONObject)objectNode.get("properties"));
+                        nodeProperties.put("active",true);
+                        objectNode.put("properties", nodeProperties);
+                    }
+                }
+                objectNode.put("childShapes", addHistoricToJSON((List<JSONObject>)objectNode.get("childShapes"), historicTaskInstances, historicstartEventInstances, historicendEventInstances, historicexclusiveGatewayInstances));
+                jsonNodeTemp.add(objectNode);
+            }else{
+                objectNode.put("childShapes", addHistoricToJSON((List<JSONObject>)objectNode.get("childShapes"), historicTaskInstances, historicstartEventInstances, historicendEventInstances, historicexclusiveGatewayInstances));
+                jsonNodeTemp.add(objectNode);
+            }
+        }
+        return jsonNodeTemp;
+    }
+
+    public void synchronizehistory(DelegateExecution execution) {
         System.out.println(execution.getVariable("data"));
         managementService.executeCommand(new Command<Void>() {
 
@@ -1638,7 +1638,7 @@ public class WorkflowService {
         });
     }
 
-      public String getFirstActivityNameByKey(String processKey) throws FileNotFoundException {
+    public String getFirstActivityNameByKey(String processKey) throws FileNotFoundException {
 
         ProcessDefinitionQuery listprocess = repositoryService.createProcessDefinitionQuery().processDefinitionKey(processKey).orderByProcessDefinitionVersion().desc();
 
@@ -1653,13 +1653,13 @@ public class WorkflowService {
 
 
         for (SequenceFlow sequenceFlow : sequenceFlows) {
-          if (sequenceFlow.getSourceFlowElement().getClass().equals(StartEvent.class)) {
-            activity.add(sequenceFlow.getTargetFlowElement().getName());
-          }
+            if (sequenceFlow.getSourceFlowElement().getClass().equals(StartEvent.class)) {
+                activity.add(sequenceFlow.getTargetFlowElement().getName());
+            }
         }
 
         return activity.get(0);
-      }
+    }
 
 }
 

@@ -6,7 +6,6 @@ import lombok.Setter;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 /**
@@ -36,8 +35,7 @@ public class BlocNumeros implements Serializable {
     private Long id;
 
     /** Le BPQ tel que l'operateur l'ecrit. */
-    @Column(name = "bloc", length = 16)
-    @Size(max = 16)
+    @Column(name = "bloc")
     private String bloc;
 
     /**
@@ -58,8 +56,7 @@ public class BlocNumeros implements Serializable {
      * decision sont gardees COTE A COTE plutot que l'une ecrasant l'autre --
      * savoir qu'un operateur a demande 062 et recu 063 fait partie du dossier.
      */
-    @Column(name = "bloc_attribue", length = 16)
-    @Size(max = 16)
+    @Column(name = "bloc_attribue")
     private String blocAttribue;
 
     @ManyToOne(fetch = FetchType.LAZY)

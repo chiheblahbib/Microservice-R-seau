@@ -16,6 +16,7 @@ import picosoft.biz.arcep.Workflow.service.WorkflowService;
 import picosoft.biz.arcep.client.currentuser.model.CurrentUser;
 import picosoft.biz.arcep.client.kernel.intercomm.KernelInterface;
 import picosoft.biz.arcep.client.kernel.model.acl.AclClass;
+import picosoft.biz.arcep.client.kernel.model.acl.Permission;
 import picosoft.biz.arcep.client.kernel.model.acl.AclObjectIdentity;
 import picosoft.biz.arcep.client.kernel.model.objects.AttachementInputDTO;
 import picosoft.biz.arcep.client.kernel.model.objects.PublicAttachementDto;
@@ -129,19 +130,145 @@ public class DemandeReseauService {
         return demandeReseauMapper.toDto(demandeReseauRepository.save(entity));
     }
 
+    /**
+     * Pose l'etape courante et note qui traite le dossier.
+     *
+     * Transpose d'AsiService.updateStep. Le circuit n'est PAS sollicite : c'est
+     * un marquage, pas une transition. `sid` peut etre nul -- on retombe alors
+     * sur le SID de l'employe courant.
+     */
+    public DemandeReseauDTO updateStep(Long id, Long step, String username, String sid) {
+        DemandeReseau entity = demandeReseauRepository.findById(id)
+                .orElseThrow(() -> new BadRequestAlertException(ReseauErrors.OBJECT_NOT_FOUND,
+                        ReseauErrors.CLASS, ReseauErrors.OBJECT_NOT_FOUND));
+        entity.setStep(step);
+        entity.setAssignee(username);
+        entity.setTraitedBy(username);
+        entity.setSidTraitedBy(sid != null ? sid : currentUser.getEmployeSid());
+        return demandeReseauMapper.toDto(demandeReseauRepository.save(entity));
+    }
+
     public Page<DemandeReseauDTO> findAll(DemandeReseauCriteria criteria, Pageable pageable, Integer size) {
         return demandeReseauQueryService.findByCriteria(criteria, pageable, size);
     }
 
+    /**
+     * Le dossier pour l'ecran de SAISIE, avec ce que le kernel autorise.
+     *
+     * A la difference de byId, cette lecture ne refuse RIEN. byId sert
+     * l'ecran de detail et applique la regle du gabarit -- un acces NONE
+     * est une erreur. Ici on renseigne la permission et on laisse le
+     * formulaire en tirer les consequences rubrique par rubrique, ce qui
+     * est precisement ce que la map `components` du circuit decrit.
+     */
     public Optional<DemandeReseauDTO> findOne(Long id) {
-        return demandeReseauRepository.findById(id).map(demandeReseauMapper::toDto);
+        AclClass aclClass = aclClassOuNull();
+        return demandeReseauRepository.findById(id).map(entity -> {
+            DemandeReseauDTO dto = demandeReseauMapper.toDto(entity);
+            dto.setUserPermission(permissionSur(aclClass, entity.getId()));
+
+            // L'IDENTITE ACL, et pas seulement la permission.
+            //
+            // `byId` la posait deja (plus bas, setClassId/setClassName) ; cette
+            // lecture-ci ne la posait pas, et c'est elle que le formulaire
+            // appelle -- le controleur sert `findOne` sur
+            // GET /demande-reseaux/{id}, `byId` n'etant branche que sur la
+            // forme au SINGULIER /demande-reseau/{id}, que personne n'appelle.
+            //
+            // Consequence mesuree le 24/09/2026 sur le dossier 21 : classId
+            // arrivait null, `chargerAttachements()` sortait par sa garde
+            // `if (!id || !classId)`, GetAllAttachement n'etait jamais appele,
+            // et « Pieces du dossier » restait vide meme une fois les fichiers
+            // publies. Une piece rattachee au kernel se demande par le couple
+            // (classId, objectId) : sans le premier, le dossier ne sait pas
+            // reclamer ses propres documents.
+            //
+            // Pose seulement si le kernel a repondu : on ne fabrique pas une
+            // identite qu'on n'a pas, meme vide.
+            if (aclClass != null) {
+                dto.setClassId(aclClass.getId());
+                dto.setClassName(aclClass.getClasse());
+            }
+            return dto;
+        });
     }
 
+    /**
+     * La classe ACL du dossier reseau, ou null si le kernel se tait.
+     *
+     * Resolue UNE fois par lecture : `findOne` en a besoin deux fois -- pour
+     * interroger checkSecurity et pour poser l'identite sur le DTO -- et deux
+     * appels rendraient la meme reponse au prix d'un aller-retour de plus.
+     */
+    private AclClass aclClassOuNull() {
+        try {
+            return kernelInterface.getaclClassByClassName(DemandeReseau.class.getName());
+        } catch (Exception e) {
+            log.warn("classe ACL du dossier reseau indisponible : {}", e.toString());
+            return null;
+        }
+    }
+
+    /**
+     * Ce que le kernel accorde a l'utilisateur courant, ou null s'il se tait.
+     *
+     * Null n'est pas un refus, c'est une absence de reponse : classe ACL
+     * pas encore declaree, ou kernel injoignable. L'ecran retombe alors
+     * sur son comportement d'avant plutot que de se verrouiller sur une
+     * donnee qu'il n'a pas. Verrouiller sur un silence ferait passer une
+     * panne d'infrastructure pour un refus de droits.
+     */
+    private String permissionSur(AclClass aclClass, Long id) {
+        if (id == null || aclClass == null) { return null; }
+        try {
+            return kernelInterface.checkSecurity(aclClass.getSimpleName(), id, currentUser.getSid());
+        } catch (Exception e) {
+            log.warn("checkSecurity indisponible pour le dossier {} : {}", id, e.toString());
+            return null;
+        }
+    }
+
+    /**
+     * Le dossier tel que CET utilisateur a le droit de le voir.
+     *
+     * Repris de AsiService.asiById : resoudre la classe ACL, demander au
+     * kernel la permission de l'utilisateur courant sur cet objet, refuser
+     * si elle est NONE, puis la poser sur le DTO. Le front lit ensuite
+     * `userPermission` exactement comme sur un dossier ASI.
+     *
+     * Le refus ne vaut que si l'objet porte deja une identite ACL : un
+     * dossier tout juste cree n'en a pas encore, et le kernel n'a alors
+     * rien a repondre -- l'interdire fermerait l'ecran a son propre auteur.
+     *
+     * Ecart assume avec le gabarit : le test est ecrit dans l'autre sens,
+     * Permission.NONE.name().equals(permission). Celui d'ASI appelle
+     * .equals sur la reponse du kernel et leve un NullPointerException si
+     * elle est nulle. Meme comportement pour toute reponse non nulle.
+     */
     public DemandeReseauOutputDTO byId(Long id) {
         DemandeReseau entity = demandeReseauRepository.findById(id)
                 .orElseThrow(() -> new BadRequestAlertException(ReseauErrors.OBJECT_NOT_FOUND,
                         ReseauErrors.CLASS, ReseauErrors.OBJECT_NOT_FOUND));
-        return demandeReseauOutputMapper.toDto(entity);
+
+        AclClass aclClass = kernelInterface.getaclClassByClassName(DemandeReseau.class.getName());
+        if (aclClass == null) {
+            throw new BadRequestAlertException(ReseauErrors.ACL_CLASS_NOT_FOUND,
+                    ReseauErrors.CLASS, ReseauErrors.ACL_CLASS_NOT_FOUND);
+        }
+
+        String permission = kernelInterface.checkSecurity(
+                aclClass.getSimpleName(), id, currentUser.getSid());
+
+        if (Permission.NONE.name().equals(permission) && entity.getAclObjectIdentity() != null) {
+            throw new BadRequestAlertException(ReseauErrors.OBJECT_NOT_AUTHORIZED,
+                    ReseauErrors.CLASS, ReseauErrors.OBJECT_NOT_AUTHORIZED);
+        }
+
+        DemandeReseauOutputDTO output = demandeReseauOutputMapper.toDto(entity);
+        output.setClassId(aclClass.getId());
+        output.setClassName(aclClass.getClasse());
+        output.setUserPermission(permission);
+        return output;
     }
 
     /**
@@ -432,12 +559,10 @@ public class DemandeReseauService {
      * Transitions suivantes : le dossier existe et son instance de process tourne.
      */
     public DemandeReseauOutputDTO submit(DemandeReseauInputDTO input, AclClass aclClass) throws Exception {
-        exigerPourSoumission(input);
         if (aclClass == null) {
             throw new BadRequestAlertException(ReseauErrors.ACL_CLASS_NOT_FOUND,
                     ReseauErrors.CLASS, ReseauErrors.ACL_CLASS_NOT_FOUND);
         }
-        exigerPiecesObligatoires(input, aclClass);
         if (input.getId() == null) {
             throw new BadRequestAlertException(ReseauErrors.OBJECT_NOT_VALID,
                     ReseauErrors.CLASS, ReseauErrors.OBJECT_NOT_VALID);
@@ -446,6 +571,35 @@ public class DemandeReseauService {
         DemandeReseau entity = demandeReseauRepository.findById(input.getId())
                 .orElseThrow(() -> new BadRequestAlertException(ReseauErrors.OBJECT_NOT_FOUND,
                         ReseauErrors.CLASS, ReseauErrors.OBJECT_NOT_FOUND));
+
+        // Le dossier complet n'est exige qu'a la saisie -- premiere tache, ou
+        // retour de la Numerotation. Aux etapes suivantes (Numerotation, Chef
+        // Centre, Technique...) l'agent decide sur un dossier deja complet et
+        // n'en renvoie pas forcement tout le graphe : comme isValidHomologation,
+        // on ne rejoue pas la validation de depot.
+        if (enSaisie(entity)) {
+            exigerPourSoumission(input);
+            exigerPiecesObligatoires(input, aclClass);
+        }
+
+        // C'est le kernel qui dit qui peut faire avancer ce dossier, et lui
+        // seul. Repris d'AsiService.submitAsi : sans WRITE ni INH_WRITE la
+        // transition est refusee ici, quelle que soit la decision demandee.
+        //
+        // C'est le PENDANT SERVEUR du bandeau de decisions, qui ne s'affiche
+        // cote front que sur un userPermission a WRITE. Une garde d'ecran
+        // seule se contourne avec un appel direct : les deux vont ensemble.
+        //
+        // Le droit est rejoue a chaque transition -- appliquerRetourMoteur
+        // repousse les authors et readers que le moteur rend pour la tache
+        // suivante -- donc l'acteur de la tache en cours est toujours auteur.
+        String permission = kernelInterface.checkSecurity(
+                aclClass.getSimpleName(), entity.getId(), currentUser.getSid());
+        if (!Permission.WRITE.name().equals(permission)
+                && !Permission.INH_WRITE.name().equals(permission)) {
+            throw new BadRequestAlertException(ReseauErrors.OBJECT_NOT_AUTHORIZED,
+                    ReseauErrors.CLASS, ReseauErrors.OBJECT_NOT_AUTHORIZED);
+        }
 
         demandeReseauInputMapper.partialUpdate(entity, input);
         entity = demandeReseauRepository.save(entity);
@@ -484,14 +638,32 @@ public class DemandeReseauService {
 
         publierPiecesJointes(input, output, entity, aclClass);
 
-        // le brouillon n'est visible que de son auteur tant qu'il n'est pas soumis
+        // Le brouillon n'est visible que de son auteur TANT QU'IL N'EST PAS SOUMIS.
+        // Une fois le circuit demarre, les droits appartiennent au moteur : les
+        // reecrire ici retirerait le groupe de la tache en cours (ex. ChefCentre)
+        // et le dossier sortirait de ses listes « en cours ». Meme garde que
+        // HomologationService.saveHomologationAsDraft (wfProcessID == null).
+        boolean circuitDemarre = entity.getWfProcessID() != null;
         entity = persistAndApplySecurity(entity,
-                Arrays.asList(currentUser.getEmployeSid()), new ArrayList<>(), aclClass);
+                circuitDemarre ? null : Arrays.asList(currentUser.getEmployeSid()),
+                circuitDemarre ? null : new ArrayList<>(), aclClass);
 
         return demandeReseauOutputMapper.toDto(entity);
     }
 
     // ------------------------------------------------------------- internes
+
+    /** Cle de la tache de saisie dans processReseau.bpmn20.xml. */
+    private static final String TACHE_SAISIE = "Task_saisie";
+
+    /** Vrai si la tache active du dossier est la saisie (ou s'il n'a pas de tache active connue). */
+    private boolean enSaisie(DemandeReseau entity) {
+        if (entity.getWfProcessID() == null) {
+            return true;
+        }
+        org.flowable.task.api.Task tache = workflowService.getActifTaskOfProcessInstance(entity.getWfProcessID());
+        return tache == null || TACHE_SAISIE.equals(tache.getTaskDefinitionKey());
+    }
 
     private DemandeReseau toEntityOrLoad(DemandeReseauInputDTO input) {
         if (input.getId() != null) {
@@ -653,7 +825,7 @@ public class DemandeReseauService {
             return;
         }
         Commentaire commentaire = new Commentaire();
-        commentaire.setAuteur(currentUser.getEmployeSid());
+        commentaire.setAuteur(currentUser.nomPourCommentaire());
         commentaire.setDescription(texte);
         commentaire.setDateSaisie(ZonedDateTime.now());
         commentaire.setClassId(aclClass.getId());

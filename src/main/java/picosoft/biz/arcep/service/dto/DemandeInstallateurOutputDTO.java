@@ -1,7 +1,5 @@
 package picosoft.biz.arcep.service.dto;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +26,6 @@ public class DemandeInstallateurOutputDTO implements Serializable {
 
     private Boolean web;
 
-    @Size(max = 25)
     private String reference;
 
     private ZonedDateTime createdDate;
@@ -36,7 +33,6 @@ public class DemandeInstallateurOutputDTO implements Serializable {
 
     private String approvedBy;
 
-    @Size(max = 32)
     private String statutDossier;
 
     /**
@@ -44,31 +40,24 @@ public class DemandeInstallateurOutputDTO implements Serializable {
      * L'omettre enverrait tous les dossiers sur la branche par defaut, sans
      * erreur ni message.
      */
-    @Size(max = 50)
     private String typeDossier;
 
     /** Nouvelle demande, ou renouvellement -- voir DemandeInstallateur. */
     private NatureDemande natureDemande;
 
-    @Size(max = 25)
     private String referenceAutorisationAnterieure;
 
     // ---------------- identite de l'entreprise : ce que `client` ne porte pas
-    @Size(max = 100)
     private String formeJuridique;
 
-    @Size(max = 50)
     private String nif;
 
-    @Size(max = 50)
     private String boitePostale;
 
     /** Distincte de l'adresse postale : sert a trouver les locaux. */
-    @Size(max = 255)
     private String localisation;
 
     // ---------------- rubrique 2
-    @Size(max = 255)
     private String etendueAutrePrecision;
 
     // ---------------- rubrique 3 : deux questions oui / non / non repondu
@@ -85,7 +74,6 @@ public class DemandeInstallateurOutputDTO implements Serializable {
     // ---------------- rubrique 8
     private Boolean zoneLibreville;
 
-    @Size(max = 255)
     private String autresLocalites;
 
     private String agences;
@@ -99,17 +87,13 @@ public class DemandeInstallateurOutputDTO implements Serializable {
 
     private BigDecimal fraisDossier;
 
-    @Size(max = 8)
     private String deviseFrais;
 
-    @Valid
     private ClientDTO client;
 
-    @Valid
     private ApplicantDTO applicant;
 
     /** Rubrique 5 : les equipements de bord. */
-    @Valid
     private List<QualiteDemandeeDTO> qualites;
 
     /** Rubrique 2 : l'etendue de l'activite, cumulable. */
@@ -125,7 +109,6 @@ public class DemandeInstallateurOutputDTO implements Serializable {
      * Le rapport d'instruction. Renseigne par l'ARCEP, jamais par le
      * demandeur -- voir RapportTechnique.
      */
-    @Valid
     private RapportTechniqueDTO rapportTechnique;
 
     /**
@@ -156,6 +139,18 @@ public class DemandeInstallateurOutputDTO implements Serializable {
     private Boolean endProcess;
     private String state;
     private Long numberOfattachments;
+
+    /**
+     * Ce que le kernel autorise CET utilisateur a faire sur CE dossier :
+     * WRITE, READ ou NONE. Pose a la lecture par le service, jamais persiste.
+     *
+     * Meme champ, meme role et meme nom que sur AsiOutputDTO. Le front s'en
+     * sert pour decider si la barre de decisions s'affiche et si les sections
+     * sont saisissables : sans lui, l'ecran ne peut qu'ouvrir tout a tout le
+     * monde, quelle que soit la tache en cours et quel que soit le role.
+     */
+    private String userPermission;
+
     private Long step;
     private String commentaire;
 }

@@ -97,6 +97,7 @@ public class DemandeImplantationController {
         return demandeImplantationService.byId(id);
     }
 
+    @PreAuthorize("hasAuthority(@kernelService.implantation_role_canEditImplantation())")
     @DeleteMapping("/demande-implantations/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         demandeImplantationService.delete(id);

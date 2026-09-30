@@ -1,0 +1,90 @@
+{
+  "id": 29,
+  "uuid": "3f6c2a9e-8b1d-4c52-9e7a-5d0b8f4a1c27",
+  "web": false,
+  "reference": "0026-28-09-2026",
+  "createdDate": "2026-09-28T13:19:05.482913+02:00[Europe/Paris]",
+  "sendedDate": "2026-09-28T13:19:05.483027+02:00[Europe/Paris]",
+  "statutDossier": "soumis",
+  "typeDossier": "RESEAU",
+  "natureReseau": "PRIVE",
+  "natureDemande": "NOUVEAU",
+  "fraisDossier": 500000.0,
+  "deviseFrais": "XAF",
+  "client": {
+    "id": 57,
+    "clientType": "COMPANY",
+    "company": "Société Test E2E v20",
+    "tradeRegisterNumber": "RCCM-TEST-2026-020",
+    "address": "Libreville, Quartier Louis, BP 1234",
+    "phone": "+241 01 23 45 67",
+    "natureActivite": "Télécommunications"
+  },
+  "applicant": {
+    "id": 31,
+    "applicantType": "COMPANY",
+    "applicantName": "Recette Test v20",
+    "qualification": "Directeur technique",
+    "nationality": "GA",
+    "nationalityComplet": "Gabon",
+    "address": "Libreville, Glass, BP 5678",
+    "email": "recette.v20@exemple.test"
+  },
+  "typesReseau": [
+    {
+      "id": 52,
+      "type": "FH",
+      "demandeReseauId": 29
+    }
+  ],
+  "services": [
+    {
+      "id": 53,
+      "type": "ACCES_INTERNET",
+      "demandeReseauId": 29
+    }
+  ],
+  "sites": [
+    {
+      "id": 41,
+      "nomSite": "Site Test E2E Libreville",
+      "province": "Estuaire",
+      "ville": "Libreville",
+      "latitudeSens": "N",
+      "latitudeDegres": 0,
+      "latitudeMinutes": 24,
+      "latitudeSecondes": 31.2,
+      "longitudeSens": "E",
+      "longitudeDegres": 9,
+      "longitudeMinutes": 26,
+      "longitudeSecondes": 30.73,
+      "altitude": 6.0,
+      "demandeReseauId": 29
+    }
+  ],
+  "liaisons": [],
+  "attestations": [
+    {
+      "id": 84,
+      "reference": "0084-28-09-2026",
+      "classId": 1203,
+      "nomModele": "PRIVE",
+      "sysdateCreated": "2026-09-28T13:47:12.308114+02:00[Europe/Paris]",
+      "sysdateUpdated": "2026-09-28T13:47:12.341507+02:00[Europe/Paris]"
+    }
+  ],
+  "idsPostAttachments": "b7e1c0d2-6a41-4f7e-9d3b-1c2e5f8a9b01,4c9d2e7f-1b3a-4e6c-8f0d-2a5b7c9e1d03,9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c65",
+  "labelsPostAttachments": "Attestation du Nom commercial,Pièce d’identité du demandeur,Preuve de statut légal",
+  "wfProcessID": "5c1e9f3a-7d2b-11f1-9a4e-0a0027000011",
+  "classId": 1187,
+  "className": "picosoft.biz.arcep.domain.reseau.DemandeReseau",
+  "activityName": "Signature du Président du Conseil de Régulation",
+  "assignee": "agent.technique",
+  "endProcess": false,
+  "state": "En cours",
+  "numberOfattachments": 0,
+  "signaturePresidence": "data:image/png;base64,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",
+  "signatureChefCentre": "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",
+  "signatureAgentTechnique": "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",
+  "conclusion": "Avis favorable : réseau conforme au dossier technique déposé."
+}

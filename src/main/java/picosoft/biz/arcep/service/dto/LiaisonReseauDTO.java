@@ -1,7 +1,5 @@
 package picosoft.biz.arcep.service.dto;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,10 +19,8 @@ public class LiaisonReseauDTO implements Serializable {
 
     private NatureLiaison nature;
 
-    @Size(max = 255)
     private String precisionAutre;
 
-    @Size(max = 100)
     private String bandeFrequences;
 
     private Double debitEmission;

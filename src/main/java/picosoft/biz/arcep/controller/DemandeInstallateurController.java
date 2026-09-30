@@ -97,6 +97,7 @@ public class DemandeInstallateurController {
         return demandeInstallateurService.byId(id);
     }
 
+    @PreAuthorize("hasAuthority(@kernelService.installateur_role_canEditInstallateur())")
     @DeleteMapping("/demande-installateurs/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         demandeInstallateurService.delete(id);

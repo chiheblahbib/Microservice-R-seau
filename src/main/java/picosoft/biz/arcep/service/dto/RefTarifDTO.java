@@ -1,6 +1,5 @@
 package picosoft.biz.arcep.service.dto;
 
-import javax.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,25 +21,20 @@ public class RefTarifDTO implements Serializable {
 
     private Long id;
 
-    @Size(max = 64)
 
     private String code;
 
-    @Size(max = 255)
 
     private String libelle;
 
-    @Size(max = 128)
 
     private String service;
 
-    @Size(max = 255)
 
     private String application;
 
     private BigDecimal montant;
 
-    @Size(max = 8)
 
     private String devise;
 
@@ -52,7 +46,6 @@ public class RefTarifDTO implements Serializable {
 
     private Boolean actif;
 
-    @Size(max = 500)
 
     private String commentaire;
 }

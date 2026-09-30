@@ -1,7 +1,5 @@
 package picosoft.biz.arcep.service.dto;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,7 +31,6 @@ public class DemandeMmsiDTO implements Serializable {
 
     private Boolean web;
 
-    @Size(max = 25)
     private String reference;
 
     /**
@@ -56,7 +53,6 @@ public class DemandeMmsiDTO implements Serializable {
 
     private String approvedBy;
 
-    @Size(max = 32)
     private String statutDossier;
 
     /**
@@ -64,7 +60,6 @@ public class DemandeMmsiDTO implements Serializable {
      * L'omettre enverrait tous les dossiers sur la branche par defaut, sans
      * erreur ni message.
      */
-    @Size(max = 50)
     private String typeDossier;
 
     private NatureDemande natureDemande;
@@ -73,39 +68,30 @@ public class DemandeMmsiDTO implements Serializable {
     private CategorieStation categorie;
 
     /** Absents des rubriques ; facultatifs -- voir DemandeMmsi. */
-    @Size(max = 100)
     private String nomMobile;
 
-    @Size(max = 32)
     private String immatriculationMobile;
 
     /** Attribue par l'ARCEP, vide au depot. Chaine : les zeros de tete comptent. */
-    @Size(max = 16)
     private String mmsiAttribue;
 
-    @Size(max = 25)
     private String referenceAutorisationAnterieure;
 
     private BigDecimal fraisDossier;
 
-    @Size(max = 8)
     private String deviseFrais;
 
-    @Valid
     private ClientDTO client;
 
-    @Valid
     private ApplicantDTO applicant;
 
     /** Rubrique 5 : les equipements de bord. */
-    @Valid
     private List<BesoinMmsiDTO> besoins;
 
     /**
      * Le rapport d'instruction. Renseigne par l'ARCEP, jamais par le
      * demandeur -- voir RapportTechnique.
      */
-    @Valid
     private RapportTechniqueDTO rapportTechnique;
 
     // ------------------------- workflow / ACL -------------------------
@@ -125,6 +111,15 @@ public class DemandeMmsiDTO implements Serializable {
     private Boolean endProcess;
     private String state;
     private Long numberOfattachments;
+    /**
+     * Ce que le kernel autorise CET utilisateur a faire sur CE dossier.
+     *
+     * Meme champ que sur le DTO de sortie, et pour la meme raison : le
+     * formulaire lit par ici, et c'est de cette valeur qu'il deduit si ses
+     * rubriques sont saisissables. Jamais persiste, jamais relu en entree.
+     */
+    private String userPermission;
+
     private Long step;
     private String commentaire;
 }

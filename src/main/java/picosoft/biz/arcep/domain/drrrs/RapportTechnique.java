@@ -1,4 +1,4 @@
-package picosoft.biz.arcep.domain.shared;
+package picosoft.biz.arcep.domain.drrrs;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,6 +25,27 @@ import java.time.ZonedDateTime;
  * Le rapport technique d'instruction du dossier.
  *
  * REPRIS DE homologation, dont il garde les champs et la forme de la relation.
+ *
+ *
+ * IL N'EST PAS DANS `domain.shared`, ET C'EST DELIBERE
+ *
+ * Il y a ete jusqu'au 10 septembre 2026, par mimetisme avec homologation. Mais
+ * `domain.shared` designe ce qui est PARTAGE avec homologation -- meme nom de
+ * classe ET meme table : Client, Applicant, Attestation, Commentaire. Le
+ * rapport technique n'est pas dans ce cas : la classe portait le meme nom
+ * qualifie que celle d'homologation, mais visait une AUTRE table
+ * (`drrrs.rapport_technique` contre `homologation.rapport_technique`).
+ *
+ * Or `acl_class.class` porte une contrainte d'unicite. Deux tables sous un
+ * seul nom qualifie, c'est une seule ligne au kernel : `getaclClassByClassName`
+ * rendait celle d'homologation, DRRRS posait donc son `classId` sur ses
+ * rapports et tirait ses references sur la sequence d'homologation. Les pieces
+ * jointes des deux services se retrouvaient sous le meme couple
+ * (classId, id) -- en silence, sans erreur nulle part.
+ *
+ * D'ou `domain.drrrs` : un nom qualifie propre, donc une ligne `acl_class`
+ * propre. A declarer au kernel sous
+ * `picosoft.biz.arcep.domain.drrrs.RapportTechnique`.
  *
  *
  * UNE SEULE TABLE, DIX CLES ETRANGERES
@@ -96,42 +117,42 @@ public class RapportTechnique extends Auditable implements Serializable {
     private Long classId;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_aeronef_id", nullable = true, unique = true)
+    @JoinColumn(name = "demande_aeronef_id", nullable = true)
     private DemandeAeronef demandeAeronef;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_declaratif_id", nullable = true, unique = true)
+    @JoinColumn(name = "demande_declaratif_id", nullable = true)
     private DemandeDeclaratif demandeDeclaratif;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_installateur_id", nullable = true, unique = true)
+    @JoinColumn(name = "demande_installateur_id", nullable = true)
     private DemandeInstallateur demandeInstallateur;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_ispc_id", nullable = true, unique = true)
+    @JoinColumn(name = "demande_ispc_id", nullable = true)
     private DemandeIspc demandeIspc;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_mmsi_id", nullable = true, unique = true)
+    @JoinColumn(name = "demande_mmsi_id", nullable = true)
     private DemandeMmsi demandeMmsi;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_navire_id", nullable = true, unique = true)
+    @JoinColumn(name = "demande_navire_id", nullable = true)
     private DemandeNavire demandeNavire;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_numerocourt_id", nullable = true, unique = true)
+    @JoinColumn(name = "demande_numerocourt_id", nullable = true)
     private DemandeNumeroCourt demandeNumeroCourt;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_numerocourturgence_id", nullable = true, unique = true)
+    @JoinColumn(name = "demande_numerocourturgence_id", nullable = true)
     private DemandeNumeroCourtUrgence demandeNumeroCourtUrgence;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_pq_id", nullable = true, unique = true)
+    @JoinColumn(name = "demande_pq_id", nullable = true)
     private DemandePq demandePq;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_ussd_id", nullable = true, unique = true)
+    @JoinColumn(name = "demande_ussd_id", nullable = true)
     private DemandeUssd demandeUssd;
 }

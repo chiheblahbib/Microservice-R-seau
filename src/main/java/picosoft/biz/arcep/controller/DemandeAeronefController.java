@@ -97,6 +97,7 @@ public class DemandeAeronefController {
         return demandeAeronefService.byId(id);
     }
 
+    @PreAuthorize("hasAuthority(@kernelService.aeronef_role_canEditAeronef())")
     @DeleteMapping("/demande-aeronefs/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         demandeAeronefService.delete(id);

@@ -9,7 +9,6 @@ import picosoft.biz.arcep.configuration.audit.Auditable;
 import picosoft.biz.arcep.domain.reseau.enumeration.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 /**
@@ -38,11 +37,11 @@ public class ServiceDeclare extends Auditable implements Serializable {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type", length = 32)
+    @Column(name = "type")
     private TypeService type;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "portee", length = 16)
+    @Column(name = "portee")
     private PorteeService portee;
 
     @ManyToOne(fetch = FetchType.LAZY)

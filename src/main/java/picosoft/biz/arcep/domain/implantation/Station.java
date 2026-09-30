@@ -11,7 +11,6 @@ import picosoft.biz.arcep.client.kernel.model.acl.AclObjectIdentity;
 import picosoft.biz.arcep.domain.shared.Attestation;
 import picosoft.biz.arcep.domain.shared.enumeration.ApplicantType;
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
@@ -31,33 +30,32 @@ public class Station extends Auditable implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
+    @Column(columnDefinition = "uuid", updatable = false)
     private UUID uuid;
 
-    @Column(name = "reference", length = 25)
-    @Size(max = 25)
+    @Column(name = "reference")
     private String reference;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "nature_implantation", length = 32)
+    @Column(name = "nature_implantation")
     private NatureImplantation natureImplantation;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type_station", length = 32)
+    @Column(name = "type_station")
     private TypeStation typeStation;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type_trafic", length = 16)
+    @Column(name = "type_trafic")
     private TypeTrafic typeTrafic;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "nature_trafic", length = 16)
+    @Column(name = "nature_trafic")
     private NatureTrafic natureTrafic;
 
     // ---------------------------- support ----------------------------
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "nature_support", length = 32)
+    @Column(name = "nature_support")
     private NatureSupport natureSupport;
 
     @Column(name = "hauteur_support")
@@ -69,11 +67,11 @@ public class Station extends Auditable implements Serializable {
     // ---------------------------- antenne ----------------------------
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type_antenne", length = 16)
+    @Column(name = "type_antenne")
     private TypeAntenne typeAntenne;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "positionnement_antenne", length = 16)
+    @Column(name = "positionnement_antenne")
     private PositionnementAntenne positionnement;
 
     // -------------------------- installateur -------------------------
@@ -91,55 +89,45 @@ public class Station extends Auditable implements Serializable {
 
     /** COMPANY ou INDIVIDUAL, comme pour le demandeur. */
     @Enumerated(EnumType.STRING)
-    @Column(name = "installateur_type", length = 16)
+    @Column(name = "installateur_type")
     private ApplicantType installateurType;
 
     /** Le pendant de client.company. */
-    @Column(name = "installateur_raison_sociale", length = 100)
-    @Size(max = 100)
+    @Column(name = "installateur_raison_sociale")
     private String installateurRaisonSociale;
 
-    @Column(name = "installateur_adresse", length = 200)
-    @Size(max = 200)
+    @Column(name = "installateur_adresse")
     private String installateurAdresse;
 
-    @Column(name = "installateur_registre_commerce", length = 50)
-    @Size(max = 50)
+    @Column(name = "installateur_registre_commerce")
     private String installateurRegistreCommerce;
 
-    @Column(name = "installateur_nature_activite", length = 500)
-    @Size(max = 500)
+    @Column(name = "installateur_nature_activite")
     private String installateurNatureActivite;
 
     /** Le pendant de applicant.applicantName : la personne qui installe. */
-    @Column(name = "installateur_identite", length = 100)
-    @Size(max = 100)
+    @Column(name = "installateur_identite")
     private String installateurIdentite;
 
-    @Column(name = "installateur_nationalite", length = 50)
-    @Size(max = 50)
+    @Column(name = "installateur_nationalite")
     private String installateurNationalite;
 
     /** Le libelle du pays, stocke a cote du code, comme chez le demandeur. */
-    @Column(name = "installateur_nationalite_complet", length = 100)
-    @Size(max = 100)
+    @Column(name = "installateur_nationalite_complet")
     private String installateurNationaliteComplet;
 
-    @Column(name = "installateur_qualification", length = 100)
-    @Size(max = 100)
+    @Column(name = "installateur_qualification")
     private String installateurQualification;
 
-    @Column(name = "installateur_telephone", length = 20)
-    @Size(max = 20)
+    @Column(name = "installateur_telephone")
     private String installateurTelephone;
 
-    @Column(name = "installateur_email", length = 100)
-    @Size(max = 100)
+    @Column(name = "installateur_email")
     private String installateurEmail;
 
     /** Pilote l'eclatement du dossier parent en circuits enfants. */
     @Enumerated(EnumType.STRING)
-    @Column(name = "statut_station", length = 16)
+    @Column(name = "statut_station")
     private StatutStation statutStation;
 
     /**
@@ -204,8 +192,7 @@ public class Station extends Auditable implements Serializable {
     @Column(name = "end_process")
     private Boolean endProcess = false;
 
-    @Column(name = "state", length = 64)
-    @Size(max = 64)
+    @Column(name = "state")
     private String state;
 
     @Column(name = "number_of_attachments")

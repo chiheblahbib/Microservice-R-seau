@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 /** Un code USSD sollicite, rubrique 5. */
@@ -18,14 +17,12 @@ public class CodeUssdDTO implements Serializable {
     private Long id;
 
     /** Chaine : l'etoile et le diese font partie du code. */
-    @Size(max = 32)
     private String code;
 
     /** Rang de preference : 1 pour le plus souhaite. */
     private Integer rang;
 
     /** Attribue par l'ARCEP, vide au depot. */
-    @Size(max = 32)
     private String codeAttribue;
 
     private Long demandeUssdId;

@@ -1,7 +1,5 @@
 package picosoft.biz.arcep.service.dto;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +26,6 @@ public class DemandeAeronefInputDTO implements Serializable {
 
     private Boolean web;
 
-    @Size(max = 25)
     private String reference;
 
     private ZonedDateTime createdDate;
@@ -36,7 +33,6 @@ public class DemandeAeronefInputDTO implements Serializable {
 
     private String approvedBy;
 
-    @Size(max = 32)
     private String statutDossier;
 
     /**
@@ -44,13 +40,11 @@ public class DemandeAeronefInputDTO implements Serializable {
      * L'omettre enverrait tous les dossiers sur la branche par defaut, sans
      * erreur ni message.
      */
-    @Size(max = 50)
     private String typeDossier;
 
     private NatureDemande natureDemande;
 
     /** Absente du formulaire papier -- voir DemandeAeronef. */
-    @Size(max = 32)
     private String immatriculationAeronef;
 
     /** Rubrique 4 : null signifie « question non repondue », pas « non ». */
@@ -64,42 +58,34 @@ public class DemandeAeronefInputDTO implements Serializable {
     private Boolean traficDonnees;
     private Boolean traficAutres;
 
-    @Size(max = 255)
     private String traficAutresPrecision;
 
     private Boolean traficNational;
     private Boolean traficInternational;
 
-    @Size(max = 25)
     private String referenceAutorisationAnterieure;
 
     private BigDecimal fraisDossier;
 
-    @Size(max = 8)
     private String deviseFrais;
 
-    @Valid
     private ClientDTO client;
 
-    @Valid
     private ApplicantDTO applicant;
 
     /** Rubrique 5 : les equipements de bord. */
-    @Valid
     private List<EquipementBordAeronefDTO> equipements;
 
     /**
      * Rubrique 7 : les controles. Remplis par l'ARCEP pendant l'instruction,
      * jamais par le demandeur -- voir DemandeAeronef.
      */
-    @Valid
     private List<VerificationControleDTO> verifications;
 
     /**
      * Le rapport d'instruction. Renseigne par l'ARCEP, jamais par le
      * demandeur -- voir RapportTechnique.
      */
-    @Valid
     private RapportTechniqueDTO rapportTechnique;
 
     // ------------------------- workflow / ACL -------------------------

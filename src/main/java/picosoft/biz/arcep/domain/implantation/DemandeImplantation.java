@@ -11,7 +11,6 @@ import picosoft.biz.arcep.client.kernel.model.acl.AclObjectIdentity;
 import picosoft.biz.arcep.domain.shared.Applicant;
 import picosoft.biz.arcep.domain.shared.Client;
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -32,20 +31,19 @@ public class DemandeImplantation extends Auditable implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
+    @Column(columnDefinition = "uuid", updatable = false)
     private UUID uuid;
 
     @Column(name = "web")
     private Boolean web;
 
-    @Column(name = "reference", length = 25)
-    @Size(max = 25)
+    @Column(name = "reference")
     private String reference;
 
-    @Column(name = "created_date", length = 25)
+    @Column(name = "created_date")
     private ZonedDateTime createdDate;
 
-    @Column(name = "sended_date", length = 25)
+    @Column(name = "sended_date")
     private ZonedDateTime sendedDate;
 
     @Column(name = "approvedBy")
@@ -56,13 +54,11 @@ public class DemandeImplantation extends Auditable implements Serializable {
      * String et non enumeration, pour s'aligner sur Asi.java:130 et sur les diagrammes
      * deployes, qui comparent a des chaines nues. La valeur est posee par le front.
      */
-    @Column(name = "statut_dossier", length = 32)
-    @Size(max = 32)
+    @Column(name = "statut_dossier")
     private String statutDossier;
 
     /** Oriente la branche de signature : Direction Commerce ou Chef Centre. */
-    @Column(name = "type_dossier", length = 50)
-    @Size(max = 50)
+    @Column(name = "type_dossier")
     private String typeDossier;
 
     // ------------------------------------------------------------------
@@ -140,8 +136,7 @@ public class DemandeImplantation extends Auditable implements Serializable {
     @Column(name = "end_process")
     private Boolean endProcess = false;
 
-    @Column(name = "state", length = 64)
-    @Size(max = 64)
+    @Column(name = "state")
     private String state;
 
     @Column(name = "number_of_attachments")

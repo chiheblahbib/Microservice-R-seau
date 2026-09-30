@@ -1,7 +1,5 @@
 package picosoft.biz.arcep.service.dto;
 
-import javax.validation.constraints.Size;
-import javax.validation.Valid;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,7 +29,6 @@ public class StationInputDTO implements Serializable {
 
     private UUID uuid;
 
-    @Size(max = 25)
 
     private String reference;
 
@@ -58,44 +55,32 @@ public class StationInputDTO implements Serializable {
 
     private ApplicantType installateurType;
 
-    @Size(max = 100)
     private String installateurRaisonSociale;
 
-    @Size(max = 200)
     private String installateurAdresse;
 
-    @Size(max = 50)
     private String installateurRegistreCommerce;
 
-    @Size(max = 500)
     private String installateurNatureActivite;
 
-    @Size(max = 100)
     private String installateurIdentite;
 
-    @Size(max = 50)
     private String installateurNationalite;
 
-    @Size(max = 100)
     private String installateurNationaliteComplet;
 
-    @Size(max = 100)
     private String installateurQualification;
 
-    @Size(max = 20)
     private String installateurTelephone;
 
-    @Size(max = 100)
     private String installateurEmail;
 
     private StatutStation statutStation;
 
     private Long demandeImplantationId;
 
-    @Valid
     private SiteImplantationDTO siteImplantation;
 
-    @Valid
     private List<FrequenceDTO> frequences;
 
     private List<AttestationDTO> attestations;
@@ -122,7 +107,6 @@ public class StationInputDTO implements Serializable {
 
     private Boolean endProcess;
 
-    @Size(max = 64)
 
     private String state;
 
@@ -146,7 +130,6 @@ public class StationInputDTO implements Serializable {
 
     private String WfComment;
 
-    @Size(max = 500)
 
     private String commentaire;
 }

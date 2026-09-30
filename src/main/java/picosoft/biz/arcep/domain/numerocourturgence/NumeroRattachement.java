@@ -6,7 +6,6 @@ import lombok.Setter;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 /** Un numero long ou fixe auquel le numero d'urgence est rattache, rubrique 4. */
@@ -28,8 +27,7 @@ public class NumeroRattachement implements Serializable {
     private Long id;
 
     /** Chaine : un numero garde ses zeros de tete et ne se calcule pas. */
-    @Column(name = "numero", length = 32)
-    @Size(max = 32)
+    @Column(name = "numero")
     private String numero;
 
     @ManyToOne(fetch = FetchType.LAZY)

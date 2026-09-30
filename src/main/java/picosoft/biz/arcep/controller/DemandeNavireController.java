@@ -97,6 +97,7 @@ public class DemandeNavireController {
         return demandeNavireService.byId(id);
     }
 
+    @PreAuthorize("hasAuthority(@kernelService.navire_role_canEditNavire())")
     @DeleteMapping("/demande-navires/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         demandeNavireService.delete(id);

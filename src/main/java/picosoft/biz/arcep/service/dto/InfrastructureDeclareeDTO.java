@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import picosoft.biz.arcep.domain.declaratif.enumeration.TypeInfrastructure;
 
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 /** Une caracteristique de reseau declaree, rubrique 8.a. */
@@ -20,7 +19,6 @@ public class InfrastructureDeclareeDTO implements Serializable {
 
     private TypeInfrastructure typeInfrastructure;
 
-    @Size(max = 255)
     private String precisionDetail;
 
     private Long demandeDeclaratifId;

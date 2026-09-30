@@ -6,7 +6,6 @@ import lombok.Setter;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 /**
@@ -36,8 +35,7 @@ public class NumeroRattachement implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "numero", length = 32)
-    @Size(max = 32)
+    @Column(name = "numero")
     private String numero;
 
     @ManyToOne(fetch = FetchType.LAZY)

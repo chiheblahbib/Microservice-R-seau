@@ -5,6 +5,7 @@ import javax.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import picosoft.biz.arcep.service.SiteImplantationService;
 import picosoft.biz.arcep.service.criteria.SiteImplantationCriteria;
@@ -43,6 +44,7 @@ public class SiteImplantationController {
         return siteImplantationService.findOne(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasAuthority(@kernelService.station_role_canEditStation())")
     @DeleteMapping("/site-implantations/{id}")
     public ResponseEntity<Void> deleteSiteImplantation(@PathVariable Long id) {
         siteImplantationService.delete(id);

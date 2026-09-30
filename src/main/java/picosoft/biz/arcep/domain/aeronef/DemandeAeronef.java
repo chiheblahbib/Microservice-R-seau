@@ -7,14 +7,13 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import picosoft.biz.arcep.configuration.audit.Auditable;
 import picosoft.biz.arcep.domain.shared.Applicant;
-import picosoft.biz.arcep.domain.shared.RapportTechnique;
+import picosoft.biz.arcep.domain.drrrs.RapportTechnique;
 import picosoft.biz.arcep.domain.aeronef.enumeration.*;
 import picosoft.biz.arcep.client.kernel.model.acl.AclObjectIdentity;
 import picosoft.biz.arcep.domain.shared.Attestation;
 import picosoft.biz.arcep.domain.shared.Client;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -84,20 +83,19 @@ public class DemandeAeronef extends Auditable implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
+    @Column(columnDefinition = "uuid", updatable = false)
     private UUID uuid;
 
     @Column(name = "web")
     private Boolean web;
 
-    @Column(name = "reference", length = 25)
-    @Size(max = 25)
+    @Column(name = "reference")
     private String reference;
 
-    @Column(name = "created_date", length = 25)
+    @Column(name = "created_date")
     private ZonedDateTime createdDate;
 
-    @Column(name = "sended_date", length = 25)
+    @Column(name = "sended_date")
     private ZonedDateTime sendedDate;
 
     @Column(name = "approvedBy")
@@ -108,18 +106,16 @@ public class DemandeAeronef extends Auditable implements Serializable {
      * Chaine et non enumeration, pour s'aligner sur Asi et sur les diagrammes
      * deployes, qui testent des chaines nues. La valeur est posee par le front.
      */
-    @Column(name = "statut_dossier", length = 32)
-    @Size(max = 32)
+    @Column(name = "statut_dossier")
     private String statutDossier;
 
-    @Column(name = "type_dossier", length = 50)
-    @Size(max = 50)
+    @Column(name = "type_dossier")
     private String typeDossier;
 
     // ---------------------------- rubrique 3 ----------------------------
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "nature_demande", length = 16)
+    @Column(name = "nature_demande")
     private NatureDemande natureDemande;
 
     /**
@@ -128,8 +124,7 @@ public class DemandeAeronef extends Auditable implements Serializable {
      * Absente du formulaire papier -- voir l'en-tete de classe. Facultative
      * tant que le metier n'a pas tranche.
      */
-    @Column(name = "immatriculation_aeronef", length = 32)
-    @Size(max = 32)
+    @Column(name = "immatriculation_aeronef")
     private String immatriculationAeronef;
 
     // ---------------------------- rubrique 4 ----------------------------
@@ -147,7 +142,7 @@ public class DemandeAeronef extends Auditable implements Serializable {
 
     /** Restriction de parcours : IFR ou FR. */
     @Enumerated(EnumType.STRING)
-    @Column(name = "restriction_parcours", length = 8)
+    @Column(name = "restriction_parcours")
     private RestrictionParcours restrictionParcours;
 
     // ---------------------------- rubrique 6 ----------------------------
@@ -166,8 +161,7 @@ public class DemandeAeronef extends Auditable implements Serializable {
     private Boolean traficAutres;
 
     /** N'a de sens que si traficAutres est coche. */
-    @Column(name = "trafic_autres_precision", length = 255)
-    @Size(max = 255)
+    @Column(name = "trafic_autres_precision")
     private String traficAutresPrecision;
 
     /** Nature du trafic : national et international sont cumulables. */
@@ -182,8 +176,7 @@ public class DemandeAeronef extends Auditable implements Serializable {
      * Le formulaire demande d'en joindre une copie ; on garde ici de quoi la
      * retrouver.
      */
-    @Column(name = "reference_autorisation_anterieure", length = 25)
-    @Size(max = 25)
+    @Column(name = "reference_autorisation_anterieure")
     private String referenceAutorisationAnterieure;
 
     // ---------------------------- rubrique 9 ----------------------------
@@ -199,8 +192,7 @@ public class DemandeAeronef extends Auditable implements Serializable {
     @Column(name = "frais_dossier", precision = 12, scale = 2)
     private BigDecimal fraisDossier;
 
-    @Column(name = "devise_frais", length = 8)
-    @Size(max = 8)
+    @Column(name = "devise_frais")
     private String deviseFrais;
 
     // ------------------------------------------------------------------
@@ -311,8 +303,7 @@ public class DemandeAeronef extends Auditable implements Serializable {
     @Column(name = "end_process")
     private Boolean endProcess = false;
 
-    @Column(name = "state", length = 64)
-    @Size(max = 64)
+    @Column(name = "state")
     private String state;
 
     @Column(name = "number_of_attachments")

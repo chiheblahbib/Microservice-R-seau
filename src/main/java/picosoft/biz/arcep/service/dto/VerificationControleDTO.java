@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDate;
 
@@ -20,13 +19,10 @@ public class VerificationControleDTO implements Serializable {
 
     private LocalDate dateControle;
 
-    @Size(max = 150)
     private String lieu;
 
-    @Size(max = 100)
     private String visa;
 
-    @Size(max = 500)
     private String observations;
 
     private Long demandeAeronefId;

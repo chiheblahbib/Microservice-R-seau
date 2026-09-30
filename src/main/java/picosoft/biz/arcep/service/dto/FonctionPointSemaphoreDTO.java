@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import picosoft.biz.arcep.domain.ispc.enumeration.FonctionSemaphore;
 
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 /** Une fonction cochee a la rubrique 6 du formulaire ISPC. */
@@ -21,7 +20,6 @@ public class FonctionPointSemaphoreDTO implements Serializable {
     private FonctionSemaphore fonction;
 
     /** N'a de sens que si `fonction` vaut AUTRE. */
-    @Size(max = 255)
     private String precisionAutre;
 
     private Long demandeIspcId;

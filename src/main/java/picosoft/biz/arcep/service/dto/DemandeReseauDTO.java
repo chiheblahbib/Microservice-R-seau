@@ -1,7 +1,5 @@
 package picosoft.biz.arcep.service.dto;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,7 +31,6 @@ public class DemandeReseauDTO implements Serializable {
 
     private Boolean web;
 
-    @Size(max = 25)
     private String reference;
 
     /**
@@ -56,50 +53,37 @@ public class DemandeReseauDTO implements Serializable {
 
     private String approvedBy;
 
-    @Size(max = 32)
     private String statutDossier;
 
-    @Size(max = 50)
     private String typeDossier;
 
     private NatureReseau natureReseau;
     private NatureDemande natureDemande;
 
-    @Size(max = 25)
     private String referenceAutorisationAnterieure;
 
     private BigDecimal fraisDossier;
 
-    @Size(max = 8)
     private String deviseFrais;
 
-    @Size(max = 100)
     private String engagementNom;
 
-    @Size(max = 100)
     private String engagementQualite;
 
-    @Size(max = 100)
     private String engagementLieu;
 
     private ZonedDateTime engagementDate;
 
-    @Valid
     private ClientDTO client;
 
-    @Valid
     private ApplicantDTO applicant;
 
-    @Valid
     private List<TypeReseauDeclareDTO> typesReseau;
 
-    @Valid
     private List<ServiceDeclareDTO> services;
 
-    @Valid
     private List<SiteReseauDTO> sites;
 
-    @Valid
     private List<LiaisonReseauDTO> liaisons;
 
     // ------------------------- workflow / ACL -------------------------
@@ -119,6 +103,15 @@ public class DemandeReseauDTO implements Serializable {
     private Boolean endProcess;
     private String state;
     private Long numberOfattachments;
+    /**
+     * Ce que le kernel autorise CET utilisateur a faire sur CE dossier.
+     *
+     * Meme champ que sur le DTO de sortie, et pour la meme raison : le
+     * formulaire lit par ici, et c'est de cette valeur qu'il deduit si ses
+     * rubriques sont saisissables. Jamais persiste, jamais relu en entree.
+     */
+    private String userPermission;
+
     private Long step;
     private String commentaire;
 }

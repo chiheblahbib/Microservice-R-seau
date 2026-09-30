@@ -9,7 +9,6 @@ import picosoft.biz.arcep.configuration.audit.Auditable;
 import picosoft.biz.arcep.domain.shared.enumeration.MomentTarif;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -48,36 +47,31 @@ public class RefTarif extends Auditable implements Serializable {
     private Long id;
 
     /** Identifiant stable de la ligne, ex. FRAIS_ETUDE_DOSSIER. */
-    @Column(name = "code", length = 64, nullable = false)
-    @Size(max = 64)
+    @Column(name = "code")
     private String code;
 
-    @Column(name = "libelle", length = 255)
-    @Size(max = 255)
+    @Column(name = "libelle")
     private String libelle;
 
     /**
      * Colonne "Service" de l'annexe. Null pour un tarif forfaitaire qui ne depend
      * pas du service rendu.
      */
-    @Column(name = "service", length = 128)
-    @Size(max = 128)
+    @Column(name = "service")
     private String service;
 
     /** Colonne "Application" de l'annexe : la precision qui distingue deux lignes de meme service. */
-    @Column(name = "application", length = 255)
-    @Size(max = 255)
+    @Column(name = "application")
     private String application;
 
     @Column(name = "montant", precision = 15, scale = 2)
     private BigDecimal montant;
 
-    @Column(name = "devise", length = 8)
-    @Size(max = 8)
+    @Column(name = "devise")
     private String devise;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "moment", length = 16)
+    @Column(name = "moment")
     private MomentTarif moment;
 
     @Column(name = "date_effet")
@@ -90,7 +84,6 @@ public class RefTarif extends Auditable implements Serializable {
     @Column(name = "actif")
     private Boolean actif = true;
 
-    @Column(name = "commentaire", length = 500)
-    @Size(max = 500)
+    @Column(name = "commentaire")
     private String commentaire;
 }

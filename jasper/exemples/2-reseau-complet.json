@@ -1,0 +1,73 @@
+{
+  "id": 131,
+  "uuid": "7d1f0c55-2a9e-4b61-8f3d-0e9b6c2a4f18",
+  "web": false,
+  "reference": "0131-15-10-2026",
+  "createdDate": "2026-10-15T08:02:11.120Z",
+  "sendedDate": "2026-10-15T08:47:36.905Z",
+  "statutDossier": "soumis",
+  "typeDossier": "RESEAU",
+  "natureReseau": "PRIVE",
+  "natureDemande": "RENOUVELLEMENT",
+  "referenceAutorisationAnterieure": "012/AUT/RP/ARCEP/2021",
+  "fraisDossier": 500000,
+  "deviseFrais": "XAF",
+  "client": {
+    "id": 88,
+    "clientType": "COMPANY",
+    "company": "Exemple Réseaux & Services Pétroliers du Gabon SA",
+    "tradeRegisterNumber": "GA-POG-01-2019-B12-00345",
+    "address": "Zone industrielle d'Oloumi, rue des Entrepreneurs, BP 20 000 Libreville",
+    "phone": "+241 11 70 00 00",
+    "natureActivite": "Services pétroliers et logistique offshore"
+  },
+  "applicant": {
+    "id": 64,
+    "applicantType": "COMPANY",
+    "applicantName": "Jean-Baptiste EXEMPLE",
+    "qualification": "Directeur des systèmes d'information",
+    "nationality": "GA",
+    "nationalityComplet": "Gabon",
+    "address": "Quartier Louis, BP 1111 Libreville",
+    "email": "dsi@exemple-reseaux.test"
+  },
+  "typesReseau": [
+    { "id": 301, "type": "FH", "demandeReseauId": 131 },
+    { "id": 302, "type": "VSAT", "demandeReseauId": 131 },
+    { "id": 303, "type": "AUTRE", "precisionAutre": "Liaison radio UHF de secours", "demandeReseauId": 131 }
+  ],
+  "services": [
+    { "id": 311, "type": "TRANSMISSION_DONNEES", "demandeReseauId": 131 },
+    { "id": 312, "type": "TELEPHONIE_IP", "portee": "INTERNATIONALE", "demandeReseauId": 131 }
+  ],
+  "sites": [
+    { "id": 401, "nomSite": "Base logistique Port-Gentil", "province": "Ogooué-Maritime", "ville": "Port-Gentil",
+      "latitudeSens": "S", "latitudeDegres": 0, "latitudeMinutes": 42, "latitudeSecondes": 5.4,
+      "longitudeSens": "E", "longitudeDegres": 8, "longitudeMinutes": 47, "longitudeSecondes": 12.0, "altitude": 4.0, "demandeReseauId": 131 },
+    { "id": 402, "nomSite": "Plateforme ATORA (VSAT SMP103)", "province": "Ogooué-Maritime", "ville": "Omboué",
+      "latitudeSens": "S", "latitudeDegres": 2, "latitudeMinutes": 25, "latitudeSecondes": 34.0,
+      "longitudeSens": "E", "longitudeDegres": 9, "longitudeMinutes": 52, "longitudeSecondes": 19.0, "demandeReseauId": 131 },
+    { "id": 403, "nomSite": "Siège Libreville", "province": "Estuaire", "ville": "Libreville",
+      "latitudeSens": "N", "latitudeDegres": 0, "latitudeMinutes": 23, "latitudeSecondes": 51.72,
+      "longitudeSens": "E", "longitudeDegres": 9, "longitudeMinutes": 27, "longitudeSecondes": 15.3, "altitude": 12.5, "demandeReseauId": 131 }
+  ],
+  "liaisons": [
+    { "id": 501, "nature": "FH", "bandeFrequences": "7 GHz (7 125 – 7 425 MHz)", "debitEmission": 155.0, "debitReception": 155.0, "nombreBonds": 3, "siteOrigineId": 403, "siteExtremiteId": 401, "demandeReseauId": 131 },
+    { "id": 502, "nature": "VSAT", "bandeFrequences": "Bande C — Tx 6240,5330 / Rx 3947,6600 MHz", "debitEmission": 0.512, "debitReception": 0.512, "siteOrigineId": 402, "siteExtremiteId": 401, "demandeReseauId": 131 },
+    { "id": 503, "nature": "AUTRE", "precisionAutre": "Radio UHF", "siteOrigineId": 401, "demandeReseauId": 131 }
+  ],
+  "attestations": [
+    { "id": 97, "reference": "0097-20-10-2026", "classId": 1203, "nomModele": "PRIVE",
+      "sysdateCreated": "2026-10-20T09:12:40.004Z", "sysdateUpdated": "2026-10-20T09:12:40.004Z" }
+  ],
+  "labelsPostAttachments": "Formulaire de demande signé;Statuts de la société;Extrait RCCM de moins de 3 mois;Pièce d’identité du demandeur;Plan de situation des sites;Architecture du réseau;Fiches techniques des équipements",
+  "labelsMissingPostAttachments": "Engagement sur l’honneur;Quitus fiscal",
+  "wfProcessID": "9e2b41c0-a8f1-11f1-8c5d-0a0027000011",
+  "classId": 1187,
+  "className": "picosoft.biz.arcep.domain.reseau.DemandeReseau",
+  "activityName": "Contrôle & Numérotation du Dossier",
+  "assignee": "Numerotation",
+  "endProcess": false,
+  "state": "En cours",
+  "numberOfattachments": 9
+}

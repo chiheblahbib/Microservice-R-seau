@@ -1,0 +1,1033 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  DechargeReseau : accusé de réception d'une demande d’autorisation de réseau de
+  communications électroniques (DRRRS, DemandeReseau), dans le style des modèles ASI du kernel.
+  Données : le JSON du dossier (variable Flowable « data », DemandeReseauOutputDTO).
+  Ressources à joindre au modèle dans le kernel (Paramétrage Jasper), mêmes fichiers que l'ASI :
+  arcepLogo, RGUTJ, logo-arcep-1.
+-->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DechargeReseau" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="10" bottomMargin="10" uuid="aec7f100-a2bc-5e60-bd84-fc6d338296ec">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true"/>
+	<style name="Base" isDefault="true" fontName="Arial" fontSize="8"/>
+	<style name="Section" mode="Opaque" backcolor="#F2F2F2" vTextAlign="Middle" fontName="Arial" fontSize="8" isBold="true">
+		<box leftPadding="12">
+			<pen lineWidth="1.0" lineColor="#BFC9D1"/>
+		</box>
+	</style>
+	<style name="Libelle" vTextAlign="Middle" fontName="Arial" fontSize="8">
+		<box topPadding="3" leftPadding="10" bottomPadding="3" rightPadding="4">
+			<bottomPen lineWidth="1.0" lineColor="#BFC9D1"/>
+		</box>
+	</style>
+	<style name="Valeur" vTextAlign="Middle" fontName="Arial" fontSize="8">
+		<box topPadding="3" leftPadding="10" bottomPadding="3" rightPadding="6">
+			<leftPen lineWidth="1.0" lineColor="#BFC9D1"/>
+			<bottomPen lineWidth="1.0" lineColor="#BFC9D1"/>
+		</box>
+	</style>
+	<style name="Entete" mode="Opaque" backcolor="#F2F2F2" hTextAlign="Center" vTextAlign="Middle" fontName="Arial" fontSize="7" isBold="true">
+		<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+			<pen lineWidth="1.0" lineColor="#BFC9D1"/>
+		</box>
+	</style>
+	<style name="Cellule" hTextAlign="Center" vTextAlign="Middle" fontName="Arial" fontSize="8">
+		<box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3">
+			<pen lineWidth="1.0" lineColor="#BFC9D1"/>
+		</box>
+	</style>
+	<subDataset name="dsSites" uuid="a1d5efa4-991b-587f-b4ec-30d51edffee6">
+		<field name="nomSite" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="nomSite"/>
+			<fieldDescription><![CDATA[nomSite]]></fieldDescription>
+		</field>
+		<field name="province" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="province"/>
+			<fieldDescription><![CDATA[province]]></fieldDescription>
+		</field>
+		<field name="ville" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="ville"/>
+			<fieldDescription><![CDATA[ville]]></fieldDescription>
+		</field>
+		<field name="latitudeSens" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="latitudeSens"/>
+			<fieldDescription><![CDATA[latitudeSens]]></fieldDescription>
+		</field>
+		<field name="latitudeDegres" class="java.lang.Integer">
+			<property name="net.sf.jasperreports.json.field.expression" value="latitudeDegres"/>
+			<fieldDescription><![CDATA[latitudeDegres]]></fieldDescription>
+		</field>
+		<field name="latitudeMinutes" class="java.lang.Integer">
+			<property name="net.sf.jasperreports.json.field.expression" value="latitudeMinutes"/>
+			<fieldDescription><![CDATA[latitudeMinutes]]></fieldDescription>
+		</field>
+		<field name="latitudeSecondes" class="java.lang.Double">
+			<property name="net.sf.jasperreports.json.field.expression" value="latitudeSecondes"/>
+			<fieldDescription><![CDATA[latitudeSecondes]]></fieldDescription>
+		</field>
+		<field name="longitudeSens" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="longitudeSens"/>
+			<fieldDescription><![CDATA[longitudeSens]]></fieldDescription>
+		</field>
+		<field name="longitudeDegres" class="java.lang.Integer">
+			<property name="net.sf.jasperreports.json.field.expression" value="longitudeDegres"/>
+			<fieldDescription><![CDATA[longitudeDegres]]></fieldDescription>
+		</field>
+		<field name="longitudeMinutes" class="java.lang.Integer">
+			<property name="net.sf.jasperreports.json.field.expression" value="longitudeMinutes"/>
+			<fieldDescription><![CDATA[longitudeMinutes]]></fieldDescription>
+		</field>
+		<field name="longitudeSecondes" class="java.lang.Double">
+			<property name="net.sf.jasperreports.json.field.expression" value="longitudeSecondes"/>
+			<fieldDescription><![CDATA[longitudeSecondes]]></fieldDescription>
+		</field>
+		<field name="altitude" class="java.lang.Double">
+			<property name="net.sf.jasperreports.json.field.expression" value="altitude"/>
+			<fieldDescription><![CDATA[altitude]]></fieldDescription>
+		</field>
+		<field name="description" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="description"/>
+			<fieldDescription><![CDATA[description]]></fieldDescription>
+		</field>
+	</subDataset>
+	<parameter name="arcepLogo" class="java.io.InputStream">
+		<parameterDescription><![CDATA[Ressource « arcepLogo » du modèle au kernel (même fichier que les modèles ASI).]]></parameterDescription>
+	</parameter>
+	<parameter name="RGUTJ" class="java.io.InputStream">
+		<parameterDescription><![CDATA[Ressource « RGUTJ » du modèle au kernel (même fichier que les modèles ASI).]]></parameterDescription>
+	</parameter>
+	<parameter name="logo-arcep-1" class="java.io.InputStream">
+		<parameterDescription><![CDATA[Ressource « logo-arcep-1 » du modèle au kernel (même fichier que les modèles ASI).]]></parameterDescription>
+	</parameter>
+	<parameter name="FUSEAU_HORAIRE" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[Fuseau dans lequel les dates et heures sont imprimées.]]></parameterDescription>
+		<defaultValueExpression><![CDATA["Africa/Libreville"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="LIBELLES" class="java.util.Map" isForPrompting="false">
+		<parameterDescription><![CDATA[Libellés des énumérations du service reseau (repris de reseau-vocabulaire.ts côté front).]]></parameterDescription>
+		<defaultValueExpression><![CDATA[java.util.stream.Stream.of(new String[][] {
+	{"PRIVE", "Réseau privé"},
+	{"OUVERT_AU_PUBLIC", "Réseau ouvert au public"},
+	{"NOUVEAU", "Nouveau réseau"},
+	{"MODIFICATION", "Modification du réseau"},
+	{"RENOUVELLEMENT", "Renouvellement d’autorisation"},
+	{"FH", "Réseau FH"},
+	{"VSAT", "VSAT"},
+	{"STATION_TERRIENNE", "Station terrienne"},
+	{"FIBRE_OPTIQUE", "Réseau fibre optique"},
+	{"IOT", "Internet des objets (IoT)"},
+	{"BLR", "Réseau BLR (boucle locale radio)"},
+	{"PMR", "Réseau PMR (radiocommunication d’entreprise)"},
+	{"AUTRE", "Autre"},
+	{"ACCES_INTERNET", "Accès à Internet"},
+	{"TRANSMISSION_DONNEES", "Transmission de données"},
+	{"TELEPHONIE", "Téléphonie"},
+	{"TELEPHONIE_IP", "Téléphonie sur IP"},
+	{"LOCALE", "locale"},
+	{"NATIONALE", "nationale"},
+	{"INTERNATIONALE", "internationale"}
+}).collect(java.util.stream.Collectors.toMap(e -> e[0], e -> e[1]))]]></defaultValueExpression>
+	</parameter>
+	<queryString language="json">
+		<![CDATA[]]>
+	</queryString>
+	<field name="reference" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="reference"/>
+		<fieldDescription><![CDATA[reference]]></fieldDescription>
+	</field>
+	<field name="sendedDate" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="sendedDate"/>
+		<fieldDescription><![CDATA[sendedDate]]></fieldDescription>
+	</field>
+	<field name="createdDate" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="createdDate"/>
+		<fieldDescription><![CDATA[createdDate]]></fieldDescription>
+	</field>
+	<field name="natureReseau" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="natureReseau"/>
+		<fieldDescription><![CDATA[natureReseau]]></fieldDescription>
+	</field>
+	<field name="natureDemande" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="natureDemande"/>
+		<fieldDescription><![CDATA[natureDemande]]></fieldDescription>
+	</field>
+	<field name="referenceAutorisationAnterieure" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="referenceAutorisationAnterieure"/>
+		<fieldDescription><![CDATA[referenceAutorisationAnterieure]]></fieldDescription>
+	</field>
+	<field name="fraisDossier" class="java.math.BigDecimal">
+		<property name="net.sf.jasperreports.json.field.expression" value="fraisDossier"/>
+		<fieldDescription><![CDATA[fraisDossier]]></fieldDescription>
+	</field>
+	<field name="deviseFrais" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="deviseFrais"/>
+		<fieldDescription><![CDATA[deviseFrais]]></fieldDescription>
+	</field>
+	<field name="clientType" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="client.clientType"/>
+		<fieldDescription><![CDATA[client.clientType]]></fieldDescription>
+	</field>
+	<field name="company" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="client.company"/>
+		<fieldDescription><![CDATA[client.company]]></fieldDescription>
+	</field>
+	<field name="clientName" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="client.clientName"/>
+		<fieldDescription><![CDATA[client.clientName]]></fieldDescription>
+	</field>
+	<field name="tradeRegisterNumber" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="client.tradeRegisterNumber"/>
+		<fieldDescription><![CDATA[client.tradeRegisterNumber]]></fieldDescription>
+	</field>
+	<field name="address" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="client.address"/>
+		<fieldDescription><![CDATA[client.address]]></fieldDescription>
+	</field>
+	<field name="phone" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="client.phone"/>
+		<fieldDescription><![CDATA[client.phone]]></fieldDescription>
+	</field>
+	<field name="email" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="client.email"/>
+		<fieldDescription><![CDATA[client.email]]></fieldDescription>
+	</field>
+	<field name="natureActivite" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="client.natureActivite"/>
+		<fieldDescription><![CDATA[client.natureActivite]]></fieldDescription>
+	</field>
+	<field name="applicantName" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="applicant.applicantName"/>
+		<fieldDescription><![CDATA[applicant.applicantName]]></fieldDescription>
+	</field>
+	<field name="qualification" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="applicant.qualification"/>
+		<fieldDescription><![CDATA[applicant.qualification]]></fieldDescription>
+	</field>
+	<field name="nationality" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="applicant.nationality"/>
+		<fieldDescription><![CDATA[applicant.nationality]]></fieldDescription>
+	</field>
+	<field name="nationalityComplet" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="applicant.nationalityComplet"/>
+		<fieldDescription><![CDATA[applicant.nationalityComplet]]></fieldDescription>
+	</field>
+	<field name="applicantAddress" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="applicant.address"/>
+		<fieldDescription><![CDATA[applicant.address]]></fieldDescription>
+	</field>
+	<field name="applicantPhone" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="applicant.phone"/>
+		<fieldDescription><![CDATA[applicant.phone]]></fieldDescription>
+	</field>
+	<field name="applicantEmail" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="applicant.email"/>
+		<fieldDescription><![CDATA[applicant.email]]></fieldDescription>
+	</field>
+	<field name="typesReseau" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="typesReseau"/>
+		<fieldDescription><![CDATA[typesReseau]]></fieldDescription>
+	</field>
+	<field name="services" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="services"/>
+		<fieldDescription><![CDATA[services]]></fieldDescription>
+	</field>
+	<field name="sites" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="sites"/>
+		<fieldDescription><![CDATA[sites]]></fieldDescription>
+	</field>
+	<field name="liaisons" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="liaisons"/>
+		<fieldDescription><![CDATA[liaisons]]></fieldDescription>
+	</field>
+	<field name="assignee" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="assignee"/>
+		<fieldDescription><![CDATA[assignee]]></fieldDescription>
+	</field>
+	<field name="labelsPostAttachments" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="labelsPostAttachments"/>
+		<fieldDescription><![CDATA[labelsPostAttachments]]></fieldDescription>
+	</field>
+	<field name="labelsMissingPostAttachments" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="labelsMissingPostAttachments"/>
+		<fieldDescription><![CDATA[labelsMissingPostAttachments]]></fieldDescription>
+	</field>
+	<variable name="dateReception" class="java.time.ZonedDateTime">
+		<variableExpression><![CDATA[$F{sendedDate} != null && $F{sendedDate}.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}.*") ? java.time.ZonedDateTime.parse($F{sendedDate}, java.time.format.DateTimeFormatter.ISO_DATE_TIME.withZone(java.time.ZoneId.of($P{FUSEAU_HORAIRE}))).withZoneSameInstant(java.time.ZoneId.of($P{FUSEAU_HORAIRE}))
+: $F{createdDate} != null && $F{createdDate}.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}.*") ? java.time.ZonedDateTime.parse($F{createdDate}, java.time.format.DateTimeFormatter.ISO_DATE_TIME.withZone(java.time.ZoneId.of($P{FUSEAU_HORAIRE}))).withZoneSameInstant(java.time.ZoneId.of($P{FUSEAU_HORAIRE}))
+: null]]></variableExpression>
+	</variable>
+	<variable name="titulaire" class="java.lang.String">
+		<variableExpression><![CDATA[$F{company} != null && !$F{company}.trim().isEmpty() ? $F{company} : $F{clientName}]]></variableExpression>
+	</variable>
+	<variable name="typesLibelle" class="java.lang.String">
+		<variableExpression><![CDATA[$F{typesReseau} == null || $F{typesReseau}.trim().isEmpty() ? ""
+: ((java.util.List<java.util.Map<String, Object>>) new com.fasterxml.jackson.databind.ObjectMapper()
+    .readValue($F{typesReseau}, java.util.List.class))
+  .stream()
+  .filter(e -> e != null && e.get("type") != null)
+  .map(e -> "AUTRE".equals(e.get("type")) && e.get("precisionAutre") != null
+        ? String.valueOf(e.get("precisionAutre"))
+        : (String) $P{LIBELLES}.getOrDefault(String.valueOf(e.get("type")), String.valueOf(e.get("type"))))
+  .collect(java.util.stream.Collectors.joining(", "))]]></variableExpression>
+	</variable>
+	<variable name="servicesLibelle" class="java.lang.String">
+		<variableExpression><![CDATA[$F{services} == null || $F{services}.trim().isEmpty() ? ""
+: ((java.util.List<java.util.Map<String, Object>>) new com.fasterxml.jackson.databind.ObjectMapper()
+    .readValue($F{services}, java.util.List.class))
+  .stream()
+  .filter(e -> e != null && e.get("type") != null)
+  .map(e -> $P{LIBELLES}.getOrDefault(String.valueOf(e.get("type")), String.valueOf(e.get("type")))
+        + (e.get("portee") != null ? " (portée " + $P{LIBELLES}.getOrDefault(String.valueOf(e.get("portee")), String.valueOf(e.get("portee"))) + ")" : ""))
+  .collect(java.util.stream.Collectors.joining(", "))]]></variableExpression>
+	</variable>
+	<variable name="nombreSites" class="java.lang.Integer">
+		<variableExpression><![CDATA[$F{sites} == null || $F{sites}.trim().isEmpty() ? 0
+: new com.fasterxml.jackson.databind.ObjectMapper().readTree($F{sites}).size()]]></variableExpression>
+	</variable>
+	<variable name="piecesRecues" class="java.lang.String">
+		<variableExpression><![CDATA[$F{labelsPostAttachments} == null ? "" :
+java.util.Arrays.stream($F{labelsPostAttachments}.split("[,;]")).map(String::trim).filter(s -> !s.isEmpty())
+    .map(s -> "•  " + s).collect(java.util.stream.Collectors.joining("\n"))]]></variableExpression>
+	</variable>
+	<variable name="piecesManquantes" class="java.lang.String">
+		<variableExpression><![CDATA[$F{labelsMissingPostAttachments} == null ? "" :
+java.util.Arrays.stream($F{labelsMissingPostAttachments}.split("[,;]")).map(String::trim).filter(s -> !s.isEmpty())
+    .map(s -> "•  " + s).collect(java.util.stream.Collectors.joining("\n"))]]></variableExpression>
+	</variable>
+	<title>
+		<band height="90" splitType="Stretch">
+			<image scaleImage="RetainShape" hAlign="Left" vAlign="Middle" onErrorType="Blank">
+				<reportElement x="9" y="0" width="118" height="76" uuid="00d87b4c-8e11-50f1-ac3c-9d69dd39b76e"/>
+				<imageExpression><![CDATA[$P{arcepLogo}]]></imageExpression>
+			</image>
+			<image scaleImage="RetainShape" hAlign="Center" vAlign="Middle" onErrorType="Blank">
+				<reportElement x="465" y="12" width="90" height="56" uuid="8c16d372-b406-5fa0-9c20-b6bc361f36c8"/>
+				<imageExpression><![CDATA[$P{RGUTJ}]]></imageExpression>
+			</image>
+			<rectangle>
+				<reportElement mode="Opaque" x="0" y="82" width="185" height="5" forecolor="#00B050" backcolor="#00B050" uuid="297484ed-be45-59b2-94b3-86be5f58f72d"/>
+				<graphicElement>
+					<pen lineWidth="0.0"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Opaque" x="185" y="82" width="185" height="5" forecolor="#FFFF00" backcolor="#FFFF00" uuid="c15a8d2a-eeda-54c9-8325-cfac984ae622"/>
+				<graphicElement>
+					<pen lineWidth="0.0"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Opaque" x="370" y="82" width="185" height="5" forecolor="#0070C0" backcolor="#0070C0" uuid="e278b480-6146-5efb-a725-acd0b58b6f07"/>
+				<graphicElement>
+					<pen lineWidth="0.0"/>
+				</graphicElement>
+			</rectangle>
+		</band>
+	</title>
+	<detail>
+		<band height="96" splitType="Prevent">
+			<frame>
+				<reportElement positionType="Float" x="117" y="4" width="320" height="22" uuid="0e14136f-263b-5e80-a673-7e1e7d8f2f15"/>
+				<rectangle radius="11">
+					<reportElement mode="Opaque" x="0" y="0" width="320" height="22" forecolor="#000000" backcolor="#000000" uuid="c7336235-b905-5da9-a03c-a06c480f0369"/>
+				</rectangle>
+				<staticText>
+					<reportElement x="0" y="0" width="320" height="22" forecolor="#FFFFFF" uuid="3537b32f-7634-5544-b0c0-2facdd837cdf"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[ACCUSÉ DE RÉCEPTION DE DEMANDE]]></text>
+				</staticText>
+			</frame>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement x="40" y="30" width="475" height="14" uuid="7b9c6956-c619-57ac-83a8-6914c87ef976"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="8.5" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Demande d’autorisation d’établissement et d’exploitation d’un réseau de communications électroniques"]]></textFieldExpression>
+			</textField>
+			<frame>
+				<reportElement x="12" y="50" width="177" height="42" uuid="a3578796-caea-5140-8d5a-7f298a75dbdd"/>
+				<box>
+					<pen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="5" width="177" height="14" uuid="586e3e4e-b609-595f-b037-fb9f372db9a7"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["DOSSIER N°"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement forecolor="#0070C0" x="0" y="19" width="177" height="20" uuid="e6bf24a3-7fae-5287-9159-4579738197be"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{reference} != null ? $F{reference} : "—"]]></textFieldExpression>
+			</textField>
+			</frame>
+			<frame>
+				<reportElement x="189" y="50" width="177" height="42" uuid="304686aa-a1bc-5a3f-b71c-44015fed9ab5"/>
+				<box>
+					<pen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="5" width="177" height="14" uuid="8e5235a4-7796-5f06-a5df-ed4f9fbbba12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["DATE DE RÉCEPTION"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement forecolor="#0070C0" x="0" y="19" width="177" height="20" uuid="b08da948-45bb-5239-bf25-42a6654b18de"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{dateReception} == null ? "—" : $V{dateReception}.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy", java.util.Locale.FRENCH))]]></textFieldExpression>
+			</textField>
+			</frame>
+			<frame>
+				<reportElement x="366" y="50" width="177" height="42" uuid="fa9d4526-fa01-5d34-9336-c2bd9269de7d"/>
+				<box>
+					<pen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="5" width="177" height="14" uuid="df2c61d5-c255-5554-aeb6-f21b4180ab09"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["HEURE"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement forecolor="#0070C0" x="0" y="19" width="177" height="20" uuid="215b2f53-cb7c-55d4-ba6c-360e0b2b877c"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{dateReception} == null ? "—" : $V{dateReception}.format(java.time.format.DateTimeFormatter.ofPattern("HH'H'mm", java.util.Locale.FRENCH))]]></textFieldExpression>
+			</textField>
+			</frame>
+		</band>
+		<band height="167" splitType="Prevent">
+			<textField textAdjust="StretchHeight">
+				<reportElement style="Section" positionType="Float" x="12" y="8" width="531" height="15" uuid="3a540e89-31dd-5b7b-b7f5-8a4119d0e29d"/>
+				<textFieldExpression><![CDATA["1. IDENTIFICATION DU DEMANDEUR"]]></textFieldExpression>
+			</textField>
+			<frame>
+				<reportElement positionType="Float" x="12" y="23" width="531" height="16" uuid="2e311aae-6c3b-501a-8aee-2e20992e05b2"/>
+				<box>
+					<leftPen lineWidth="1.0" lineColor="#BFC9D1"/>
+					<rightPen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Libelle" stretchType="ContainerHeight" x="0" y="0" width="200" height="16" uuid="da3a655c-729a-5f9b-9af1-f4212ac3d394"/>
+					<textFieldExpression><![CDATA["Demandeur"]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement style="Valeur" stretchType="ContainerHeight" x="200" y="0" width="331" height="16" uuid="df7f61ce-e7ca-5152-8a04-70d96e75ddc5"/>
+					<textElement markup="none"></textElement>
+					<textFieldExpression><![CDATA[$F{applicantName}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" x="12" y="39" width="531" height="16" uuid="5a07e04c-a925-5b8d-ad39-f510a1a2cf90"/>
+				<box>
+					<leftPen lineWidth="1.0" lineColor="#BFC9D1"/>
+					<rightPen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Libelle" stretchType="ContainerHeight" x="0" y="0" width="200" height="16" uuid="ca73d9c9-f542-52be-bc42-9a1cbe8775d2"/>
+					<textFieldExpression><![CDATA["Demande pour le compte de la société"]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement style="Valeur" stretchType="ContainerHeight" x="200" y="0" width="331" height="16" uuid="9657c79c-e1d6-53b3-b22a-5a48cb15b39a"/>
+					<textElement markup="none"></textElement>
+					<textFieldExpression><![CDATA[$V{titulaire}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" x="12" y="55" width="531" height="16" uuid="5d89029d-f178-5ead-a6f3-148fcdb4ddb8"/>
+				<box>
+					<leftPen lineWidth="1.0" lineColor="#BFC9D1"/>
+					<rightPen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Libelle" stretchType="ContainerHeight" x="0" y="0" width="200" height="16" uuid="2ef3f403-1754-5f49-a230-c2e10fa7bad6"/>
+					<textFieldExpression><![CDATA["Agissant en qualité de (fonction / titre)"]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement style="Valeur" stretchType="ContainerHeight" x="200" y="0" width="331" height="16" uuid="a0c7ec27-2f05-56f9-bec9-2dc1807727a4"/>
+					<textElement markup="none"></textElement>
+					<textFieldExpression><![CDATA[$F{qualification}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" x="12" y="71" width="531" height="16" uuid="a36bd048-2630-5404-a044-23b4c292813a"/>
+				<box>
+					<leftPen lineWidth="1.0" lineColor="#BFC9D1"/>
+					<rightPen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Libelle" stretchType="ContainerHeight" x="0" y="0" width="200" height="16" uuid="7ec13597-00b7-55f6-a41c-d5ee5f0392f8"/>
+					<textFieldExpression><![CDATA["N° d’inscription au Registre de Commerce"]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement style="Valeur" stretchType="ContainerHeight" x="200" y="0" width="331" height="16" uuid="2a0efcb4-8827-5fea-a719-79bdedbb49ca"/>
+					<textElement markup="none"></textElement>
+					<textFieldExpression><![CDATA[$F{tradeRegisterNumber}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" x="12" y="87" width="531" height="16" uuid="a8ee5c54-544f-5d92-9352-50bbaea7ba2f"/>
+				<box>
+					<leftPen lineWidth="1.0" lineColor="#BFC9D1"/>
+					<rightPen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Libelle" stretchType="ContainerHeight" x="0" y="0" width="200" height="16" uuid="3b28f99a-b602-5c60-a6a9-e9529a90f840"/>
+					<textFieldExpression><![CDATA["De nationalité"]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement style="Valeur" stretchType="ContainerHeight" x="200" y="0" width="331" height="16" uuid="3669607a-d76b-5876-a95b-5d96b1bdb5ac"/>
+					<textElement markup="none"></textElement>
+					<textFieldExpression><![CDATA[$F{nationalityComplet} != null ? $F{nationalityComplet}
+: $F{nationality} != null && $F{nationality}.length() == 2
+  ? new java.util.Locale("", $F{nationality}).getDisplayCountry(java.util.Locale.FRENCH)
+  : $F{nationality}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" x="12" y="103" width="531" height="16" uuid="03709347-952f-5a8e-afb9-9aa99926375c"/>
+				<box>
+					<leftPen lineWidth="1.0" lineColor="#BFC9D1"/>
+					<rightPen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Libelle" stretchType="ContainerHeight" x="0" y="0" width="200" height="16" uuid="98047b2f-0bb4-5531-afa2-e8059c524ddc"/>
+					<textFieldExpression><![CDATA["Adresse de la société (ville, quartier, rue, boîte postale)"]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement style="Valeur" stretchType="ContainerHeight" x="200" y="0" width="331" height="16" uuid="c0d5dd80-5917-5004-a47b-d84915018a67"/>
+					<textElement markup="none"></textElement>
+					<textFieldExpression><![CDATA[$F{address} != null ? $F{address} : $F{applicantAddress}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" x="12" y="119" width="531" height="16" uuid="f7d8f858-387a-5883-bbfe-1d90ab4a0937"/>
+				<box>
+					<leftPen lineWidth="1.0" lineColor="#BFC9D1"/>
+					<rightPen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Libelle" stretchType="ContainerHeight" x="0" y="0" width="200" height="16" uuid="74dac6ae-a341-5bbd-ad7a-ab8f4c871d0b"/>
+					<textFieldExpression><![CDATA["Téléphone"]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement style="Valeur" stretchType="ContainerHeight" x="200" y="0" width="331" height="16" uuid="37c294d9-1e35-5da8-b19c-4ca314cb9505"/>
+					<textElement markup="none"></textElement>
+					<textFieldExpression><![CDATA[$F{phone} != null ? $F{phone} : $F{applicantPhone}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" x="12" y="135" width="531" height="16" uuid="bea6491c-3156-5e4b-9210-348a458543bd"/>
+				<box>
+					<leftPen lineWidth="1.0" lineColor="#BFC9D1"/>
+					<rightPen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Libelle" stretchType="ContainerHeight" x="0" y="0" width="200" height="16" uuid="1e5ee300-7380-52ce-871d-534c7b935894"/>
+					<textFieldExpression><![CDATA["E-mail"]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement style="Valeur" stretchType="ContainerHeight" x="200" y="0" width="331" height="16" uuid="45b0a2a2-be64-500b-8370-1b7be6c9f741"/>
+					<textElement markup="none"></textElement>
+					<textFieldExpression><![CDATA[$F{applicantEmail} != null ? $F{applicantEmail} : $F{email}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" x="12" y="151" width="531" height="16" uuid="19613495-5ea7-5d46-ae66-315e52f9e91d"/>
+				<box>
+					<leftPen lineWidth="1.0" lineColor="#BFC9D1"/>
+					<rightPen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Libelle" stretchType="ContainerHeight" x="0" y="0" width="200" height="16" uuid="902f27ce-bc24-58f2-ac97-74b9a6005f01"/>
+					<textFieldExpression><![CDATA["Nature d'activité"]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement style="Valeur" stretchType="ContainerHeight" x="200" y="0" width="331" height="16" uuid="549505f1-68c9-5fbf-92ed-8bad4cb97040"/>
+					<textElement markup="none"></textElement>
+					<textFieldExpression><![CDATA[$F{natureActivite}]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+		<band height="119" splitType="Prevent">
+			<textField textAdjust="StretchHeight">
+				<reportElement style="Section" positionType="Float" x="12" y="8" width="531" height="15" uuid="051c934f-07fb-59d0-8165-e9d7cd2ac39e"/>
+				<textFieldExpression><![CDATA["2. OBJET DE LA DEMANDE"]]></textFieldExpression>
+			</textField>
+			<frame>
+				<reportElement positionType="Float" x="12" y="23" width="531" height="16" uuid="ca276766-5ff4-55ab-afb4-b5dd00db5f23"/>
+				<box>
+					<leftPen lineWidth="1.0" lineColor="#BFC9D1"/>
+					<bottomPen lineWidth="1.0" lineColor="#BFC9D1"/>
+					<rightPen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+				<staticText>
+					<reportElement style="Libelle" x="0" y="0" width="200" height="16" uuid="e38aaac1-c7ee-5121-a977-222ab531b334"/>
+					<text><![CDATA[Nature du réseau]]></text>
+				</staticText>
+				<line>
+					<reportElement x="200" y="0" width="1" height="16" forecolor="#BFC9D1" uuid="32955869-3d08-56ce-9be5-74f26edf8ab5"/>
+				</line>
+				<textField>
+					<reportElement x="210" y="3" width="10" height="10" uuid="351dab63-fe74-59c9-b739-3d2bc994aea2"/>
+					<box>
+						<pen lineWidth="1.0" lineColor="#030303"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["PRIVE".equals($F{natureReseau}) ? "X" : ""]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="224" y="0" width="70" height="16" uuid="c87a8d37-7f1d-57af-8638-514b98795469"/>
+					<textElement verticalAlignment="Middle"/>
+					<text><![CDATA[Réseau privé]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="302" y="3" width="10" height="10" uuid="c2df4f30-3736-504b-b1bd-e883bcb96534"/>
+					<box>
+						<pen lineWidth="1.0" lineColor="#030303"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["OUVERT_AU_PUBLIC".equals($F{natureReseau}) ? "X" : ""]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="316" y="0" width="110" height="16" uuid="626ec870-4c65-5743-a347-12b20c9ff8d7"/>
+					<textElement verticalAlignment="Middle"/>
+					<text><![CDATA[Réseau ouvert au public]]></text>
+				</staticText>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" x="12" y="39" width="531" height="16" uuid="73a457e3-844b-5922-ab1d-2cdb011c2721"/>
+				<box>
+					<leftPen lineWidth="1.0" lineColor="#BFC9D1"/>
+					<bottomPen lineWidth="1.0" lineColor="#BFC9D1"/>
+					<rightPen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+				<staticText>
+					<reportElement style="Libelle" x="0" y="0" width="200" height="16" uuid="762972f5-9b61-52d4-8265-ff18927a629e"/>
+					<text><![CDATA[Nature de la demande]]></text>
+				</staticText>
+				<line>
+					<reportElement x="200" y="0" width="1" height="16" forecolor="#BFC9D1" uuid="f9a4040c-ce07-5d49-be0c-292d49b2c1d0"/>
+				</line>
+				<textField>
+					<reportElement x="210" y="3" width="10" height="10" uuid="0d1f4299-e959-569c-b516-db7d093b5805"/>
+					<box>
+						<pen lineWidth="1.0" lineColor="#030303"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["NOUVEAU".equals($F{natureDemande}) ? "X" : ""]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="224" y="0" width="70" height="16" uuid="3e393e3e-eac5-53c2-85b4-ca2a0cfe454a"/>
+					<textElement verticalAlignment="Middle"/>
+					<text><![CDATA[Nouveau réseau]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="302" y="3" width="10" height="10" uuid="dbcc286f-7291-5261-9955-5d38681be5f6"/>
+					<box>
+						<pen lineWidth="1.0" lineColor="#030303"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["MODIFICATION".equals($F{natureDemande}) ? "X" : ""]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="316" y="0" width="60" height="16" uuid="4982ec99-80ae-5d25-ba4e-bd52cc39fbe4"/>
+					<textElement verticalAlignment="Middle"/>
+					<text><![CDATA[Modification]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="384" y="3" width="10" height="10" uuid="5fa12d5b-55d1-5c47-9416-5d9a4782be03"/>
+					<box>
+						<pen lineWidth="1.0" lineColor="#030303"/>
+					</box>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="7" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["RENOUVELLEMENT".equals($F{natureDemande}) ? "X" : ""]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="398" y="0" width="70" height="16" uuid="ecab2829-dafb-594a-a7e7-69319a1b49b3"/>
+					<textElement verticalAlignment="Middle"/>
+					<text><![CDATA[Renouvellement]]></text>
+				</staticText>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" x="12" y="55" width="531" height="16" isRemoveLineWhenBlank="true" uuid="eb402113-1bb1-5623-b6a1-5dc368338384">
+					<printWhenExpression><![CDATA["RENOUVELLEMENT".equals($F{natureDemande})]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<leftPen lineWidth="1.0" lineColor="#BFC9D1"/>
+					<rightPen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Libelle" stretchType="ContainerHeight" x="0" y="0" width="200" height="16" uuid="62a9b407-55cc-5877-a60a-4da360308791"/>
+					<textFieldExpression><![CDATA["Autorisation échue (renouvellement)"]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement style="Valeur" stretchType="ContainerHeight" x="200" y="0" width="331" height="16" uuid="5eae9016-0ef0-54c9-a473-e18122bf5453"/>
+					<textElement markup="none"></textElement>
+					<textFieldExpression><![CDATA[$F{referenceAutorisationAnterieure}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" x="12" y="71" width="531" height="16" uuid="bb676170-9f46-58ec-b16c-0990200e19a7"/>
+				<box>
+					<leftPen lineWidth="1.0" lineColor="#BFC9D1"/>
+					<rightPen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Libelle" stretchType="ContainerHeight" x="0" y="0" width="200" height="16" uuid="e6d90bec-23cd-55f4-aa51-db2079f0fbe4"/>
+					<textFieldExpression><![CDATA["Type(s) de réseau"]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement style="Valeur" stretchType="ContainerHeight" x="200" y="0" width="331" height="16" uuid="4e488eec-97c9-57ac-b523-a9773b5832bb"/>
+					<textElement markup="none"><font isBold="true"/></textElement>
+					<textFieldExpression><![CDATA[$V{typesLibelle}.isEmpty() ? "—" : $V{typesLibelle}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" x="12" y="87" width="531" height="16" uuid="debebbfd-48ec-5327-9687-19f731b38e29"/>
+				<box>
+					<leftPen lineWidth="1.0" lineColor="#BFC9D1"/>
+					<rightPen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Libelle" stretchType="ContainerHeight" x="0" y="0" width="200" height="16" uuid="b6d45b7e-f421-562d-95cf-0afbb5fd6338"/>
+					<textFieldExpression><![CDATA["Service(s) exploité(s)"]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement style="Valeur" stretchType="ContainerHeight" x="200" y="0" width="331" height="16" uuid="da6edf1f-0d7d-5b97-ac20-90789f217a99"/>
+					<textElement markup="none"><font isBold="true"/></textElement>
+					<textFieldExpression><![CDATA[$V{servicesLibelle}.isEmpty() ? "—" : $V{servicesLibelle}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" x="12" y="103" width="531" height="16" uuid="5713113b-922b-5e25-a7bb-42a739e396de"/>
+				<box>
+					<leftPen lineWidth="1.0" lineColor="#BFC9D1"/>
+					<rightPen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Libelle" stretchType="ContainerHeight" x="0" y="0" width="200" height="16" uuid="0618cb4a-534d-5700-8a44-6725a8b98080"/>
+					<textFieldExpression><![CDATA["Frais de dossier"]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement style="Valeur" stretchType="ContainerHeight" x="200" y="0" width="331" height="16" uuid="a785889b-bc1b-5bb9-8957-27e1860c33de"/>
+					<textElement markup="none"><font isBold="true"/></textElement>
+					<textFieldExpression><![CDATA[$F{fraisDossier} == null ? "—"
+: String.format(java.util.Locale.FRANCE, "%,.0f", $F{fraisDossier}).replace('\u202F', '\u00A0')
+  + " " + ($F{deviseFrais} == null || "XAF".equals($F{deviseFrais}) ? "FCFA" : $F{deviseFrais})]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+		<band height="62" splitType="Stretch">
+			<textField textAdjust="StretchHeight">
+				<reportElement style="Section" positionType="Float" x="12" y="8" width="531" height="15" uuid="5d3235d7-bd75-5bd9-9be9-06d3447c7e7f"/>
+				<textFieldExpression><![CDATA["3. SITES DU RÉSEAU (" + $V{nombreSites} + ")"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="12" y="25" width="531" height="14" uuid="f29e7807-808e-5f7f-8509-f030deaa6c14">
+					<printWhenExpression><![CDATA[$V{nombreSites} == 0]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle" markup="none">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Aucun site déclaré."]]></textFieldExpression>
+			</textField>
+			<componentElement>
+				<reportElement positionType="Float" x="12" y="23" width="531" height="36" isRemoveLineWhenBlank="true" uuid="caf8e5bb-b9e6-5394-9958-c5b09adbeccb">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<printWhenExpression><![CDATA[$V{nombreSites} > 0]]></printWhenExpression>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="dsSites" uuid="30353c1d-f2b8-5326-be24-587d29d350c3">
+						<dataSourceExpression><![CDATA[$F{sites} == null || $F{sites}.trim().isEmpty()
+? (net.sf.jasperreports.engine.JRDataSource) new net.sf.jasperreports.engine.JREmptyDataSource(0)
+: ((java.util.function.Function<String, net.sf.jasperreports.engine.JRDataSource>) t -> {
+    try {
+      net.sf.jasperreports.engine.data.JsonDataSource d = new net.sf.jasperreports.engine.data.JsonDataSource(
+          new java.io.ByteArrayInputStream(t.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+      d.setLocale(java.util.Locale.ROOT);
+      return d;
+    } catch (net.sf.jasperreports.engine.JRException e) { throw new RuntimeException(e); }
+  }).apply($F{sites})]]></dataSourceExpression>
+					</datasetRun>
+					<jr:column width="26" uuid="d61005fa-731c-5810-aad4-b47a686c9b4f">
+						<jr:columnHeader height="18">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="26" height="18" uuid="1af63ead-eff0-5dbe-af65-0ef67eb0da99"/>
+								<text><![CDATA[N°]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="26" height="18" uuid="dccd5bdb-2938-51b8-978d-bb15b0d94192"/>
+								<textElement textAlignment="Center" markup="none"></textElement>
+								<textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="150" uuid="643d6f0c-ff07-53c7-b138-b39fd87b14f6">
+						<jr:columnHeader height="18">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="150" height="18" uuid="317af951-e1fc-53ce-b359-02f58cd39ba3"/>
+								<text><![CDATA[Site]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="150" height="18" uuid="930dc518-a62f-5f3d-a215-205b166cbc6d"/>
+								<textElement textAlignment="Left" markup="none"><font isBold="true"/></textElement>
+								<textFieldExpression><![CDATA[$F{nomSite} != null ? $F{nomSite} : "—"]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="90" uuid="ceae2cd2-b679-5c3d-86e2-9e0cd2bf24d9">
+						<jr:columnHeader height="18">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="90" height="18" uuid="9075edec-a0b6-52ea-a746-c171cf6664e5"/>
+								<text><![CDATA[Province]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="90" height="18" uuid="9b2c207d-e502-5492-bee8-9ff4110beadd"/>
+								<textElement textAlignment="Center" markup="none"></textElement>
+								<textFieldExpression><![CDATA[$F{province} != null ? $F{province} : "—"]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="80" uuid="fcf0424a-8dd7-5bd1-ba87-8c6168b39553">
+						<jr:columnHeader height="18">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="80" height="18" uuid="a60bfc2e-dbea-57f2-8738-62ae3d208cfb"/>
+								<text><![CDATA[Ville]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="80" height="18" uuid="3074ebc4-579c-53fd-b4d3-3fa51dd8e897"/>
+								<textElement textAlignment="Center" markup="none"></textElement>
+								<textFieldExpression><![CDATA[$F{ville} != null ? $F{ville} : "—"]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="70" uuid="8c300a56-0891-502b-996d-6ff54e30cf0e">
+						<jr:columnHeader height="18">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="70" height="18" uuid="b72aaf9c-5c2c-5e7c-87cf-77a11b765c17"/>
+								<text><![CDATA[Latitude]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="70" height="18" uuid="3cf572d2-7455-5b34-9a0b-6e2674f96b8c"/>
+								<textElement textAlignment="Center" markup="none"></textElement>
+								<textFieldExpression><![CDATA[$F{latitudeDegres} == null ? "—"
+: $F{latitudeDegres} + "° " + String.format("%02d", $F{latitudeMinutes} == null ? 0 : $F{latitudeMinutes}) + "' "
+  + String.format(java.util.Locale.FRANCE, "%05.2f", $F{latitudeSecondes} == null ? 0d : $F{latitudeSecondes}) + "\" "
+  + ($F{latitudeSens} == null ? "" : $F{latitudeSens})]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="70" uuid="4bfa4ff9-7377-5a76-ae80-7bb35cfb5799">
+						<jr:columnHeader height="18">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="70" height="18" uuid="d37535a0-ca7c-5977-8cf2-672965b36cfa"/>
+								<text><![CDATA[Longitude]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="70" height="18" uuid="53ba5ba5-46d1-562f-ac8a-7fe3720ef694"/>
+								<textElement textAlignment="Center" markup="none"></textElement>
+								<textFieldExpression><![CDATA[$F{longitudeDegres} == null ? "—"
+: $F{longitudeDegres} + "° " + String.format("%02d", $F{longitudeMinutes} == null ? 0 : $F{longitudeMinutes}) + "' "
+  + String.format(java.util.Locale.FRANCE, "%05.2f", $F{longitudeSecondes} == null ? 0d : $F{longitudeSecondes}) + "\" "
+  + ($F{longitudeSens} == null ? "" : $F{longitudeSens})]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="45" uuid="f9b0ef0e-8e95-594f-9643-c900635016f9">
+						<jr:columnHeader height="18">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="45" height="18" uuid="17ad9ce6-5aa1-54b3-bdbf-1af69c6f4a81"/>
+								<text><![CDATA[Altitude (m)]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="45" height="18" uuid="f2a1f3e4-a834-5658-96f8-31ab4950aa55"/>
+								<textElement textAlignment="Center" markup="none"></textElement>
+								<textFieldExpression><![CDATA[$F{altitude} == null ? "—"
+: new java.text.DecimalFormat("0.#", java.text.DecimalFormatSymbols.getInstance(java.util.Locale.FRANCE)).format($F{altitude})]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+		<band height="43" splitType="Prevent">
+			<textField textAdjust="StretchHeight">
+				<reportElement style="Section" positionType="Float" x="12" y="8" width="531" height="15" uuid="5fee4b01-d5f4-56ac-b935-afd100a8b58e"/>
+				<textFieldExpression><![CDATA["4. PIÈCES JOINTES AU DOSSIER"]]></textFieldExpression>
+			</textField>
+			<frame>
+				<reportElement positionType="Float" x="12" y="23" width="531" height="20" uuid="14e801f8-e089-53e6-a230-1d7b31ae596d"/>
+				<box>
+					<pen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="265" height="16" uuid="8d8a3fc5-5b41-516e-afa5-d447020b7550"/>
+				<box topPadding="3" leftPadding="10"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" markup="styled">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>Pièces reçues</b>"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement x="0" y="16" width="265" height="4" uuid="0277d945-5851-553e-a9b6-03023f7aacd6"/>
+				<box leftPadding="10" bottomPadding="4"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" markup="none">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{piecesRecues}.isEmpty() ? "—" : $V{piecesRecues}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement x="266" y="0" width="265" height="16" uuid="3a569fdc-7d8c-521e-b563-6da19b815c05"/>
+				<box topPadding="3" leftPadding="10"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" markup="styled">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>Pièces manquantes à compléter</b>"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement x="266" y="16" width="265" height="4" uuid="adbfadd1-c873-5541-a296-236123b2033d">
+					<propertyExpression name="net.sf.jasperreports.style.forecolor"><![CDATA[$V{piecesManquantes}.isEmpty() ? "#000000" : "#C00000"]]></propertyExpression>
+				</reportElement>
+				<box leftPadding="10" bottomPadding="4"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" markup="none">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{piecesManquantes}.isEmpty() ? "Aucune" : $V{piecesManquantes}]]></textFieldExpression>
+			</textField>
+				<line>
+					<reportElement stretchType="ContainerHeight" x="265" y="0" width="1" height="20" forecolor="#BFC9D1" uuid="f8270850-7ec6-598b-a750-c79b833cd829"/>
+				</line>
+			</frame>
+		</band>
+		<band height="172" splitType="Prevent">
+			<textField textAdjust="StretchHeight">
+				<reportElement style="Section" positionType="Float" x="12" y="8" width="531" height="15" uuid="f18c5fa4-7682-5446-a05a-31b6cf868229"/>
+				<textFieldExpression><![CDATA["5. CONFIRMATION DE RÉCEPTION"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="12" y="27" width="531" height="22" uuid="5c12f525-4bc2-5669-9228-cf31fc8787db"/>
+				<box leftPadding="10" rightPadding="10"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle" markup="none">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Nous accusons bonne réception de votre demande enregistrée sous la référence ci-dessus. Votre dossier est désormais transmis aux services compétents pour instruction."]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" mode="Opaque" backcolor="#DEEBF7" x="12" y="52" width="531" height="26" uuid="2d8118ff-bb32-58a5-8542-159b3ced7795"/>
+				<box topPadding="4" leftPadding="10" bottomPadding="4" rightPadding="10"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle" markup="styled">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>Important :</b> conservez ce document. La référence du dossier vous sera demandée pour tout suivi. Vous pouvez consulter l’état d’avancement de votre demande en ligne sur <b>www.arcep.ga</b> ou par téléphone au <b>+241 11 44 68 11/12</b>."]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="12" y="82" width="531" height="14" uuid="0dfe52a1-84f7-5443-8143-bd2cef063ce9"/>
+				<box leftPadding="10"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" markup="styled">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Agent récepteur : <b>" + net.sf.jasperreports.engine.util.JRStringUtil.xmlEncode($F{assignee} != null ? $F{assignee} : "—") + "</b>"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" x="190" y="100" width="175" height="14" uuid="aaf971f5-69d7-525d-b853-d0fbd73f6fbd"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Signature Électronique Unique"]]></textFieldExpression>
+			</textField>
+			<componentElement>
+				<reportElement positionType="Float" x="251" y="116" width="52" height="52" uuid="ee39428a-0fa8-55e2-81f2-39e868e5e976"/>
+				<jr:QRCode xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" margin="0" errorCorrectionLevel="H">
+					<jr:codeExpression><![CDATA[((java.util.function.Function<String, String>) q -> q.length() > 300 ? q.substring(0, 300) : q).apply(
+    "ARCEP - ACCUSE DE RECEPTION - DOSSIER RESEAU N " + ($F{reference} != null ? $F{reference} : "") + ($V{dateReception} != null ? " - RECU LE " + $V{dateReception}.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) : ""))]]></jr:codeExpression>
+				</jr:QRCode>
+			</componentElement>
+			<image hAlign="Center" vAlign="Middle" onErrorType="Blank">
+				<reportElement positionType="Float" mode="Opaque" x="269" y="134" width="16" height="16" backcolor="#FFFFFF" uuid="fb9bc85c-b69c-5789-b128-7e7a679854cd"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#030000"/>
+				</box>
+				<imageExpression><![CDATA[$P{logo-arcep-1}]]></imageExpression>
+			</image>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="22" splitType="Stretch">
+			<rectangle>
+				<reportElement mode="Opaque" x="0" y="4" width="185" height="3" forecolor="#00B050" backcolor="#00B050" uuid="2f9145a2-8c99-5568-8138-05c353981a15"/>
+				<graphicElement>
+					<pen lineWidth="0.0"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Opaque" x="185" y="4" width="185" height="3" forecolor="#FFFF00" backcolor="#FFFF00" uuid="7b487154-4491-5ae8-98c9-0349e4316dc1"/>
+				<graphicElement>
+					<pen lineWidth="0.0"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Opaque" x="370" y="4" width="185" height="3" forecolor="#0070C0" backcolor="#0070C0" uuid="3096b28b-c9ba-54d6-9582-0506e64408f5"/>
+				<graphicElement>
+					<pen lineWidth="0.0"/>
+				</graphicElement>
+			</rectangle>
+			<textField isBlankWhenNull="true">
+				<reportElement forecolor="#0070C0" x="0" y="8" width="515" height="10" uuid="9697c4a3-4602-56f3-b654-4bc9bd320cdf"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="5.5" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ARCEP — SIEGE SOCIAL : 1030 AVENUE PAUL MOUKAMBI, KALIKAK | B.P : 50 000 LIBREVILLE | TEL : +241 11 44 68 11/12 | WWW.ARCEP.GA"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement forecolor="#555555" x="515" y="8" width="26" height="10" uuid="a3ef9398-60c4-5574-a3f8-c20d14f56000"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER} + " / "]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true" evaluationTime="Report">
+				<reportElement forecolor="#555555" x="541" y="8" width="14" height="10" uuid="4ad24fc0-7c28-501e-925d-d9226b9d532f"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" markup="none">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

@@ -1,7 +1,5 @@
 package picosoft.biz.arcep.service.dto;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,7 +31,6 @@ public class DemandeNavireDTO implements Serializable {
 
     private Boolean web;
 
-    @Size(max = 25)
     private String reference;
 
     /**
@@ -56,7 +53,6 @@ public class DemandeNavireDTO implements Serializable {
 
     private String approvedBy;
 
-    @Size(max = 32)
     private String statutDossier;
 
     /**
@@ -64,34 +60,27 @@ public class DemandeNavireDTO implements Serializable {
      * L'omettre enverrait tous les dossiers sur la branche par defaut, sans
      * erreur ni message.
      */
-    @Size(max = 50)
     private String typeDossier;
 
     private NatureDemande natureDemande;
 
     /** Rubrique 3 : le nom du navire. */
-    @Size(max = 100)
     private String nomNavire;
 
     /** Absente du formulaire papier -- voir DemandeNavire. */
-    @Size(max = 32)
     private String immatriculationNavire;
 
     /** Rubrique 4 : null signifie « question non repondue », pas « non ». */
     private Boolean possedaitNavireRadio;
 
     /** Rubrique 4 : le numero de l'autorisation deja detenue. */
-    @Size(max = 50)
     private String numeroAutorisation;
 
     /** Rubrique 5.1 : ou la station est implantee. */
-    @Size(max = 100)
     private String province;
 
-    @Size(max = 100)
     private String localite;
 
-    @Size(max = 100)
     private String quartier;
 
     /** Degres decimaux ; BigDecimal pour que la saisie soit rendue exacte. */
@@ -102,16 +91,13 @@ public class DemandeNavireDTO implements Serializable {
     /** Creation, extension, modification, autre. */
     private MotifImplantation motifImplantation;
 
-    @Size(max = 255)
     private String motifImplantationPrecision;
 
     /** Rubrique 5.2 : satellite, hertzienne, autre. */
     private TypeStation typeStation;
 
-    @Size(max = 255)
     private String typeStationPrecision;
 
-    @Size(max = 150)
     private String bandeFrequencesExploitee;
 
     /** Rubrique 6 : trois cases cumulables, plus la nature du trafic. */
@@ -119,13 +105,11 @@ public class DemandeNavireDTO implements Serializable {
     private Boolean traficDonnees;
     private Boolean traficAutres;
 
-    @Size(max = 255)
     private String traficAutresPrecision;
 
     private Boolean traficNational;
     private Boolean traficInternational;
 
-    @Size(max = 25)
     private String referenceAutorisationAnterieure;
 
     private BigDecimal fraisDossier;
@@ -133,28 +117,22 @@ public class DemandeNavireDTO implements Serializable {
     /** Due apres jugement de conformite, quand les frais accompagnent le depot. */
     private BigDecimal redevanceAnnuelle;
 
-    @Size(max = 8)
     private String deviseFrais;
 
-    @Valid
     private ClientDTO client;
 
-    @Valid
     private ApplicantDTO applicant;
 
     /** Rubrique 4 : les autorisations deja obtenues, une par ligne. */
-    @Valid
     private List<AutorisationAnterieureDTO> autorisationsAnterieures;
 
     /** Rubrique 5 : les equipements de bord. */
-    @Valid
     private List<EquipementBordNavireDTO> equipements;
 
     /**
      * Le rapport d'instruction. Renseigne par l'ARCEP, jamais par le
      * demandeur -- voir RapportTechnique.
      */
-    @Valid
     private RapportTechniqueDTO rapportTechnique;
 
     // ------------------------- workflow / ACL -------------------------
@@ -174,6 +152,15 @@ public class DemandeNavireDTO implements Serializable {
     private Boolean endProcess;
     private String state;
     private Long numberOfattachments;
+    /**
+     * Ce que le kernel autorise CET utilisateur a faire sur CE dossier.
+     *
+     * Meme champ que sur le DTO de sortie, et pour la meme raison : le
+     * formulaire lit par ici, et c'est de cette valeur qu'il deduit si ses
+     * rubriques sont saisissables. Jamais persiste, jamais relu en entree.
+     */
+    private String userPermission;
+
     private Long step;
     private String commentaire;
 }

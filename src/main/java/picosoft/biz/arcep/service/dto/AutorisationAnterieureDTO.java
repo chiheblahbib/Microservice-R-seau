@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 /** Une autorisation deja detenue, rubrique 4 du formulaire. */
@@ -17,7 +16,6 @@ public class AutorisationAnterieureDTO implements Serializable {
 
     private Long id;
 
-    @Size(max = 100)
     private String reference;
 
     private Long demandeNavireId;

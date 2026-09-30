@@ -3,7 +3,7 @@ package picosoft.biz.arcep.service.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
-import picosoft.biz.arcep.domain.shared.RapportTechnique;
+import picosoft.biz.arcep.domain.drrrs.RapportTechnique;
 import picosoft.biz.arcep.service.dto.RapportTechniqueDTO;
 
 /**

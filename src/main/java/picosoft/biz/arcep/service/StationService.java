@@ -242,6 +242,33 @@ public class StationService {
      * la transition du parent doit echouer bruyamment plutot que de laisser un dossier
      * valide sans aucune station instruite.
      */
+    /**
+     * Point d'entree du DIAGRAMME PARENT, appele A LA SIGNATURE du dossier
+     * d'implantation, sur les deux flux terminaux :
+     *     ${stationService.ouvrirTitre(data.id)}
+     *
+     * C'est le meme geste qu'`initFromDemande` -- ouvrir un circuit de titre par
+     * station non encore instruite -- sous le nom que le diagramme lui donne.
+     * Les deux existent parce qu'ils ne sont pas appeles au meme titre :
+     * `initFromDemande` est aussi l'operation REST de `StationController`, quand
+     * un agent relance l'eclatement a la main.
+     *
+     * POURQUOI A LA SIGNATURE, et non a la sortie de l'etude technique comme
+     * avant : tant que le dossier n'est pas signe, aucun titre n'a a etre
+     * prepare. Le Chef Centre pouvait renvoyer le dossier apres l'etude, et les
+     * circuits de station etaient deja lances.
+     *
+     * Idempotent, comme `initFromDemande` : les stations dont le circuit tourne
+     * sont ignorees. C'est indispensable, les deux flux porteurs etant
+     * re-traversables par les boucles du circuit parent.
+     *
+     * Aucun appelant Java : renommer cette methode casse le process a
+     * l'execution, pas a la compilation.
+     */
+    public List<StationOutputDTO> ouvrirTitre(Long demandeImplantationId) throws Exception {
+        return initFromDemande(demandeImplantationId);
+    }
+
     public List<StationOutputDTO> initFromDemande(Long demandeImplantationId) throws Exception {
         return initFromDemande(demandeImplantationId,
                 kernelInterface.getaclClassByClassName(Station.class.getName()));
@@ -414,7 +441,7 @@ public class StationService {
             return;
         }
         Commentaire commentaire = new Commentaire();
-        commentaire.setAuteur(currentUser.getEmployeSid());
+        commentaire.setAuteur(currentUser.nomPourCommentaire());
         commentaire.setDescription(texte);
         commentaire.setDateSaisie(ZonedDateTime.now());
         commentaire.setClassId(aclClass.getId());

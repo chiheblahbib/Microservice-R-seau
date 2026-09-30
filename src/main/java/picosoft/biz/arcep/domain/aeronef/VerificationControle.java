@@ -8,7 +8,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import picosoft.biz.arcep.configuration.audit.Auditable;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -35,23 +34,20 @@ public class VerificationControle extends Auditable implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
+    @Column(columnDefinition = "uuid", updatable = false)
     private UUID uuid;
 
     @Column(name = "date_controle")
     private LocalDate dateControle;
 
-    @Column(name = "lieu", length = 150)
-    @Size(max = 150)
+    @Column(name = "lieu")
     private String lieu;
 
     /** Le visa de l'agent : un nom ou un matricule, pas une signature. */
-    @Column(name = "visa", length = 100)
-    @Size(max = 100)
+    @Column(name = "visa")
     private String visa;
 
-    @Column(name = "observations", length = 500)
-    @Size(max = 500)
+    @Column(name = "observations")
     private String observations;
 
     @ManyToOne(fetch = FetchType.LAZY)

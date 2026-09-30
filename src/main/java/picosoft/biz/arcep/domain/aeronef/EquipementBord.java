@@ -8,7 +8,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import picosoft.biz.arcep.configuration.audit.Auditable;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -41,27 +40,22 @@ public class EquipementBord extends Auditable implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
+    @Column(columnDefinition = "uuid", updatable = false)
     private UUID uuid;
 
-    @Column(name = "designation", length = 150)
-    @Size(max = 150)
+    @Column(name = "designation")
     private String designation;
 
-    @Column(name = "marque", length = 100)
-    @Size(max = 100)
+    @Column(name = "marque")
     private String marque;
 
-    @Column(name = "type_materiel", length = 100)
-    @Size(max = 100)
+    @Column(name = "type_materiel")
     private String typeMateriel;
 
-    @Column(name = "puissance", length = 50)
-    @Size(max = 50)
+    @Column(name = "puissance")
     private String puissance;
 
-    @Column(name = "bandes_frequences", length = 150)
-    @Size(max = 150)
+    @Column(name = "bandes_frequences")
     private String bandesFrequences;
 
     @ManyToOne(fetch = FetchType.LAZY)

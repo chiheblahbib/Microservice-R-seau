@@ -1,7 +1,5 @@
 package picosoft.biz.arcep.service.dto;
 
-import javax.validation.constraints.Size;
-import javax.validation.Valid;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,7 +30,6 @@ public class DemandeImplantationInputDTO implements Serializable {
 
     private Boolean web;
 
-    @Size(max = 25)
 
     private String reference;
 
@@ -40,25 +37,19 @@ public class DemandeImplantationInputDTO implements Serializable {
 
     private ZonedDateTime sendedDate;
 
-    @Size(max = 25)
 
     private String approvedBy;
 
-    @Size(max = 32)
 
     private String statutDossier;
 
-    @Size(max = 50)
 
     private String typeDossier;
 
-    @Valid
     private ClientDTO client;
 
-    @Valid
     private ApplicantDTO applicant;
 
-    @Valid
     /** LA station du dossier : une autorisation en vise une seule. */
     private StationDTO station;
 
@@ -84,7 +75,6 @@ public class DemandeImplantationInputDTO implements Serializable {
 
     private Boolean endProcess;
 
-    @Size(max = 64)
 
     private String state;
 
@@ -108,7 +98,6 @@ public class DemandeImplantationInputDTO implements Serializable {
 
     private String WfComment;
 
-    @Size(max = 500)
 
     private String commentaire;
 }

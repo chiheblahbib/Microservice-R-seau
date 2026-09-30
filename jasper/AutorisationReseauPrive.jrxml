@@ -1,0 +1,875 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  AutorisationReseauPrive : autorisation d'établissement et d'exploitation d'un
+  réseau privé (DRRRS, dossier DemandeReseau), avec son annexe « Condition
+  d'exploitation ». JasperReports / Jaspersoft Studio 6.21.2.
+
+  Modèle : l'acte signé « AUTORISATION N° 004/AUT/RP/ARCEP/2024 RELATIVE A
+  L'ETABLISSEMENT ET A L'EXPLOITATION DE RESEAUX PRIVES » (Président du
+  Conseil de Régulation) ; mêmes chapitres et articles, mêmes rubriques.
+
+  Données : le JSON du dossier (DemandeReseauOutputDTO) avec l'attestation
+  créée au passage « Pour Signature » dans attestations[0] (reference, id,
+  classId, nomModele = natureReseau). Champ facultatif : signaturePresidence
+  (image base64, comme la signature des attestations ASI / homologation).
+  Le numéro « 0084-28-09-2026 » de la séquence kernel est imprimé au format
+  officiel « 0084/AUT/RP/ARCEP/2026 » ; la référence brute reste en pied de
+  signature pour la traçabilité.
+
+  Images : « logo-arcep » et « filigrane-arcep » ont une image par défaut
+  intégrée. Une ressource du même nom fournie par le kernel la remplace.
+-->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AutorisationReseauPrive" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="539" leftMargin="28" rightMargin="28" topMargin="24" bottomMargin="24" isSummaryNewPage="true" isSummaryWithPageHeaderAndFooter="true" uuid="8504f866-a726-5a57-9d61-165effe434de">
+	<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<style name="Base" isDefault="true" fontName="DejaVu Sans" fontSize="9.5" forecolor="#000000"/>
+	<style name="Article" style="Base" hTextAlign="Justified" markup="styled" fontSize="9.5">
+		<paragraph lineSpacing="Proportional" lineSpacingSize="1.1" spacingAfter="5"/>
+	</style>
+	<style name="Entete" style="Base" mode="Opaque" backcolor="#BFBFBF" hTextAlign="Center" vTextAlign="Middle" fontSize="7.5" isBold="true">
+		<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+			<pen lineWidth="0.75"/>
+		</box>
+	</style>
+	<style name="Cellule" style="Base" hTextAlign="Center" vTextAlign="Middle" fontSize="8">
+		<box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3">
+			<pen lineWidth="0.75"/>
+		</box>
+	</style>
+	<subDataset name="dsSites" uuid="e9da03c7-0671-5f14-b94b-c0d2d280aa59">
+		<field name="nomSite" class="java.lang.String"/>
+		<field name="province" class="java.lang.String"/>
+		<field name="ville" class="java.lang.String"/>
+		<field name="latitudeSens" class="java.lang.String"/>
+		<field name="latitudeDegres" class="java.lang.Integer"/>
+		<field name="latitudeMinutes" class="java.lang.Integer"/>
+		<field name="latitudeSecondes" class="java.lang.Double"/>
+		<field name="longitudeSens" class="java.lang.String"/>
+		<field name="longitudeDegres" class="java.lang.Integer"/>
+		<field name="longitudeMinutes" class="java.lang.Integer"/>
+		<field name="longitudeSecondes" class="java.lang.Double"/>
+		<field name="altitude" class="java.lang.Double"/>
+	</subDataset>
+	<subDataset name="dsLiaisons" uuid="809cc629-3a8a-5224-b8e0-92686f654778">
+		<parameter name="SITES" class="java.lang.Object"/>
+		<field name="nature" class="java.lang.String"/>
+		<field name="precisionAutre" class="java.lang.String"/>
+		<field name="bandeFrequences" class="java.lang.String"/>
+		<field name="debitEmission" class="java.lang.Double"/>
+		<field name="debitReception" class="java.lang.Double"/>
+		<field name="nombreBonds" class="java.lang.Integer"/>
+		<field name="siteOrigineId" class="java.lang.Long"/>
+		<field name="siteExtremiteId" class="java.lang.Long"/>
+	</subDataset>
+	<parameter name="logo-arcep" class="java.lang.Object" isForPrompting="false">
+		<defaultValueExpression><![CDATA[java.util.Base64.getDecoder().decode("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")]]></defaultValueExpression>
+	</parameter>
+	<parameter name="filigrane-arcep" class="java.lang.Object" isForPrompting="false">
+		<defaultValueExpression><![CDATA[java.util.Base64.getDecoder().decode("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")]]></defaultValueExpression>
+	</parameter>
+	<parameter name="FUSEAU_HORAIRE" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["Africa/Libreville"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DATE_SIGNATURE" class="java.util.Date" isForPrompting="false">
+		<parameterDescription><![CDATA[Date imprimée après « Fait à Libreville, le ». Vide : date de génération.]]></parameterDescription>
+	</parameter>
+	<parameter name="SIGNATAIRE_QUALITE" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["Le Président du Conseil de Régulation"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SIGNATAIRE_NOM" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[Prénom et NOM imprimés sous la signature. Vide : ligne laissée blanche.]]></parameterDescription>
+	</parameter>
+	<parameter name="LIBELLES" class="java.util.Map" isForPrompting="false">
+		<parameterDescription><![CDATA[Libellés des énumérations du service reseau (repris de reseau-vocabulaire.ts côté front).]]></parameterDescription>
+		<defaultValueExpression><![CDATA[java.util.stream.Stream.of(new String[][] {
+	{"FH", "Réseau FH"},
+	{"VSAT", "VSAT"},
+	{"STATION_TERRIENNE", "Station terrienne"},
+	{"FIBRE_OPTIQUE", "Réseau fibre optique"},
+	{"IOT", "Internet des objets (IoT)"},
+	{"BLR", "Réseau BLR (boucle locale radio)"},
+	{"PMR", "Réseau PMR (radiocommunication d’entreprise)"},
+	{"AUTRE", "Autre"},
+	{"ACCES_INTERNET", "Accès à Internet"},
+	{"TRANSMISSION_DONNEES", "Transmission de données"},
+	{"TELEPHONIE", "Téléphonie"},
+	{"TELEPHONIE_IP", "Téléphonie sur IP"},
+	{"LOCALE", "au niveau local"},
+	{"NATIONALE", "au niveau national"},
+	{"INTERNATIONALE", "à l'international"}
+}).collect(java.util.stream.Collectors.toMap(e -> e[0], e -> e[1]))]]></defaultValueExpression>
+	</parameter>
+	<queryString language="json">
+		<![CDATA[]]>
+	</queryString>
+	<field name="reference" class="java.lang.String"/>
+	<field name="natureReseau" class="java.lang.String"/>
+	<field name="referenceAttestation" class="java.lang.String">
+		<fieldDescription><![CDATA[attestations[0].reference]]></fieldDescription>
+	</field>
+	<field name="company" class="java.lang.String">
+		<fieldDescription><![CDATA[client.company]]></fieldDescription>
+	</field>
+	<field name="clientName" class="java.lang.String">
+		<fieldDescription><![CDATA[client.clientName]]></fieldDescription>
+	</field>
+	<field name="tradeRegisterNumber" class="java.lang.String">
+		<fieldDescription><![CDATA[client.tradeRegisterNumber]]></fieldDescription>
+	</field>
+	<field name="clientAddress" class="java.lang.String">
+		<fieldDescription><![CDATA[client.address]]></fieldDescription>
+	</field>
+	<field name="clientPhone" class="java.lang.String">
+		<fieldDescription><![CDATA[client.phone]]></fieldDescription>
+	</field>
+	<field name="clientEmail" class="java.lang.String">
+		<fieldDescription><![CDATA[client.email]]></fieldDescription>
+	</field>
+	<field name="applicantName" class="java.lang.String">
+		<fieldDescription><![CDATA[applicant.applicantName]]></fieldDescription>
+	</field>
+	<field name="qualification" class="java.lang.String">
+		<fieldDescription><![CDATA[applicant.qualification]]></fieldDescription>
+	</field>
+	<field name="nationality" class="java.lang.String">
+		<fieldDescription><![CDATA[applicant.nationality]]></fieldDescription>
+	</field>
+	<field name="nationalityComplet" class="java.lang.String">
+		<fieldDescription><![CDATA[applicant.nationalityComplet]]></fieldDescription>
+	</field>
+	<field name="applicantPhone" class="java.lang.String">
+		<fieldDescription><![CDATA[applicant.phone]]></fieldDescription>
+	</field>
+	<field name="applicantEmail" class="java.lang.String">
+		<fieldDescription><![CDATA[applicant.email]]></fieldDescription>
+	</field>
+	<field name="typesReseau" class="java.lang.Object"/>
+	<field name="services" class="java.lang.Object"/>
+	<field name="sites" class="java.lang.Object"/>
+	<field name="liaisons" class="java.lang.Object"/>
+	<field name="signaturePresidence" class="java.lang.String"/>
+	<variable name="fuseau" class="java.time.ZoneId" calculation="System">
+		<initialValueExpression><![CDATA[java.time.ZoneId.of($P{FUSEAU_HORAIRE})]]></initialValueExpression>
+	</variable>
+	<variable name="numeroAutorisation" class="java.lang.String">
+		<variableExpression><![CDATA[$F{referenceAttestation} == null ? "……………"
+: $F{referenceAttestation}.matches("\\d+-\\d{2}-\\d{2}-\\d{4}")
+  ? $F{referenceAttestation}.replaceAll("^(\\d+)-\\d{2}-\\d{2}-(\\d{4})$", "$1/AUT/RP/ARCEP/$2")
+  : $F{referenceAttestation}]]></variableExpression>
+	</variable>
+	<variable name="titulaire" class="java.lang.String">
+		<variableExpression><![CDATA[$F{company} != null && !$F{company}.trim().isEmpty() ? $F{company} : $F{clientName}]]></variableExpression>
+	</variable>
+	<variable name="typesLibelle" class="java.lang.String">
+		<variableExpression><![CDATA[$F{typesReseau} == null ? ""
+: java.util.stream.StreamSupport.stream(((com.fasterxml.jackson.databind.JsonNode) $F{typesReseau}).spliterator(), false)
+    .map(n -> "AUTRE".equals(n.path("type").asText()) && n.hasNonNull("precisionAutre")
+        ? n.path("precisionAutre").asText()
+        : (String) $P{LIBELLES}.getOrDefault(n.path("type").asText(), n.path("type").asText()))
+    .collect(java.util.stream.Collectors.joining(", "))]]></variableExpression>
+	</variable>
+	<variable name="nombreTypes" class="java.lang.Integer">
+		<variableExpression><![CDATA[$F{typesReseau} == null ? 0 : ((com.fasterxml.jackson.databind.JsonNode) $F{typesReseau}).size()]]></variableExpression>
+	</variable>
+	<variable name="servicesLibelle" class="java.lang.String">
+		<variableExpression><![CDATA[$F{services} == null ? ""
+: java.util.stream.StreamSupport.stream(((com.fasterxml.jackson.databind.JsonNode) $F{services}).spliterator(), false)
+    .map(n -> $P{LIBELLES}.getOrDefault(n.path("type").asText(), n.path("type").asText())
+        + (n.hasNonNull("portee") ? " " + $P{LIBELLES}.getOrDefault(n.path("portee").asText(), n.path("portee").asText()) : ""))
+    .collect(java.util.stream.Collectors.joining(", "))]]></variableExpression>
+	</variable>
+	<variable name="nombreServices" class="java.lang.Integer">
+		<variableExpression><![CDATA[$F{services} == null ? 0 : ((com.fasterxml.jackson.databind.JsonNode) $F{services}).size()]]></variableExpression>
+	</variable>
+	<variable name="nombreSites" class="java.lang.Integer">
+		<variableExpression><![CDATA[$F{sites} == null ? 0 : ((com.fasterxml.jackson.databind.JsonNode) $F{sites}).size()]]></variableExpression>
+	</variable>
+	<variable name="nombreLiaisons" class="java.lang.Integer">
+		<variableExpression><![CDATA[$F{liaisons} == null ? 0 : ((com.fasterxml.jackson.databind.JsonNode) $F{liaisons}).size()]]></variableExpression>
+	</variable>
+	<variable name="sitesEnLettres" class="java.lang.String">
+		<variableExpression><![CDATA[$V{nombreSites} <= 20
+? new String[] {"aucun", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf", "dix",
+    "onze", "douze", "treize", "quatorze", "quinze", "seize", "dix-sept", "dix-huit", "dix-neuf", "vingt"}[$V{nombreSites}]
+  + " (" + String.format("%02d", $V{nombreSites}) + ")"
+: String.valueOf($V{nombreSites})]]></variableExpression>
+	</variable>
+	<variable name="dateSignature" class="java.lang.String">
+		<variableExpression><![CDATA[($P{DATE_SIGNATURE} != null ? $P{DATE_SIGNATURE}.toInstant() : java.time.Instant.now())
+    .atZone($V{fuseau}).format(java.time.format.DateTimeFormatter.ofPattern("dd MMMM yyyy", java.util.Locale.FRENCH))]]></variableExpression>
+	</variable>
+	<background>
+		<band height="794" splitType="Stretch">
+			<rectangle>
+				<reportElement x="0" y="0" width="539" height="794" uuid="ed098637-fb39-51e8-93f0-a8a150a35555"/>
+				<graphicElement>
+					<pen lineWidth="2.25"/>
+				</graphicElement>
+			</rectangle>
+			<image scaleImage="RetainShape" hAlign="Center" vAlign="Middle" onErrorType="Blank">
+				<reportElement x="50" y="300" width="440" height="186" uuid="4424298e-f565-5ddb-acfd-46f1d50c5261"/>
+				<imageExpression><![CDATA[$P{filigrane-arcep}]]></imageExpression>
+			</image>
+		</band>
+	</background>
+	<title>
+		<band height="222" splitType="Stretch">
+			<image scaleImage="RetainShape" hAlign="Left" vAlign="Middle" onErrorType="Blank">
+				<reportElement x="14" y="12" width="104" height="51" uuid="dcc73f47-73bf-50cf-a988-d89f32e82ea0"/>
+				<imageExpression><![CDATA[$P{logo-arcep}]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="118" y="12" width="250" height="40" uuid="eea253f6-27f3-5517-8fb3-f06edd4b2dfb"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9.5" isBold="true"/>
+				</textElement>
+				<text><![CDATA[AUTORITE DE REGULATION DES
+COMMUNICATIONS ELECTRONIQUES
+ET DES POSTES]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="118" y="55" width="250" height="12" uuid="3b767251-7153-5340-8172-e1f8e0e44967"/>
+				<textElement textAlignment="Center">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PRESIDENCE DU CONSEIL DE REGULATION]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="372" y="12" width="153" height="14" uuid="c6ba9ae7-1438-53ec-a77b-b77e6be6fd2e"/>
+				<textElement textAlignment="Center">
+					<font size="9.5" isBold="true"/>
+				</textElement>
+				<text><![CDATA[REPUBLIQUE GABONAISE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="372" y="26" width="153" height="12" uuid="a4183f9c-6e9d-5820-b715-636b9f12d526"/>
+				<textElement textAlignment="Center">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Union-Travail-Justice]]></text>
+			</staticText>
+			<!-- evaluationTime="Report" : au titre, les variables ne sont pas encore calculées -->
+			<textField evaluationTime="Report">
+				<reportElement x="44" y="78" width="451" height="42" uuid="aededb9a-99d7-5d3b-964c-227fdaec783c"/>
+				<box>
+					<pen lineWidth="1.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["AUTORISATION N° " + $V{numeroAutorisation} + " RELATIVE\nA L'ETABLISSEMENT ET A L'EXPLOITATION DE RESEAUX PRIVES"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="16" y="134" width="507" height="80" uuid="ab94c054-ab2e-5571-82cf-c0e0ff1801ac"/>
+				<textElement markup="styled">
+					<font size="10"/>
+					<paragraph lineSpacing="Proportional" lineSpacingSize="1.15" spacingAfter="2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Titulaire : <b>" + net.sf.jasperreports.engine.util.JRStringUtil.xmlEncode($F{company} != null && !$F{company}.trim().isEmpty() ? $F{company} : ($F{clientName} != null ? $F{clientName} : "—")) + "</b>"
++ ($F{tradeRegisterNumber} != null ? "        RCCM : <b>" + net.sf.jasperreports.engine.util.JRStringUtil.xmlEncode($F{tradeRegisterNumber}) + "</b>" : "")
++ "\nReprésenté par : <b>" + net.sf.jasperreports.engine.util.JRStringUtil.xmlEncode($F{applicantName} != null ? $F{applicantName} : "—") + "</b>"
++ ($F{qualification} != null ? " en qualité de <b>" + net.sf.jasperreports.engine.util.JRStringUtil.xmlEncode($F{qualification}) + "</b>" : "")
++ "\nNationalité : <b>" + net.sf.jasperreports.engine.util.JRStringUtil.xmlEncode($F{nationalityComplet} != null ? $F{nationalityComplet} : ($F{nationality} != null ? $F{nationality} : "—")) + "</b>"
++ "        Adresse : <b>" + net.sf.jasperreports.engine.util.JRStringUtil.xmlEncode($F{clientAddress} != null ? $F{clientAddress} : "—") + "</b>"
++ "\nN° Tél : <b>" + net.sf.jasperreports.engine.util.JRStringUtil.xmlEncode($F{clientPhone} != null ? $F{clientPhone} : ($F{applicantPhone} != null ? $F{applicantPhone} : "—")) + "</b>"
++ "\nE-mail : <b>" + net.sf.jasperreports.engine.util.JRStringUtil.xmlEncode($F{applicantEmail} != null ? $F{applicantEmail} : ($F{clientEmail} != null ? $F{clientEmail} : "—")) + "</b>"]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="8" splitType="Stretch"/>
+	</pageHeader>
+	<detail>
+		<band height="26" splitType="Prevent">
+			<printWhenExpression><![CDATA[$F{natureReseau} != null && !"PRIVE".equals($F{natureReseau})]]></printWhenExpression>
+			<staticText>
+				<reportElement mode="Opaque" x="16" y="2" width="507" height="20" forecolor="#B42318" backcolor="#FDECEA" uuid="4260b1b4-ca58-5e39-a4ff-4443fe71e00b"/>
+				<box leftPadding="6" rightPadding="6">
+					<pen lineWidth="1.0" lineColor="#B42318"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8.5" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Modèle réservé aux réseaux privés : ce dossier porte sur un réseau ouvert au public.]]></text>
+			</staticText>
+		</band>
+		<band height="48" splitType="Stretch">
+			<staticText>
+				<reportElement x="16" y="8" width="112" height="14" uuid="fc68e9d7-8707-58fd-aaef-ce0ff76edd80"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Chapitre premier :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="128" y="8" width="395" height="14" uuid="ea7389f3-56a4-5422-a96c-5d9414d5310d"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Du cadre et de l'objet de l'Autorisation]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight">
+				<reportElement style="Article" x="16" y="26" width="507" height="20" uuid="604c794a-69d1-5a5f-bd0d-d01010394b8a"/>
+				<textFieldExpression><![CDATA["<b>Article premier</b> : La présente Autorisation, prise en application des dispositions combinées des articles 10 de la loi n°005/2001 du 27 juin 2001 portant réglementation du secteur des Télécommunications en République gabonaise, 18 de la loi n°026/2018 du 22 octobre 2019 portant réglementation des communications électroniques en République gabonaise et 11 de l'ordonnance n°0000008/PR/2012 du 13 février 2012 portant création et organisation de l'Autorité de Régulation des Communications Electroniques et des Postes en abrégée <b>ARCEP</b>, confère au Titulaire le droit d'établir et d'exploiter un réseau privé."]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="48" splitType="Stretch">
+			<staticText>
+				<reportElement x="16" y="8" width="112" height="14" uuid="6b19574e-06f0-5bd1-bde6-ac2cd7188d4f"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Chapitre 2 :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="128" y="8" width="395" height="14" uuid="46945f29-ba50-59b7-99f5-1287dd268644"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[De la nature du réseau et des services exploités]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight">
+				<reportElement style="Article" x="16" y="26" width="507" height="20" uuid="df51076c-90c6-59dc-bdc3-302edb250e90"/>
+				<textFieldExpression><![CDATA["<b>Article 2</b> : La présente Autorisation porte sur l'établissement et l'exploitation d'un réseau privé"
++ ($V{nombreSites} > 0 ? " comprenant " + $V{sitesEnLettres} + ($V{nombreSites} > 1 ? " sites" : " site") : "")
++ ($V{typesLibelle}.isEmpty() ? "" : ($V{nombreSites} > 0 ? "," : "") + " de type" + ($V{nombreTypes} > 1 ? "s " : " ")
+    + "<b>" + net.sf.jasperreports.engine.util.JRStringUtil.xmlEncode($V{typesLibelle}) + "</b>")
++ "."
++ "\nLes caractéristiques de ce réseau, objet de la présente Autorisation, sont décrites en annexe."
++ "\n<b>Article 3</b> : Le Titulaire est autorisé à exploiter "
++ ($V{nombreServices} == 0 ? "les services déclarés dans sa demande"
+    : ($V{nombreServices} > 1 ? "les services de " : "le service de ")
+      + "<b>" + net.sf.jasperreports.engine.util.JRStringUtil.xmlEncode($V{servicesLibelle}) + "</b>")
++ "."
++ "\nToutefois, si le Titulaire souhaite fournir un nouveau service, il est tenu de requérir l'avis préalable de l'ARCEP."]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="48" splitType="Stretch">
+			<staticText>
+				<reportElement x="16" y="8" width="112" height="14" uuid="15fa7225-43d1-56ae-95fa-fe021e9c9d0b"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Chapitre 3 :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="128" y="8" width="395" height="14" uuid="2c8ff087-98ba-589b-9c1e-2bf7e9586053"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Des conditions d'exploitation]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight">
+				<reportElement style="Article" x="16" y="26" width="507" height="20" uuid="f579995e-aeb5-57fa-8b3b-fd3353fb003f"/>
+				<textFieldExpression><![CDATA["<b>Article 4</b> : Le Titulaire établit et exploite le réseau privé susmentionné dans le respect de la législation en vigueur en République gabonaise."
++ "\n<b>Article 5</b> : Le réseau du Titulaire est conforme à l'architecture décrite en annexe."
++ "\nToutefois, si le Titulaire souhaite modifier les caractéristiques de son réseau, il est tenu de requérir l'avis préalable de l'ARCEP, qui le cas échéant, met à jour l'annexe susvisée."
++ "\n<b>Article 6</b> : Conformément à la réglementation en vigueur en République gabonaise, le Titulaire est autorisé à exploiter les ressources en fréquences radioélectriques qui lui sont assignées."
++ "\n<b>Article 7</b> : Le réseau privé établi et exploité par le Titulaire est conforme aux normes en vigueur, notamment celles de l'Union Internationale des Télécommunications."
++ "\n<b>Article 8</b> : Le Titulaire veille à ce que les équipements terminaux qu'il utilise et exploite sur son réseau soient préalablement homologués par l'ARCEP conformément à la législation en vigueur en République gabonaise."
++ "\n<b>Article 9</b> : Le Titulaire n'est pas autorisé à établir des liaisons filaires dans le domaine public."
++ "\nToutefois, il peut recourir aux offres de location des capacités des opérateurs dûment autorisés."
++ "\nEn cas d'absence d'offres, le Titulaire requiert des Autorités administratives compétentes, des autorisations y relatives, conformément à la réglementation en vigueur en République gabonaise."
++ "\nIl est entendu que l'autorisation de l'ARCEP est donnée en dernier ressort."
++ "\n<b>Article 10</b> : L'établissement et l'exploitation du réseau privé objet de la présente Autorisation ne doit pas causer de brouillage préjudiciable aux autres réseaux."
++ "\nEn cas de brouillage préjudiciable de ses équipements, le Titulaire est tenu d'informer l'ARCEP et de mettre en œuvre, dans les meilleurs délais, les moyens techniques et humains susceptibles de pallier les conséquences les plus graves des défaillances de ses équipements."
++ "\n<b>Article 11</b> : Le Titulaire se conforme au respect des exigences et prescriptions en matière de Sécurité publique et de Défense nationale."
++ "\n<b>Article 12</b> : La présente Autorisation est strictement personnelle. Elle ne peut être vendue, louée, cédée ou donnée en garantie."]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="48" splitType="Stretch">
+			<staticText>
+				<reportElement x="16" y="8" width="112" height="14" uuid="e711fdc2-f575-5f62-b87b-dfb991f35692"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Chapitre 4 :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="128" y="8" width="395" height="14" uuid="900bcc92-a615-51a8-b7c7-3624564bbe35"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Du contrôle]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight">
+				<reportElement style="Article" x="16" y="26" width="507" height="20" uuid="91f55bea-360f-5d88-a334-fd28c874e7e7"/>
+				<textFieldExpression><![CDATA["<b>Article 13</b> : L'ARCEP procède à des contrôles inopinés ou programmés relatifs au bon fonctionnement des équipements terminaux du réseau privé par le Titulaire. Tout projet de contrôle programmé est préalablement notifié au Titulaire dans un délai de quarante-huit (48) heures."
++ "\nLe Titulaire met à la disposition du personnel mandaté par l'ARCEP des informations et documents nécessaires aux opérations de contrôle."]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="48" splitType="Stretch">
+			<staticText>
+				<reportElement x="16" y="8" width="112" height="14" uuid="c082fcda-eaef-5fe5-a7c5-9adab61788b5"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Chapitre 5 :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="128" y="8" width="395" height="14" uuid="c649e639-c444-5670-8df5-048cdfb7a0ba"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Des redevances]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight">
+				<reportElement style="Article" x="16" y="26" width="507" height="20" uuid="3e92556d-fd96-5fc4-acbb-476ebcf5875d"/>
+				<textFieldExpression><![CDATA["<b>Article 14</b> : Le Titulaire s'engage à s'acquitter dans les délais fixés, des frais, redevances, contributions et taxes relatifs à l'établissement et à l'exploitation du réseau privé, objet de la présente Autorisation, conformément à la législation en vigueur en République gabonaise."]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="48" splitType="Stretch">
+			<staticText>
+				<reportElement x="16" y="8" width="112" height="14" uuid="dd31b810-ebf8-51e2-82fe-6bdb6fe4e836"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Chapitre 6 :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="128" y="8" width="395" height="14" uuid="a7c39d90-d6fd-57b5-84da-8bd30a7de748"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[De la durée, du renouvellement et de la modification]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight">
+				<reportElement style="Article" x="16" y="26" width="507" height="20" uuid="396d17ff-72ab-53bd-a64d-bb6027c4c0c0"/>
+				<textFieldExpression><![CDATA["<b>Article 15</b> : La présente Autorisation est valable pour une durée de cinq (05) ans, renouvelable."
++ "\nLa présente Autorisation est renouvelée sur demande du Titulaire, adressée à l'ARCEP six (06) mois au plus tard avant son expiration."
++ "\nCe renouvellement peut faire l'objet des modifications de tout ou partie des obligations contenues dans la présente Autorisation."
++ "\n<b>Article 16</b> : Elle peut être modifiée à l'initiative de l'Autorité de Régulation et ou sur demande écrite du Titulaire et après accord préalable de l'ARCEP."]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="48" splitType="Stretch">
+			<staticText>
+				<reportElement x="16" y="8" width="112" height="14" uuid="0e786f66-1082-5bc1-bcae-f8fbbebc2c91"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Chapitre 7 :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="128" y="8" width="395" height="14" uuid="b90c5c1c-d146-5432-9f11-a0f05a6fbf49"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Des sanctions]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight">
+				<reportElement style="Article" x="16" y="26" width="507" height="20" uuid="6bf1ffb4-e303-58d1-9122-f7bf5bc71823"/>
+				<textFieldExpression><![CDATA["<b>Article 17</b> : En cas de non-respect des dispositions de la présente Autorisation, ou s'il apparaît, à la suite de l'établissement et de l'exploitation du réseau privé objet de la présente Autorisation, que le Titulaire porte atteinte à la sûreté ou à l'ordre public ou est contraire à la morale et aux bonnes mœurs, l'ARCEP peut, sans préjudice d'éventuelles poursuites pénales, prononcer des sanctions dans les conditions prévues par la législation en vigueur."]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="48" splitType="Stretch">
+			<staticText>
+				<reportElement x="16" y="8" width="112" height="14" uuid="e54f2ce3-edcb-50dd-a299-be3c841aa8be"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Chapitre 8 :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="128" y="8" width="395" height="14" uuid="ab58768f-9fef-5734-b5ed-bad2f703df1d"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Des dispositions finales]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight">
+				<reportElement style="Article" x="16" y="26" width="507" height="20" uuid="2485b963-0cb0-54ba-8b2c-29676ea8aba6"/>
+				<textFieldExpression><![CDATA["<b>Article 18</b> : La présente Autorisation, qui prend effet pour compter de sa date de signature, est enregistrée, et notifiée à l'intéressé, conformément aux dispositions de l'article 15 nouveau de l'ordonnance n°0000008/PR/2012 du 13 février 2012 susvisée."]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="150" splitType="Prevent">
+			<textField>
+				<reportElement x="263" y="10" width="260" height="16" uuid="268fa377-f93f-5b7a-8a68-a15b958a9386"/>
+				<textElement textAlignment="Right">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Fait à Libreville, le " + $V{dateSignature}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="263" y="32" width="260" height="16" uuid="a11412b8-d362-57ed-bc37-cc585cf7b5b5"/>
+				<textElement textAlignment="Center">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{SIGNATAIRE_QUALITE}]]></textFieldExpression>
+			</textField>
+			<image scaleImage="RetainShape" hAlign="Center" vAlign="Middle" onErrorType="Blank">
+				<reportElement x="313" y="52" width="160" height="64" uuid="fd608837-14e9-501e-a67c-f388c42a3812">
+					<printWhenExpression><![CDATA[$F{signaturePresidence} != null && !$F{signaturePresidence}.isEmpty()]]></printWhenExpression>
+				</reportElement>
+				<imageExpression><![CDATA[java.util.Base64.getMimeDecoder().decode($F{signaturePresidence}.replaceFirst("^data:[^,]*,", ""))]]></imageExpression>
+			</image>
+			<textField isBlankWhenNull="true">
+				<reportElement x="263" y="120" width="260" height="16" uuid="410a1b31-4015-58ac-b2c6-4b6ae99d1086"/>
+				<textElement textAlignment="Center">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{SIGNATAIRE_NOM}]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="22" splitType="Prevent">
+			<textField>
+				<reportElement x="16" y="6" width="507" height="12" forecolor="#6B7280" uuid="5829f5ef-8c75-53a8-b451-76b1c4c62091"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Dossier n° " + ($F{reference} != null ? $F{reference} : "—")
++ " — Attestation n° " + ($F{referenceAttestation} != null ? $F{referenceAttestation} : "—")
++ " — Valable cinq (05) ans à compter de sa signature (article 15)."]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="30" splitType="Stretch">
+			<line>
+				<reportElement x="10" y="4" width="519" height="1" uuid="92d13206-a317-59be-91ac-42f1a167b9ff"/>
+				<graphicElement>
+					<pen lineWidth="1.5" lineStyle="Double"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement x="14" y="9" width="470" height="16" uuid="b928cace-92a6-52fe-bfb2-b96c416d0c9e"/>
+				<textElement verticalAlignment="Middle" markup="styled">
+					<font size="7.5"/>
+				</textElement>
+				<text><![CDATA[<b>SIEGE SOCIAL</b> 1030 Avenue Paul MOUKAMBI, KALIKAK BP: 50 000 LBV Tel.: +241 11 44 68 11/12 Site web: www.arcep.ga]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="484" y="9" width="24" height="16" forecolor="#6B7280" uuid="6cca6b3b-eaf3-5f28-aef1-916d3a4ee0b9"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER} + " /"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="508" y="9" width="17" height="16" forecolor="#6B7280" uuid="93e42239-0a50-59ac-af49-7e19078ed9ac"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="292" splitType="Stretch">
+			<textField evaluationTime="Report">
+				<reportElement x="16" y="24" width="507" height="18" uuid="1565eb4b-14c0-55b0-a835-655256a939c5"/>
+				<textElement textAlignment="Center">
+					<font size="11" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ANNEXE DE L'AUTORISATION N° " + $V{numeroAutorisation}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="16" y="48" width="507" height="18" uuid="102b4bae-6cac-5adf-9369-e7e93e1ac39c"/>
+				<textElement textAlignment="Center">
+					<font size="11" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[CONDITION D'EXPLOITATION]]></text>
+			</staticText>
+			<frame>
+				<reportElement x="60" y="86" width="419" height="24" uuid="057b0785-807d-57c5-9115-87b4011a3a07"/>
+				<staticText>
+					<reportElement style="Entete" stretchType="ContainerHeight" x="0" y="0" width="190" height="24" uuid="55611d0d-c229-565d-b019-75defe32a0fd"/>
+					<textElement>
+						<font size="9.5"/>
+					</textElement>
+					<text><![CDATA[Type de signaux émis]]></text>
+				</staticText>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Entete" x="190" y="0" width="229" height="24" uuid="4ebd895a-8b5e-5f70-90fb-b32ef97ccb0b"/>
+					<textElement>
+						<font size="9.5"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{servicesLibelle}.isEmpty() ? "—" : $V{servicesLibelle}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" x="60" y="110" width="419" height="24" uuid="596ebd41-7be7-5589-b553-cfa41c535be8"/>
+				<staticText>
+					<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="190" height="24" uuid="89fa1c80-2d47-5957-840e-58eca2e961fc"/>
+					<textElement>
+						<font size="9.5"/>
+					</textElement>
+					<text><![CDATA[Type de liaisons]]></text>
+				</staticText>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Cellule" x="190" y="0" width="229" height="24" uuid="665da71b-d9d0-5935-b833-440cdeea343e"/>
+					<textElement>
+						<font size="9.5" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{typesLibelle}.isEmpty() ? "—" : $V{typesLibelle}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<staticText>
+				<reportElement positionType="Float" x="16" y="150" width="507" height="14" uuid="678542b7-366a-57a9-8c71-d5329e5101b9"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Sites du réseau]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement positionType="Float" x="16" y="166" width="507" height="50" isRemoveLineWhenBlank="true" uuid="952e30f7-5422-56bc-8135-e3e41140f0b4">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<printWhenExpression><![CDATA[$V{nombreSites} > 0]]></printWhenExpression>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="dsSites" uuid="b98ddacf-45c2-5153-95d3-46b95729e32d">
+						<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JsonData) $P{REPORT_DATA_SOURCE}).subDataSource("sites")]]></dataSourceExpression>
+					</datasetRun>
+					<jr:column width="128" uuid="47c6650b-cf1a-5501-b487-498d01538fa2">
+						<jr:columnHeader height="32" rowSpan="2">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="128" height="32" uuid="4577c0f5-c0cf-5436-bc3f-d425456d13a8"/>
+								<text><![CDATA[Désignation]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="128" height="18" uuid="6dc67917-be7f-58d6-837f-27789cb46535"/>
+								<textElement>
+									<font isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{nomSite} != null ? $F{nomSite} : "—"]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="86" uuid="c017a632-ccf5-5549-9346-16e62a2fecc9">
+						<jr:columnHeader height="32" rowSpan="2">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="86" height="32" uuid="7ead1e4c-620a-5003-8848-7fb5de7c803f"/>
+								<text><![CDATA[Province]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="86" height="18" uuid="e036bf06-8816-5cc7-98c5-0e3ebafe1285"/>
+								<textFieldExpression><![CDATA[$F{province} != null ? $F{province} : "—"]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="80" uuid="2f8adb19-1bc4-5a95-b769-b7360f4f9fbd">
+						<jr:columnHeader height="32" rowSpan="2">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="80" height="32" uuid="8b460ada-c9df-56cd-95d3-8d7ceab39fa4"/>
+								<text><![CDATA[Ville]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="80" height="18" uuid="074d7098-835a-5bbc-a0d3-67e23092e29c"/>
+								<textFieldExpression><![CDATA[$F{ville} != null ? $F{ville} : "—"]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:columnGroup width="170" uuid="5fcfaf4e-814a-551f-a641-838f5833ab64">
+						<jr:columnHeader height="16">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="170" height="16" uuid="7b50f2c7-b5b8-57c5-93e3-b632746fb365"/>
+								<text><![CDATA[Localisation (DMS)]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:column width="85" uuid="69e51c9c-5820-5241-882b-7c0796870064">
+							<jr:columnHeader height="16">
+								<staticText>
+									<reportElement style="Entete" x="0" y="0" width="85" height="16" uuid="9a708c20-16d8-50be-9268-01a65583d5f2"/>
+									<text><![CDATA[Latitude]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:detailCell height="18">
+								<textField textAdjust="StretchHeight">
+									<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="85" height="18" uuid="bb118477-db3e-5052-871f-6a12f8f039b7"/>
+									<textFieldExpression><![CDATA[$F{latitudeDegres} == null ? "—"
+: $F{latitudeDegres} + "° " + String.format("%02d", $F{latitudeMinutes} == null ? 0 : $F{latitudeMinutes}) + "' "
+  + String.format(java.util.Locale.FRANCE, "%05.2f", $F{latitudeSecondes} == null ? 0d : $F{latitudeSecondes}) + "\" "
+  + ($F{latitudeSens} == null ? "" : $F{latitudeSens})]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="85" uuid="dfaa3024-ff3f-5feb-a574-487472adc2ec">
+							<jr:columnHeader height="16">
+								<staticText>
+									<reportElement style="Entete" x="0" y="0" width="85" height="16" uuid="dc09e36d-a387-5b5c-9776-d3c1e1f5efb5"/>
+									<text><![CDATA[Longitude]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:detailCell height="18">
+								<textField textAdjust="StretchHeight">
+									<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="85" height="18" uuid="ad915e0f-bfb3-50d2-9540-ae2b6e9067cd"/>
+									<textFieldExpression><![CDATA[$F{longitudeDegres} == null ? "—"
+: $F{longitudeDegres} + "° " + String.format("%02d", $F{longitudeMinutes} == null ? 0 : $F{longitudeMinutes}) + "' "
+  + String.format(java.util.Locale.FRANCE, "%05.2f", $F{longitudeSecondes} == null ? 0d : $F{longitudeSecondes}) + "\" "
+  + ($F{longitudeSens} == null ? "" : $F{longitudeSens})]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:columnGroup>
+					<jr:column width="43" uuid="a52b6aa4-edbe-56ec-93e4-df9cc534fcfd">
+						<jr:columnHeader height="32" rowSpan="2">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="43" height="32" uuid="9dcee156-9761-5497-a2d3-b4294a1b031f"/>
+								<text><![CDATA[Altitude (m)]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="43" height="18" uuid="31fdeea6-e4da-5098-b666-beb0576ad08d"/>
+								<textFieldExpression><![CDATA[$F{altitude} == null ? "N/A"
+: new java.text.DecimalFormat("0.#", java.text.DecimalFormatSymbols.getInstance(java.util.Locale.FRANCE)).format($F{altitude})]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<staticText>
+				<reportElement positionType="Float" x="16" y="226" width="507" height="14" isRemoveLineWhenBlank="true" uuid="a63e5ba6-b182-572b-bfe6-988728f46843">
+					<printWhenExpression><![CDATA[$V{nombreLiaisons} > 0]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Liaisons du réseau]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement positionType="Float" x="16" y="242" width="507" height="50" isRemoveLineWhenBlank="true" uuid="0ea8c645-cacf-5a7e-9e79-26ff569b74dc">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<printWhenExpression><![CDATA[$V{nombreLiaisons} > 0]]></printWhenExpression>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="dsLiaisons" uuid="bec9a098-4f46-54d6-90b0-c75d94d3f2cb">
+						<datasetParameter name="SITES">
+							<datasetParameterExpression><![CDATA[$F{sites}]]></datasetParameterExpression>
+						</datasetParameter>
+						<dataSourceExpression><![CDATA[((net.sf.jasperreports.engine.data.JsonData) $P{REPORT_DATA_SOURCE}).subDataSource("liaisons")]]></dataSourceExpression>
+					</datasetRun>
+					<jr:column width="82" uuid="ff9e9db3-fb81-5e97-8459-db1263eb0365">
+						<jr:columnHeader height="32" rowSpan="2">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="82" height="32" uuid="2e5fb866-a8c9-58ab-be2c-71768bb94db8"/>
+								<text><![CDATA[Nature]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="82" height="18" uuid="3e30a3c9-6c17-508c-96b8-2cfb70a8e8be"/>
+								<textElement>
+									<font isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA["FIBRE_OPTIQUE".equals($F{nature}) ? "Fibre optique"
+: "FH".equals($F{nature}) ? "Faisceau hertzien"
+: "BLR".equals($F{nature}) ? "Boucle locale radio"
+: "VSAT".equals($F{nature}) ? "VSAT"
+: $F{precisionAutre} != null ? $F{precisionAutre}
+: $F{nature} != null ? $F{nature} : "—"]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="100" uuid="786c2608-368b-52d4-92db-c98edb4e0bb1">
+						<jr:columnHeader height="32" rowSpan="2">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="100" height="32" uuid="6edaf499-7930-5c83-979f-569f2b8821c2"/>
+								<text><![CDATA[Site d'origine]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="100" height="18" uuid="eb438c3e-18b5-5f74-b142-fc9915dee830"/>
+								<textFieldExpression><![CDATA[$F{siteOrigineId} == null || $P{SITES} == null ? "—"
+: java.util.stream.StreamSupport.stream(((com.fasterxml.jackson.databind.JsonNode) $P{SITES}).spliterator(), false)
+    .filter(s -> s.path("id").asLong() == $F{siteOrigineId}.longValue())
+    .map(s -> s.path("nomSite").asText())
+    .findFirst().orElse("Site n° " + $F{siteOrigineId})]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="100" uuid="11e80644-6cd3-5f1f-bb70-67cf626e6a3e">
+						<jr:columnHeader height="32" rowSpan="2">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="100" height="32" uuid="e0f2d68e-676e-5a1f-99ef-313a08778589"/>
+								<text><![CDATA[Site d'extrémité]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="100" height="18" uuid="b15d2bbf-31bb-54ff-aa05-00fa8ca00d49"/>
+								<textFieldExpression><![CDATA[$F{siteExtremiteId} == null || $P{SITES} == null ? "—"
+: java.util.stream.StreamSupport.stream(((com.fasterxml.jackson.databind.JsonNode) $P{SITES}).spliterator(), false)
+    .filter(s -> s.path("id").asLong() == $F{siteExtremiteId}.longValue())
+    .map(s -> s.path("nomSite").asText())
+    .findFirst().orElse("Site n° " + $F{siteExtremiteId})]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="97" uuid="59fe9a97-f2d7-595f-848e-7df9234cab92">
+						<jr:columnHeader height="32" rowSpan="2">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="97" height="32" uuid="ce8f930d-6387-589b-9512-faa0ef40f4bd"/>
+								<text><![CDATA[Bande de fréquences]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="97" height="18" uuid="d4d08080-be2b-5c60-a5cf-4154b616ce2a"/>
+								<textFieldExpression><![CDATA[$F{bandeFrequences} != null ? $F{bandeFrequences} : "N/A"]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:columnGroup width="88" uuid="75505df7-7590-50d7-adef-68c99ed2169a">
+						<jr:columnHeader height="16">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="88" height="16" uuid="a0479cac-e198-56d2-89f5-3f0b8c5eb9d1"/>
+								<text><![CDATA[Débit (Mbit/s)]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:column width="44" uuid="45c56417-a205-5559-8746-58f01c8bb8da">
+							<jr:columnHeader height="16">
+								<staticText>
+									<reportElement style="Entete" x="0" y="0" width="44" height="16" uuid="9db48fcb-3d29-508d-82d5-ab0ff1a3636b"/>
+									<text><![CDATA[Em]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:detailCell height="18">
+								<textField textAdjust="StretchHeight">
+									<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="44" height="18" uuid="728ff816-dd00-529c-ae2c-8314285f67d2"/>
+									<textFieldExpression><![CDATA[$F{debitEmission} == null ? "N/A"
+: new java.text.DecimalFormat("#,##0.###", java.text.DecimalFormatSymbols.getInstance(java.util.Locale.FRANCE)).format($F{debitEmission}).replace(' ', ' ')]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="44" uuid="0645ac03-885c-518e-924b-46b3831d82aa">
+							<jr:columnHeader height="16">
+								<staticText>
+									<reportElement style="Entete" x="0" y="0" width="44" height="16" uuid="04253f66-a31b-5c80-928f-bc0513a92ac1"/>
+									<text><![CDATA[Rec]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:detailCell height="18">
+								<textField textAdjust="StretchHeight">
+									<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="44" height="18" uuid="3f131c8a-0e19-5af9-bfac-7c52f98d347d"/>
+									<textFieldExpression><![CDATA[$F{debitReception} == null ? "N/A"
+: new java.text.DecimalFormat("#,##0.###", java.text.DecimalFormatSymbols.getInstance(java.util.Locale.FRANCE)).format($F{debitReception}).replace(' ', ' ')]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:columnGroup>
+					<jr:column width="40" uuid="51760242-0009-5d87-bc38-220429343f1c">
+						<jr:columnHeader height="32" rowSpan="2">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="40" height="32" uuid="64b04838-307b-5750-94d5-e4289827b7de"/>
+								<text><![CDATA[Bonds]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="40" height="18" uuid="23f57d8c-a5ab-51bf-a2dd-c7c0f5ebdad0"/>
+								<textFieldExpression><![CDATA[$F{nombreBonds} != null ? String.valueOf($F{nombreBonds}) : "N/A"]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+	</summary>
+</jasperReport>

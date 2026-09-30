@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import picosoft.biz.arcep.controller.errors.BadRequestAlertException;
 import picosoft.biz.arcep.controller.errors.StationErrors;
 import picosoft.biz.arcep.domain.implantation.Frequence;
+import picosoft.biz.arcep.domain.implantation.Station;
 import picosoft.biz.arcep.repository.FrequenceRepository;
 import picosoft.biz.arcep.service.criteria.FrequenceCriteria;
 import picosoft.biz.arcep.service.dto.FrequenceDTO;
@@ -54,7 +55,26 @@ public class FrequenceService {
         return frequenceMapper.toDto(frequenceRepository.findByStationId(stationId));
     }
 
+    /**
+     * La frequence n'a ni circuit ni autorisation en propre : elle est l'enfant
+     * de la station, et c'est l'etat de celle-ci qui decide. Meme regle que
+     * StationService.delete et que SiteImplantationService.delete.
+     *
+     * Une frequence sans station est une orpheline : rien ne l'engage, elle
+     * s'efface.
+     */
     public void delete(Long id) {
-        frequenceRepository.deleteById(id);
+        Frequence entity = frequenceRepository.findById(id)
+                .orElseThrow(() -> new BadRequestAlertException(StationErrors.OBJECT_NOT_FOUND,
+                        StationErrors.CLASS, StationErrors.OBJECT_NOT_FOUND));
+
+        Station station = entity.getStation();
+        if (station != null
+                && (station.getWfProcessID() != null
+                    || (station.getAttestations() != null && !station.getAttestations().isEmpty()))) {
+            throw new BadRequestAlertException(StationErrors.OBJECT_ENGAGED,
+                    StationErrors.CLASS, StationErrors.OBJECT_ENGAGED);
+        }
+        frequenceRepository.delete(entity);
     }
 }

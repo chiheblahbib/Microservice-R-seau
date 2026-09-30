@@ -1,7 +1,5 @@
 package picosoft.biz.arcep.service.dto;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +26,6 @@ public class DemandeDeclaratifInputDTO implements Serializable {
 
     private Boolean web;
 
-    @Size(max = 25)
     private String reference;
 
     private ZonedDateTime createdDate;
@@ -36,7 +33,6 @@ public class DemandeDeclaratifInputDTO implements Serializable {
 
     private String approvedBy;
 
-    @Size(max = 32)
     private String statutDossier;
 
     /**
@@ -44,7 +40,6 @@ public class DemandeDeclaratifInputDTO implements Serializable {
      * L'omettre enverrait tous les dossiers sur la branche par defaut, sans
      * erreur ni message.
      */
-    @Size(max = 50)
     private String typeDossier;
 
     /** Absente du formulaire, conservee pour la plomberie -- voir DemandeDeclaratif. */
@@ -53,18 +48,14 @@ public class DemandeDeclaratifInputDTO implements Serializable {
     // ---------------- rubrique 4
     private TypeEnregistrement typeEnregistrement;
 
-    @Size(max = 50)
     private String numeroCertificat;
 
     /** Le certificat delivre : livrable du dossier, vide au depot. */
-    @Size(max = 50)
     private String certificatDelivre;
 
     // ---------------- rubrique 1 : ce que `client` ne porte pas
-    @Size(max = 100)
     private String formeJuridique;
 
-    @Size(max = 50)
     private String boitePostale;
 
     // ---------------- rubrique 5 : clientele cible, cumulable
@@ -75,7 +66,6 @@ public class DemandeDeclaratifInputDTO implements Serializable {
     // ---------------- rubrique 6
     private TypeCouverture typeCouverture;
 
-    @Size(max = 255)
     private String provinces;
 
     // ---------------- rubrique 8 : quatre questions oui / non / non repondu
@@ -98,17 +88,13 @@ public class DemandeDeclaratifInputDTO implements Serializable {
 
     private BigDecimal fraisDossier;
 
-    @Size(max = 8)
     private String deviseFrais;
 
-    @Valid
     private ClientDTO client;
 
-    @Valid
     private ApplicantDTO applicant;
 
     /** Rubrique 5 : les equipements de bord. */
-    @Valid
     private List<ServiceDeclareDeclaratifDTO> services;
 
     /** Rubrique 8.a : les caracteristiques de reseau declarees. */
@@ -118,7 +104,6 @@ public class DemandeDeclaratifInputDTO implements Serializable {
      * Le rapport d'instruction. Renseigne par l'ARCEP, jamais par le
      * demandeur -- voir RapportTechnique.
      */
-    @Valid
     private RapportTechniqueDTO rapportTechnique;
 
     // ------------------------- workflow / ACL -------------------------

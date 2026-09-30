@@ -6,7 +6,6 @@ import lombok.Setter;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 /**
@@ -35,8 +34,7 @@ public class AutorisationAnterieure implements Serializable {
     private Long id;
 
     /** La reference telle qu'elle figure sur le titre detenu. */
-    @Column(name = "reference", length = 100)
-    @Size(max = 100)
+    @Column(name = "reference")
     private String reference;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -45,7 +45,7 @@ public class Attestation extends Auditable implements Serializable {
     @Column(name = "class_id")
     private Long classId;
 
-    @Column(name = "nom_modele", length = 255)
+    @Column(name = "nom_modele")
     private String nomModele;
 
     @ManyToOne(fetch = FetchType.LAZY)

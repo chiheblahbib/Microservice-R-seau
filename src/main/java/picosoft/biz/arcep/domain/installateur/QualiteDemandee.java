@@ -25,7 +25,7 @@ public class QualiteDemandee implements Serializable {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "qualite", length = 24)
+    @Column(name = "qualite")
     private TypeAutorisation qualite;
 
     @ManyToOne(fetch = FetchType.LAZY)

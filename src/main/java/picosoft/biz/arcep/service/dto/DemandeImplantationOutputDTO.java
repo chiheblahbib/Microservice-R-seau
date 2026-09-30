@@ -78,6 +78,17 @@ public class DemandeImplantationOutputDTO implements Serializable {
 
     private Long numberOfattachments;
 
+    /**
+     * Ce que le kernel autorise CET utilisateur a faire sur CE dossier :
+     * WRITE, READ ou NONE. Pose a la lecture par le service, jamais persiste.
+     *
+     * Meme champ, meme role et meme nom que sur AsiOutputDTO. Le front s'en
+     * sert pour decider si la barre de decisions s'affiche et si les sections
+     * sont saisissables : sans lui, l'ecran ne peut qu'ouvrir tout a tout le
+     * monde, quelle que soit la tache en cours et quel que soit le role.
+     */
+    private String userPermission;
+
     private Long step;
 
 }

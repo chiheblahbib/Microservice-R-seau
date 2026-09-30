@@ -6,7 +6,6 @@ import lombok.Setter;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 /**
@@ -36,8 +35,7 @@ public class CodeUssd implements Serializable {
     private Long id;
 
     /** Le code tel que l'operateur l'ecrit : *123#, *4*2#... */
-    @Column(name = "code", length = 32)
-    @Size(max = 32)
+    @Column(name = "code")
     private String code;
 
     /** Rang de preference : 1 pour le plus souhaite. */
@@ -50,8 +48,7 @@ public class CodeUssd implements Serializable {
      * Garde A COTE de la demande plutot qu'a sa place : savoir qu'un operateur
      * a demande *123# et recu *124# fait partie du dossier.
      */
-    @Column(name = "code_attribue", length = 32)
-    @Size(max = 32)
+    @Column(name = "code_attribue")
     private String codeAttribue;
 
     @ManyToOne(fetch = FetchType.LAZY)

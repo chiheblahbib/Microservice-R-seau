@@ -44,14 +44,52 @@ public class createEvent {
 
 
 
+  /**
+   * Notifier ne doit pas pouvoir faire echouer le depot.
+   *
+   * Flowable evalue cette expression DANS la transaction du circuit : toute
+   * exception qui remonte d'ici annule le depot entier. Un seul type
+   * d'evenement absent du kernel suffisait donc a rendre un dossier non
+   * deposable -- constate le 21/09/2026, « DepotReseauNotif » manquant, depot
+   * en 500 alors que le dossier etait valide et la classe ACL resolue.
+   *
+   * CE N'EST PAS UNE NOUVELLE POLITIQUE, c'est celle que le code annonce
+   * deja. `processExecuteEventAsync` porte `@Async` et rend un
+   * `CompletableFuture` que personne ne consomme : si l'appel passait par le
+   * proxy Spring, l'exception y serait capturee et ne remonterait jamais. Elle
+   * ne remonte que parce que `_execute` appelle la methode SUR LUI-MEME, et
+   * qu'une auto-invocation ne traverse pas le proxy -- l'annotation reste sans
+   * effet, l'appel est synchrone. On retablit l'effet attendu.
+   *
+   * ET ON LE REND VISIBLE : la panne est journalisee, la ou le Future
+   * silencieux l'aurait perdue. Une notification qui manque doit se voir dans
+   * les traces, pas seulement ne plus nuire.
+   *
+   * Le gabarit porte le meme cablage (createEvent d'homologation, methodes
+   * identiques). Il ne s'en apercoit pas : ses types d'evenement sont declares
+   * de longue date. Ce n'est donc pas un ecart de DRRRS, c'est un defaut de la
+   * famille que seul DRRRS rencontre aujourd'hui.
+   *
+   * A RETIRER ? Non. Meme une fois les 80 types declares au kernel, un kernel
+   * indisponible ne doit pas empecher un depot.
+   */
   public void _execute(DelegateExecution execution, String eventTypeAlias) throws Exception, InterruptedException {
-
-    processExecuteEventAsync(execution, eventTypeAlias);
+    try {
+      processExecuteEventAsync(execution, eventTypeAlias);
+    } catch (Exception e) {
+      log.error("Notification '{}' non enregistree, le circuit continue sans elle : {}",
+                eventTypeAlias, e.toString());
+    }
   }
 
+  /** Meme garde, pour la variante qui joint un rapport. Voir ci-dessus. */
   public void _execute(DelegateExecution execution, String eventTypeAlias, String reportName, String className) throws Exception, InterruptedException {
-
-    processExecuteEventAsync(execution, eventTypeAlias, reportName, className);
+    try {
+      processExecuteEventAsync(execution, eventTypeAlias, reportName, className);
+    } catch (Exception e) {
+      log.error("Notification '{}' (rapport '{}') non enregistree, le circuit continue sans elle : {}",
+                eventTypeAlias, reportName, e.toString());
+    }
   }
 
 

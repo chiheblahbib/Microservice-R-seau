@@ -232,9 +232,11 @@ Le service compilait avant chacun d'eux : ils ne se voyaient qu'à l'exécution.
 
 **Aucune autorisation n'était jamais créée.** `AttestationService.createAttestationForAutorisation`
 n'avait aucun appelant : ni Java, ni le diagramme. Chez implantation, c'était le circuit ENFANT
-qui la déclenchait (`processStation.bpmn20.xml`) ; le réseau n'en a pas. Corrigé en posant
-l'écouteur sur la passerelle `Gw_signataire` (les deux branches — président ou chef centre —
-mènent à une signature, et l'autorisation doit exister avant d'être signée) :
+qui la déclenchait (`processStation.bpmn20.xml`) ; le réseau n'en a pas. Corrigé en créant
+l'autorisation juste avant la signature, puisqu'elle doit exister avant d'être signée.
+L'expression a d'abord été un écouteur de la passerelle `Gw_signataire`, puis une tâche
+« Automatique » jusqu'à la v21. La v22 a retiré l'une et l'autre (voir plus bas) : c'est
+désormais un écouteur `take` du flux « Pour Signature » (`Flow_ordre_valider`).
 
 ```
 ${empty data.attestations
@@ -259,33 +261,32 @@ confirmer sur un circuit complet.
 `sysdateCreated` à côté, sur laquelle les écrans se rabattent — sinon la colonne « Date » du
 suivi était vide pour tout dossier non encore soumis.
 
-### Premier démarrage
+### Démarrage
 
-```bash
-psql -h localhost -U postgres -f local-setup.sql
-```
-
-```bash
-.\mvnw.cmd -Plocal spring-boot:run
-```
-
-Le profil `local` pointe sur `localhost`, le profil `dev` sur le LAN du bureau.
-
-Les schémas créés par `local-setup.sql` sont **tous** nécessaires : Hibernate crée les tables
-mais jamais les schémas. Deux ne sont pas évidents — `kernel` porte une entité ACL
-(`StateWorkflow` vers la table `k_e_pa_states`) et `audit` reçoit les révisions Envers **dans
-la base primaire**, pas dans `ARCEP-AUDIT` comme son nom le suggère.
-
-### Démarrage en dev (LAN)
+**Toujours en profil `dev`.** Le profil `local` n'est plus employé, et `local-setup.sql` a
+été supprimé le 10 septembre 2026 : le développement se fait sur la base du bureau. Le
+profil reste au `pom.xml` et `application-local.properties` avec lui — inertes, récupérables.
 
 ```bash
 .\mvnw.cmd -Pdev spring-boot:run
 ```
 
+Les schémas doivent exister **avant** le démarrage : Hibernate crée les tables, jamais les
+schémas. Ils sont en place sur `ARCEP-DEV`. Deux ne sont pas évidents — `kernel` porte une
+entité ACL (`StateWorkflow` vers la table `k_e_pa_states`) et `audit` reçoit les révisions
+Envers **dans la base primaire**, pas dans `ARCEP-AUDIT` comme son nom le suggère.
+
+```sql
+CREATE SCHEMA IF NOT EXISTS drrrs;
+CREATE SCHEMA IF NOT EXISTS homologation;
+CREATE SCHEMA IF NOT EXISTS kernel;
+CREATE SCHEMA IF NOT EXISTS audit;
+```
+
 Pointe sur `ARCEP-DEV` (`192.168.10.135`) et le kernel du bureau (`192.168.10.192:8002`) —
 prérequis réseau : LAN, pas de VPN sur ce poste. `application-dev.properties` fixe
-`server.port=8080` et `server.servlet.context-path=/reseau` : pour tester sur les mêmes ports
-que le front (`proxy.conf.json` attend 8005, racine `/`), surcharger les deux au lancement.
+`server.port=8080` et `server.servlet.context-path=/drrrs`. Pour servir sur d'autres ports
+que ceux-là, surcharger les deux au lancement.
 
 **Le piège** : `-Dserver.servlet.context-path=/` échoue —
 `IllegalArgumentException: ContextPath must start with '/' and not end with '/'`. Spring veut
@@ -324,15 +325,15 @@ circuit à démarrer.
 
 Un profil Maven est **obligatoire** (`application.properties` contient
 `spring.profiles.active=@spring.profiles.active@`, résolu par filtrage de ressources).
-Un `mvn compile` sans `-Plocal` laisse le jeton non résolu : le service démarrerait alors sur
+Un `mvn compile` sans `-Pdev` laisse le jeton non résolu : le service démarrerait alors sur
 le port 8088 sans source de données.
 
 ```bash
-.\mvnw.cmd -Plocal clean compile
+.\mvnw.cmd -Pdev clean compile
 ```
 
-Port **8005**, context-path `/` en local ; 8080 et `/reseau` en `dev`. Le serveur de
-développement Angular relaie `/reseau/api` vers ce port (`proxy.conf.json`).
+Port **8080**, context-path `/drrrs`. Le front vise cette adresse par `API_URL_DRRRS`, défini
+dans `src/environments/` — et non par un `proxy.conf.json`, qui n'existe pas dans ce dépôt.
 
 ### Déploiement du diagramme
 
@@ -384,8 +385,9 @@ de pièce d'identité, que le formulaire exige des deux personnes physiques (rub
 L'y ajouter aurait modifié une table dont homologation est propriétaire.
 
 `statutDossier` et `typeDossier` sont des **String**, jamais des énumérations : c'est la
-convention de toute la suite et c'est ce que le diagramme compare —
-`${data.statutDossier== 'soumis'}`. Le front en est propriétaire.
+convention de toute la suite et c'est ce que les diagrammes comparent —
+`${data.statutDossier== 'soumis'}`. Le front en est propriétaire. Depuis la v22,
+`processReseau` ne teste plus ni l'un ni l'autre.
 
 ### Le circuit unique — et pourquoi un seul
 
@@ -414,14 +416,15 @@ réseau ne sépare pas du tout.
 #### `processReseau` — l'unique circuit
 
 Transposé de `processImplantation`, avec les six premières étapes reprises à l'identique, et
-la fin adaptée au signataire du formulaire réseau :
+la fin adaptée au signataire du formulaire réseau. Version en vigueur : **v22**, celle de
+l'administrateur kernel, redéployée à l'identique en v24 le 30/09/2026.
 
 ```
 Début
  → Saisie & Étude Complétude Dossier ──Soumettre──►
  → Contrôle & Numérotation du Dossier
      ⟲ Retourner
-     → Accepter
+     → Accepter                       ◄── décharge : événement kernel DechargeReseau (v25)
  → Orientation du Dossier
      ⟲ Pour Vérification
      → Pour Étude
@@ -429,13 +432,51 @@ Début
      ⟲ Retourner
      → Pour Validation
  → Validation Rapport Technique
- → [gw] Frais de dossier à percevoir ?
-     ├─ oui → Établir l'Ordre de Recette → Validation Ordre de Recette
-     └─ non ──┐
- → [gw] Quel signataire ?          ◄── crée l'Attestation (voir plus haut)
-     ├─ COMMERCE → Signature du Président du Conseil de Régulation ──┐
-     └─ sinon (défaut) → Signature du Dossier ─────────────────────┴──► Clôturé
+     ⟲ Pour Vérification (retour à l'Étude Technique)
+     → Soumettre
+ → Établir l'Ordre de Recette
+     → Pour Validation
+ → Validation Ordre de Recette
+     ⟲ Pour Vérification (retour à la Comptabilité)
+     → Pour Signature                 ◄── crée l'Attestation (voir plus haut)
+ → Signature du Président du Conseil de Régulation (groupe Direction Commerce)
+     → Soumettre
+ → Signature du Dossier (Chef Centre)
+     → Confirmer
+ → Clôturé
 ```
+
+Le chemin est le même pour tous les dossiers. La v22 a retiré les deux aiguillages sur la
+donnée que portait la v21 : `Gw_frais` (`${data.statutDossier== 'soumis'}`, qui pouvait sauter
+l'ordre de recette) et `Gw_signataire` (`typeDossier`, qui envoyait au Président ou au seul
+Chef Centre). Elle a aussi retiré les deux tâches « Automatique » qui les précédaient. Les
+dossiers démarrés sur une version antérieure continuent sur leur version.
+
+#### Le fichier suit la version de l'administrateur kernel
+
+L'administrateur modifie `processReseau` depuis l'éditeur BPM du kernel (`/bpm/processus`),
+qui déploie dans les mêmes tables Flowable qu'`ARCEP-DEV`. Au démarrage, drrrs-back redéploie
+**tout** `processes/`, en un seul déploiement `SpringBootAutoDeployment`, dès qu'un fichier
+diffère du déploiement précédent. Un fichier local en retard efface alors la version de
+l'administrateur, sans erreur ni avertissement.
+
+C'est arrivé le 28/09/2026 :
+
+- 14:16 : l'administrateur déploie la v22.
+- 15:19 : un redémarrage de drrrs-back redéploie l'ancien fichier en v23, qui devient la
+  version active.
+- 30/09 : le fichier a été réaligné sur la v22 puis redéployé en v24, identique à la v22.
+
+**Avant de modifier un fichier de `processes/`, ou de redémarrer après une intervention de
+l'administrateur :**
+
+1. Lire la dernière version de chaque circuit. Côté kernel : `workflow/getListProcessVersions`
+   puis `workflow/getBpmnModelXml`. Côté base : `act_re_procdef` et `act_re_deployment`. Une
+   version dont le déploiement n'est pas nommé `SpringBootAutoDeployment` vient de
+   l'administrateur.
+2. Reporter ses changements dans le fichier local.
+3. Comparer élément par élément : l'éditeur reformate tout le fichier (commentaires retirés,
+   `&#39;`, espace de noms `camunda` déclaré).
 
 Un seul objet, un seul historique au kernel, une seule classe ACL (`DemandeReseau` →
 `fw_process = processReseau`). Pas de tâche technique distincte pour l'installateur ni pour
@@ -455,7 +496,8 @@ appelée aussi bien par le CRUD que par le chemin workflow.
 **`uuid` est `nullable = false`** et se génère par `@PrePersist` sur l'entité, pas dans le
 service : un enfant créé par cascade ne passe jamais par un service dédié.
 
-**`ddl-auto=update` crée les TABLES mais jamais les SCHÉMAS.** D'où `local-setup.sql`.
+**`ddl-auto=update` crée les TABLES mais jamais les SCHÉMAS.** Ils se créent à la main, une
+fois, par `CREATE SCHEMA IF NOT EXISTS` — voir la section Démarrage.
 
 ### Une liaison désigne des sites par leur identifiant
 
@@ -504,10 +546,9 @@ Le circuit `processReseau` est **transposé** de celui de l'implantation, confir
 | № | Question | Hypothèse posée dans le code |
 |---|---|---|
 | 1 | La suite Saisie → Numérotation → Orientation → Étude technique → Validation du rapport | Supposée identique à l'implantation |
-| 2 | Le signataire final | « Signature du Président du Conseil de Régulation », le formulaire lui étant adressé. Branche par défaut : Chef Centre |
-| 3 | L'ordre de recette est-il systématique ? | La passerelle `Gw_frais` teste encore `${data.statutDossier== 'soumis'}`, condition héritée. Les frais étant dus dans tous les cas, la branche `Flow_sys_sans_frais` est probablement à supprimer |
-| 4 | Valeur de `typeDossier` pour la branche « Présidence » | `'COMMERCE'`, valeur héritée, conservée pour ne pas casser la condition |
-| 5 | Barème | 300 000 FCFA pour un réseau PMR seul, 500 000 pour tout autre assemblage. Repris du formulaire, non confirmé |
+| 2 | Le signataire final | Tranché par la v22 de l'administrateur kernel : tout dossier passe par la « Signature du Président du Conseil de Régulation », puis le Chef Centre confirme et clôture |
+| 3 | L'ordre de recette est-il systématique ? | Oui depuis la v22 : la passerelle `Gw_frais` a été retirée |
+| 4 | Barème | 300 000 FCFA pour un réseau PMR seul, 500 000 pour tout autre assemblage. Repris du formulaire, non confirmé |
 
 Deux vérifications que le formulaire demande et que le circuit **ne matérialise pas** en
 tâches distinctes, l'étude technique étant censée les couvrir :
@@ -517,13 +558,17 @@ tâches distinctes, l'étude technique étant censée les couvrir :
 
 À séparer en tâches si l'instruction les confie à des agents différents.
 
-### Un risque qui reste ouvert
+### Un risque levé par la v22
 
-`typeDossier` et `statutDossier` sont des **String libres**, posés par le front. Rien côté
-serveur ne contraint leurs valeurs : une faute de frappe sur `'COMMERCE'` enverra
-silencieusement le dossier au Chef Centre, et une valeur autre que `'soumis'` fera sauter
-l'ordre de recette. Aucune erreur ne sera levée. Un contrôle des valeurs acceptées à l'entrée
-du service fermerait ce risque.
+`typeDossier` et `statutDossier` sont des **String libres**, posés par le front, et rien côté
+serveur ne contraint leurs valeurs. Jusqu'à la v21, les deux passerelles les testaient :
+
+- une faute de frappe sur `'RESEAU'` envoyait silencieusement le dossier au seul Chef Centre ;
+- une valeur autre que `'soumis'` faisait sauter l'ordre de recette.
+
+Depuis la v22, `processReseau` ne teste plus ni l'un ni l'autre, et le risque disparaît pour
+les dossiers démarrés sur cette version. Les autres circuits de la suite qui testent ces
+valeurs y restent exposés.
 
 
 ### Le schéma est passé de `reseau` à `drrrs`
@@ -534,13 +579,7 @@ partagées — `Client`, `Applicant`, `Attestation`, `Commentaire` — restent d
 
 **Le schéma doit exister avant le démarrage** : `ddl-auto=update` crée les
 tables, jamais les schémas. Vérifié le 8 septembre 2026 : `drrrs` existe sur
-`ARCEP-DEV`, mais **pas sur la base locale**, où seul `reseau` subsiste avec
-ses sept tables. Un démarrage en profil `local` échouera tant que le schéma
-n'aura pas été créé :
-
-```sql
-CREATE SCHEMA IF NOT EXISTS drrrs;
-```
+`ARCEP-DEV`, la base sur laquelle on travaille.
 
 Les anciennes tables du schéma `reseau` ne sont pas migrées : elles restent
 là, vides ou non, sans que rien ne les lise.

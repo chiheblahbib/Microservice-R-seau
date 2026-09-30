@@ -97,6 +97,7 @@ public class DemandeDeclaratifController {
         return demandeDeclaratifService.byId(id);
     }
 
+    @PreAuthorize("hasAuthority(@kernelService.declaratif_role_canEditDeclaratif())")
     @DeleteMapping("/demande-declaratifs/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         demandeDeclaratifService.delete(id);

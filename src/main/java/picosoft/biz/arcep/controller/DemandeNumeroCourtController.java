@@ -97,6 +97,7 @@ public class DemandeNumeroCourtController {
         return demandeNumeroCourtService.byId(id);
     }
 
+    @PreAuthorize("hasAuthority(@kernelService.numerocourt_role_canEditNumeroCourt())")
     @DeleteMapping("/demande-numerocourts/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         demandeNumeroCourtService.delete(id);

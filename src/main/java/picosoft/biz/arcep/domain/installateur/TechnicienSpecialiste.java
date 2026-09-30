@@ -6,7 +6,6 @@ import lombok.Setter;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 /**
@@ -31,12 +30,10 @@ public class TechnicienSpecialiste implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nom", length = 150)
-    @Size(max = 150)
+    @Column(name = "nom")
     private String nom;
 
-    @Column(name = "qualification", length = 200)
-    @Size(max = 200)
+    @Column(name = "qualification")
     private String qualification;
 
     /**
@@ -46,12 +43,10 @@ public class TechnicienSpecialiste implements Serializable {
      * d'annees : « 12 ans chez Gabon Telecom » y est aussi recevable que
      * « 12 ». Un entier aurait refuse la premiere reponse.
      */
-    @Column(name = "experience", length = 255)
-    @Size(max = 255)
+    @Column(name = "experience")
     private String experience;
 
-    @Column(name = "fonction", length = 150)
-    @Size(max = 150)
+    @Column(name = "fonction")
     private String fonction;
 
     @ManyToOne(fetch = FetchType.LAZY)

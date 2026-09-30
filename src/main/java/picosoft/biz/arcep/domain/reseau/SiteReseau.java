@@ -9,7 +9,6 @@ import picosoft.biz.arcep.configuration.audit.Auditable;
 import picosoft.biz.arcep.domain.reseau.enumeration.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 /**
@@ -35,21 +34,17 @@ public class SiteReseau extends Auditable implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nom_site", length = 100)
-    @Size(max = 100)
+    @Column(name = "nom_site")
     private String nomSite;
 
-    @Column(name = "province", length = 100)
-    @Size(max = 100)
+    @Column(name = "province")
     private String province;
 
-    @Column(name = "ville", length = 100)
-    @Size(max = 100)
+    @Column(name = "ville")
     private String ville;
 
     /** N ou S. Faute d'indication, on lit le nord. */
-    @Column(name = "latitude_sens", length = 1)
-    @Size(max = 1)
+    @Column(name = "latitude_sens")
     private String latitudeSens;
 
     @Column(name = "latitude_degres")
@@ -62,8 +57,7 @@ public class SiteReseau extends Auditable implements Serializable {
     private Double latitudeSecondes;
 
     /** E ou W. Faute d'indication, on lit l'est. */
-    @Column(name = "longitude_sens", length = 1)
-    @Size(max = 1)
+    @Column(name = "longitude_sens")
     private String longitudeSens;
 
     @Column(name = "longitude_degres")
@@ -78,8 +72,7 @@ public class SiteReseau extends Auditable implements Serializable {
     @Column(name = "altitude")
     private Double altitude;
 
-    @Column(name = "description", length = 500)
-    @Size(max = 500)
+    @Column(name = "description")
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)

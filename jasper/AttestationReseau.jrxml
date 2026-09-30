@@ -1,0 +1,1071 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  AttestationReseau : autorisation d’établissement et d’exploitation d’un réseau privé
+  (DRRRS, DemandeReseau), mise en page comme l'attestation ASI (certificat d'une page).
+  Numéro : attestations[0].reference (séquence kernel « 0084-28-09-2026 ») imprimé au format de l'acte
+  officiel « 0084/AUT/RP/ARCEP/2026 ». Signatures facultatives (base64) : signaturePresidence
+  (à défaut signatureDirecteurCommerce, le groupe DirectionCommerce portant la tâche « Signature du
+  Président ») et signatureChefCentre (tâche « Signature du Dossier »).
+  Ressources à joindre au modèle dans le kernel : arcepLogo, RGUTJ, logo-arcep-1.
+-->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AttestationReseau" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="10" bottomMargin="10" uuid="122692d0-d7f0-56cd-9ce1-04ef1ef50fc9">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<property name="net.sf.jasperreports.awt.ignore.missing.font" value="true"/>
+	<style name="Base" isDefault="true" fontName="Arial" fontSize="8"/>
+	<style name="Section" mode="Opaque" backcolor="#F2F2F2" vTextAlign="Middle" fontName="Arial" fontSize="8" isBold="true">
+		<box leftPadding="12">
+			<pen lineWidth="1.0" lineColor="#BFC9D1"/>
+		</box>
+	</style>
+	<style name="Libelle" vTextAlign="Middle" fontName="Arial" fontSize="8">
+		<box topPadding="3" leftPadding="10" bottomPadding="3" rightPadding="4">
+			<bottomPen lineWidth="1.0" lineColor="#BFC9D1"/>
+		</box>
+	</style>
+	<style name="Valeur" vTextAlign="Middle" fontName="Arial" fontSize="8">
+		<box topPadding="3" leftPadding="10" bottomPadding="3" rightPadding="6">
+			<leftPen lineWidth="1.0" lineColor="#BFC9D1"/>
+			<bottomPen lineWidth="1.0" lineColor="#BFC9D1"/>
+		</box>
+	</style>
+	<style name="Entete" mode="Opaque" backcolor="#F2F2F2" hTextAlign="Center" vTextAlign="Middle" fontName="Arial" fontSize="7" isBold="true">
+		<box topPadding="2" leftPadding="2" bottomPadding="2" rightPadding="2">
+			<pen lineWidth="1.0" lineColor="#BFC9D1"/>
+		</box>
+	</style>
+	<style name="Cellule" hTextAlign="Center" vTextAlign="Middle" fontName="Arial" fontSize="8">
+		<box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3">
+			<pen lineWidth="1.0" lineColor="#BFC9D1"/>
+		</box>
+	</style>
+	<subDataset name="dsSites" uuid="e39bd577-d034-5de3-8327-7fd3cbd16f24">
+		<field name="nomSite" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="nomSite"/>
+			<fieldDescription><![CDATA[nomSite]]></fieldDescription>
+		</field>
+		<field name="province" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="province"/>
+			<fieldDescription><![CDATA[province]]></fieldDescription>
+		</field>
+		<field name="ville" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="ville"/>
+			<fieldDescription><![CDATA[ville]]></fieldDescription>
+		</field>
+		<field name="latitudeSens" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="latitudeSens"/>
+			<fieldDescription><![CDATA[latitudeSens]]></fieldDescription>
+		</field>
+		<field name="latitudeDegres" class="java.lang.Integer">
+			<property name="net.sf.jasperreports.json.field.expression" value="latitudeDegres"/>
+			<fieldDescription><![CDATA[latitudeDegres]]></fieldDescription>
+		</field>
+		<field name="latitudeMinutes" class="java.lang.Integer">
+			<property name="net.sf.jasperreports.json.field.expression" value="latitudeMinutes"/>
+			<fieldDescription><![CDATA[latitudeMinutes]]></fieldDescription>
+		</field>
+		<field name="latitudeSecondes" class="java.lang.Double">
+			<property name="net.sf.jasperreports.json.field.expression" value="latitudeSecondes"/>
+			<fieldDescription><![CDATA[latitudeSecondes]]></fieldDescription>
+		</field>
+		<field name="longitudeSens" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="longitudeSens"/>
+			<fieldDescription><![CDATA[longitudeSens]]></fieldDescription>
+		</field>
+		<field name="longitudeDegres" class="java.lang.Integer">
+			<property name="net.sf.jasperreports.json.field.expression" value="longitudeDegres"/>
+			<fieldDescription><![CDATA[longitudeDegres]]></fieldDescription>
+		</field>
+		<field name="longitudeMinutes" class="java.lang.Integer">
+			<property name="net.sf.jasperreports.json.field.expression" value="longitudeMinutes"/>
+			<fieldDescription><![CDATA[longitudeMinutes]]></fieldDescription>
+		</field>
+		<field name="longitudeSecondes" class="java.lang.Double">
+			<property name="net.sf.jasperreports.json.field.expression" value="longitudeSecondes"/>
+			<fieldDescription><![CDATA[longitudeSecondes]]></fieldDescription>
+		</field>
+		<field name="altitude" class="java.lang.Double">
+			<property name="net.sf.jasperreports.json.field.expression" value="altitude"/>
+			<fieldDescription><![CDATA[altitude]]></fieldDescription>
+		</field>
+		<field name="description" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="description"/>
+			<fieldDescription><![CDATA[description]]></fieldDescription>
+		</field>
+	</subDataset>
+	<subDataset name="dsLiaisons" uuid="95283afb-9c44-5781-9a65-cf0e1f6f7b29">
+		<parameter name="NOMS_SITES" class="java.util.Map"/>
+		<field name="nature" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="nature"/>
+			<fieldDescription><![CDATA[nature]]></fieldDescription>
+		</field>
+		<field name="precisionAutre" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="precisionAutre"/>
+			<fieldDescription><![CDATA[precisionAutre]]></fieldDescription>
+		</field>
+		<field name="bandeFrequences" class="java.lang.String">
+			<property name="net.sf.jasperreports.json.field.expression" value="bandeFrequences"/>
+			<fieldDescription><![CDATA[bandeFrequences]]></fieldDescription>
+		</field>
+		<field name="debitEmission" class="java.lang.Double">
+			<property name="net.sf.jasperreports.json.field.expression" value="debitEmission"/>
+			<fieldDescription><![CDATA[debitEmission]]></fieldDescription>
+		</field>
+		<field name="debitReception" class="java.lang.Double">
+			<property name="net.sf.jasperreports.json.field.expression" value="debitReception"/>
+			<fieldDescription><![CDATA[debitReception]]></fieldDescription>
+		</field>
+		<field name="nombreBonds" class="java.lang.Integer">
+			<property name="net.sf.jasperreports.json.field.expression" value="nombreBonds"/>
+			<fieldDescription><![CDATA[nombreBonds]]></fieldDescription>
+		</field>
+		<field name="siteOrigineId" class="java.lang.Long">
+			<property name="net.sf.jasperreports.json.field.expression" value="siteOrigineId"/>
+			<fieldDescription><![CDATA[siteOrigineId]]></fieldDescription>
+		</field>
+		<field name="siteExtremiteId" class="java.lang.Long">
+			<property name="net.sf.jasperreports.json.field.expression" value="siteExtremiteId"/>
+			<fieldDescription><![CDATA[siteExtremiteId]]></fieldDescription>
+		</field>
+	</subDataset>
+	<parameter name="arcepLogo" class="java.io.InputStream">
+		<parameterDescription><![CDATA[Ressource « arcepLogo » du modèle au kernel (même fichier que les modèles ASI).]]></parameterDescription>
+	</parameter>
+	<parameter name="RGUTJ" class="java.io.InputStream">
+		<parameterDescription><![CDATA[Ressource « RGUTJ » du modèle au kernel (même fichier que les modèles ASI).]]></parameterDescription>
+	</parameter>
+	<parameter name="logo-arcep-1" class="java.io.InputStream">
+		<parameterDescription><![CDATA[Ressource « logo-arcep-1 » du modèle au kernel (même fichier que les modèles ASI).]]></parameterDescription>
+	</parameter>
+	<parameter name="FUSEAU_HORAIRE" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[Fuseau dans lequel les dates et heures sont imprimées.]]></parameterDescription>
+		<defaultValueExpression><![CDATA["Africa/Libreville"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="LIBELLES" class="java.util.Map" isForPrompting="false">
+		<parameterDescription><![CDATA[Libellés des énumérations du service reseau (repris de reseau-vocabulaire.ts côté front).]]></parameterDescription>
+		<defaultValueExpression><![CDATA[java.util.stream.Stream.of(new String[][] {
+	{"PRIVE", "Réseau privé"},
+	{"OUVERT_AU_PUBLIC", "Réseau ouvert au public"},
+	{"NOUVEAU", "Nouveau réseau"},
+	{"MODIFICATION", "Modification du réseau"},
+	{"RENOUVELLEMENT", "Renouvellement d’autorisation"},
+	{"FH", "Réseau FH"},
+	{"VSAT", "VSAT"},
+	{"STATION_TERRIENNE", "Station terrienne"},
+	{"FIBRE_OPTIQUE", "Réseau fibre optique"},
+	{"IOT", "Internet des objets (IoT)"},
+	{"BLR", "Réseau BLR (boucle locale radio)"},
+	{"PMR", "Réseau PMR (radiocommunication d’entreprise)"},
+	{"AUTRE", "Autre"},
+	{"ACCES_INTERNET", "Accès à Internet"},
+	{"TRANSMISSION_DONNEES", "Transmission de données"},
+	{"TELEPHONIE", "Téléphonie"},
+	{"TELEPHONIE_IP", "Téléphonie sur IP"},
+	{"LOCALE", "locale"},
+	{"NATIONALE", "nationale"},
+	{"INTERNATIONALE", "internationale"}
+}).collect(java.util.stream.Collectors.toMap(e -> e[0], e -> e[1]))]]></defaultValueExpression>
+	</parameter>
+	<parameter name="DATE_SIGNATURE" class="java.util.Date" isForPrompting="false">
+		<parameterDescription><![CDATA[Date imprimée après « Le : ». Vide : date de génération.]]></parameterDescription>
+	</parameter>
+	<queryString language="json">
+		<![CDATA[]]>
+	</queryString>
+	<field name="reference" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="reference"/>
+		<fieldDescription><![CDATA[reference]]></fieldDescription>
+	</field>
+	<field name="sendedDate" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="sendedDate"/>
+		<fieldDescription><![CDATA[sendedDate]]></fieldDescription>
+	</field>
+	<field name="createdDate" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="createdDate"/>
+		<fieldDescription><![CDATA[createdDate]]></fieldDescription>
+	</field>
+	<field name="natureReseau" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="natureReseau"/>
+		<fieldDescription><![CDATA[natureReseau]]></fieldDescription>
+	</field>
+	<field name="natureDemande" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="natureDemande"/>
+		<fieldDescription><![CDATA[natureDemande]]></fieldDescription>
+	</field>
+	<field name="referenceAutorisationAnterieure" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="referenceAutorisationAnterieure"/>
+		<fieldDescription><![CDATA[referenceAutorisationAnterieure]]></fieldDescription>
+	</field>
+	<field name="fraisDossier" class="java.math.BigDecimal">
+		<property name="net.sf.jasperreports.json.field.expression" value="fraisDossier"/>
+		<fieldDescription><![CDATA[fraisDossier]]></fieldDescription>
+	</field>
+	<field name="deviseFrais" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="deviseFrais"/>
+		<fieldDescription><![CDATA[deviseFrais]]></fieldDescription>
+	</field>
+	<field name="clientType" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="client.clientType"/>
+		<fieldDescription><![CDATA[client.clientType]]></fieldDescription>
+	</field>
+	<field name="company" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="client.company"/>
+		<fieldDescription><![CDATA[client.company]]></fieldDescription>
+	</field>
+	<field name="clientName" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="client.clientName"/>
+		<fieldDescription><![CDATA[client.clientName]]></fieldDescription>
+	</field>
+	<field name="tradeRegisterNumber" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="client.tradeRegisterNumber"/>
+		<fieldDescription><![CDATA[client.tradeRegisterNumber]]></fieldDescription>
+	</field>
+	<field name="address" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="client.address"/>
+		<fieldDescription><![CDATA[client.address]]></fieldDescription>
+	</field>
+	<field name="phone" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="client.phone"/>
+		<fieldDescription><![CDATA[client.phone]]></fieldDescription>
+	</field>
+	<field name="email" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="client.email"/>
+		<fieldDescription><![CDATA[client.email]]></fieldDescription>
+	</field>
+	<field name="natureActivite" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="client.natureActivite"/>
+		<fieldDescription><![CDATA[client.natureActivite]]></fieldDescription>
+	</field>
+	<field name="applicantName" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="applicant.applicantName"/>
+		<fieldDescription><![CDATA[applicant.applicantName]]></fieldDescription>
+	</field>
+	<field name="qualification" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="applicant.qualification"/>
+		<fieldDescription><![CDATA[applicant.qualification]]></fieldDescription>
+	</field>
+	<field name="nationality" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="applicant.nationality"/>
+		<fieldDescription><![CDATA[applicant.nationality]]></fieldDescription>
+	</field>
+	<field name="nationalityComplet" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="applicant.nationalityComplet"/>
+		<fieldDescription><![CDATA[applicant.nationalityComplet]]></fieldDescription>
+	</field>
+	<field name="applicantAddress" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="applicant.address"/>
+		<fieldDescription><![CDATA[applicant.address]]></fieldDescription>
+	</field>
+	<field name="applicantPhone" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="applicant.phone"/>
+		<fieldDescription><![CDATA[applicant.phone]]></fieldDescription>
+	</field>
+	<field name="applicantEmail" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="applicant.email"/>
+		<fieldDescription><![CDATA[applicant.email]]></fieldDescription>
+	</field>
+	<field name="typesReseau" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="typesReseau"/>
+		<fieldDescription><![CDATA[typesReseau]]></fieldDescription>
+	</field>
+	<field name="services" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="services"/>
+		<fieldDescription><![CDATA[services]]></fieldDescription>
+	</field>
+	<field name="sites" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="sites"/>
+		<fieldDescription><![CDATA[sites]]></fieldDescription>
+	</field>
+	<field name="liaisons" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="liaisons"/>
+		<fieldDescription><![CDATA[liaisons]]></fieldDescription>
+	</field>
+	<field name="assignee" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="assignee"/>
+		<fieldDescription><![CDATA[assignee]]></fieldDescription>
+	</field>
+	<field name="referenceAttestation" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="attestations[0].reference"/>
+		<fieldDescription><![CDATA[attestations[0].reference]]></fieldDescription>
+	</field>
+	<field name="dateAttestation" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="attestations[0].sysdateCreated"/>
+		<fieldDescription><![CDATA[attestations[0].sysdateCreated]]></fieldDescription>
+	</field>
+	<field name="signaturePresidence" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="signaturePresidence"/>
+		<fieldDescription><![CDATA[signaturePresidence]]></fieldDescription>
+	</field>
+	<field name="signatureDirecteurCommerce" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="signatureDirecteurCommerce"/>
+		<fieldDescription><![CDATA[signatureDirecteurCommerce]]></fieldDescription>
+	</field>
+	<field name="signatureChefCentre" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="signatureChefCentre"/>
+		<fieldDescription><![CDATA[signatureChefCentre]]></fieldDescription>
+	</field>
+	<variable name="titulaire" class="java.lang.String">
+		<variableExpression><![CDATA[$F{company} != null && !$F{company}.trim().isEmpty() ? $F{company} : $F{clientName}]]></variableExpression>
+	</variable>
+	<variable name="typesLibelle" class="java.lang.String">
+		<variableExpression><![CDATA[$F{typesReseau} == null || $F{typesReseau}.trim().isEmpty() ? ""
+: ((java.util.List<java.util.Map<String, Object>>) new com.fasterxml.jackson.databind.ObjectMapper()
+    .readValue($F{typesReseau}, java.util.List.class))
+  .stream()
+  .filter(e -> e != null && e.get("type") != null)
+  .map(e -> "AUTRE".equals(e.get("type")) && e.get("precisionAutre") != null
+        ? String.valueOf(e.get("precisionAutre"))
+        : (String) $P{LIBELLES}.getOrDefault(String.valueOf(e.get("type")), String.valueOf(e.get("type"))))
+  .collect(java.util.stream.Collectors.joining(", "))]]></variableExpression>
+	</variable>
+	<variable name="servicesLibelle" class="java.lang.String">
+		<variableExpression><![CDATA[$F{services} == null || $F{services}.trim().isEmpty() ? ""
+: ((java.util.List<java.util.Map<String, Object>>) new com.fasterxml.jackson.databind.ObjectMapper()
+    .readValue($F{services}, java.util.List.class))
+  .stream()
+  .filter(e -> e != null && e.get("type") != null)
+  .map(e -> $P{LIBELLES}.getOrDefault(String.valueOf(e.get("type")), String.valueOf(e.get("type")))
+        + (e.get("portee") != null ? " (portée " + $P{LIBELLES}.getOrDefault(String.valueOf(e.get("portee")), String.valueOf(e.get("portee"))) + ")" : ""))
+  .collect(java.util.stream.Collectors.joining(", "))]]></variableExpression>
+	</variable>
+	<variable name="nombreSites" class="java.lang.Integer">
+		<variableExpression><![CDATA[$F{sites} == null || $F{sites}.trim().isEmpty() ? 0
+: new com.fasterxml.jackson.databind.ObjectMapper().readTree($F{sites}).size()]]></variableExpression>
+	</variable>
+	<variable name="nombreLiaisons" class="java.lang.Integer">
+		<variableExpression><![CDATA[$F{liaisons} == null || $F{liaisons}.trim().isEmpty() ? 0
+: new com.fasterxml.jackson.databind.ObjectMapper().readTree($F{liaisons}).size()]]></variableExpression>
+	</variable>
+	<variable name="nomsSites" class="java.util.Map">
+		<variableExpression><![CDATA[$F{sites} == null || $F{sites}.trim().isEmpty() ? new java.util.HashMap<String, String>()
+: ((java.util.List<java.util.Map<String, Object>>) new com.fasterxml.jackson.databind.ObjectMapper()
+    .readValue($F{sites}, java.util.List.class))
+  .stream()
+  .filter(s -> s != null && s.get("id") != null)
+  .collect(java.util.stream.Collectors.toMap(
+      s -> String.valueOf(s.get("id")).replaceFirst("[.]0+$", ""),
+      s -> s.get("nomSite") != null ? String.valueOf(s.get("nomSite")) : "Site n° " + String.valueOf(s.get("id")).replaceFirst("[.]0+$", ""),
+      (a, b) -> a))]]></variableExpression>
+	</variable>
+	<variable name="numeroAutorisation" class="java.lang.String">
+		<variableExpression><![CDATA[$F{referenceAttestation} == null ? "……………"
+: $F{referenceAttestation}.matches("\\d+-\\d{2}-\\d{2}-\\d{4}")
+  ? $F{referenceAttestation}.replaceAll("^(\\d+)-\\d{2}-\\d{2}-(\\d{4})$", "$1/AUT/RP/ARCEP/$2")
+  : $F{referenceAttestation}]]></variableExpression>
+	</variable>
+	<variable name="dateSignature" class="java.lang.String">
+		<variableExpression><![CDATA[($P{DATE_SIGNATURE} != null ? $P{DATE_SIGNATURE}.toInstant()
+ : $F{dateAttestation} != null && $F{dateAttestation}.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}.*") ? java.time.ZonedDateTime.parse($F{dateAttestation}, java.time.format.DateTimeFormatter.ISO_DATE_TIME.withZone(java.time.ZoneId.of($P{FUSEAU_HORAIRE}))).withZoneSameInstant(java.time.ZoneId.of($P{FUSEAU_HORAIRE})).toInstant()
+ : java.time.Instant.now())
+    .atZone(java.time.ZoneId.of($P{FUSEAU_HORAIRE})).format(java.time.format.DateTimeFormatter.ofPattern("dd MMMM yyyy", java.util.Locale.FRENCH))]]></variableExpression>
+	</variable>
+	<title>
+		<band height="90" splitType="Stretch">
+			<image scaleImage="RetainShape" hAlign="Left" vAlign="Middle" onErrorType="Blank">
+				<reportElement x="9" y="0" width="118" height="76" uuid="8fbb4bc0-0d77-565c-b7aa-87cec3f3f207"/>
+				<imageExpression><![CDATA[$P{arcepLogo}]]></imageExpression>
+			</image>
+			<image scaleImage="RetainShape" hAlign="Center" vAlign="Middle" onErrorType="Blank">
+				<reportElement x="465" y="12" width="90" height="56" uuid="cb786c69-0b10-5716-8570-06d3b112a289"/>
+				<imageExpression><![CDATA[$P{RGUTJ}]]></imageExpression>
+			</image>
+			<rectangle>
+				<reportElement mode="Opaque" x="0" y="82" width="185" height="5" forecolor="#00B050" backcolor="#00B050" uuid="ce1d450e-1e9d-569b-9747-f5d77a0cf83e"/>
+				<graphicElement>
+					<pen lineWidth="0.0"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Opaque" x="185" y="82" width="185" height="5" forecolor="#FFFF00" backcolor="#FFFF00" uuid="ecd27f66-d6e0-5204-9ddd-00ca06d79d66"/>
+				<graphicElement>
+					<pen lineWidth="0.0"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Opaque" x="370" y="82" width="185" height="5" forecolor="#0070C0" backcolor="#0070C0" uuid="4d92a75e-42b0-5f30-8b9b-df49f66517e6"/>
+				<graphicElement>
+					<pen lineWidth="0.0"/>
+				</graphicElement>
+			</rectangle>
+		</band>
+	</title>
+	<detail>
+		<band height="98" splitType="Prevent">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement forecolor="#008000" x="0" y="2" width="555" height="44" uuid="97169199-2682-52b6-8160-e497628dd5ec"/>
+				<box topPadding="3" bottomPadding="6">
+					<bottomPen lineWidth="0.5" lineColor="#008000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["AUTORISATION D’ÉTABLISSEMENT ET D’EXPLOITATION\nD’UN RÉSEAU PRIVÉ"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" mode="Opaque" backcolor="#D9D9D9" x="105" y="54" width="345" height="22" uuid="22dd58f8-dfd8-581b-81bc-8f09ffcfbf53"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="styled">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["N° : <b>" + net.sf.jasperreports.engine.util.JRStringUtil.xmlEncode($V{numeroAutorisation}) + "</b>"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" mode="Opaque" x="60" y="78" width="435" height="15" forecolor="#C00000" backcolor="#FDECEA" uuid="9a437b71-6189-5414-b988-37289ee64757">
+					<printWhenExpression><![CDATA[$F{natureReseau} != null && !"PRIVE".equals($F{natureReseau})]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7.5" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Modèle réservé aux réseaux privés : ce dossier porte sur un réseau ouvert au public."]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="135" splitType="Prevent">
+			<textField textAdjust="StretchHeight">
+				<reportElement style="Section" positionType="Float" x="12" y="8" width="531" height="15" uuid="72fee7eb-e57f-5eb5-a021-ca654a10142d"/>
+				<textFieldExpression><![CDATA["1. IDENTIFICATION DU TITULAIRE"]]></textFieldExpression>
+			</textField>
+			<frame>
+				<reportElement positionType="Float" x="12" y="23" width="531" height="16" uuid="f8a70ff4-696b-5595-8878-2ae4b5cea803"/>
+				<box>
+					<leftPen lineWidth="1.0" lineColor="#BFC9D1"/>
+					<rightPen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Libelle" stretchType="ContainerHeight" x="0" y="0" width="200" height="16" uuid="ef19f8e1-edd8-5f9d-8eea-61e6058e1858"/>
+					<textFieldExpression><![CDATA["Titulaire (raison sociale)"]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement style="Valeur" stretchType="ContainerHeight" x="200" y="0" width="331" height="16" uuid="3de3fe64-40bb-5452-9d23-12ce6779b3ea"/>
+					<textElement markup="none"><font isBold="true"/></textElement>
+					<textFieldExpression><![CDATA[$V{titulaire}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" x="12" y="39" width="531" height="16" uuid="09c0e428-ff4c-5dfc-8139-a011536771ef"/>
+				<box>
+					<leftPen lineWidth="1.0" lineColor="#BFC9D1"/>
+					<rightPen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Libelle" stretchType="ContainerHeight" x="0" y="0" width="200" height="16" uuid="d8f63ff6-2a39-5dff-bf38-c188d61e8949"/>
+					<textFieldExpression><![CDATA["N° d’inscription au Registre de Commerce"]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement style="Valeur" stretchType="ContainerHeight" x="200" y="0" width="331" height="16" uuid="374dcdd0-b2c1-57ad-88db-c98f57fe5212"/>
+					<textElement markup="none"></textElement>
+					<textFieldExpression><![CDATA[$F{tradeRegisterNumber}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" x="12" y="55" width="531" height="16" uuid="c4df0013-e49f-5455-a6e4-9a8666079a81"/>
+				<box>
+					<leftPen lineWidth="1.0" lineColor="#BFC9D1"/>
+					<rightPen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Libelle" stretchType="ContainerHeight" x="0" y="0" width="200" height="16" uuid="af9178d7-644d-518e-a54f-2987b0202d51"/>
+					<textFieldExpression><![CDATA["Représenté par"]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement style="Valeur" stretchType="ContainerHeight" x="200" y="0" width="331" height="16" uuid="a32183f8-6c37-54bb-9140-33819abd3d83"/>
+					<textElement markup="none"></textElement>
+					<textFieldExpression><![CDATA[($F{applicantName} != null ? $F{applicantName} : "—") + ($F{qualification} != null ? ", " + $F{qualification} : "")]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" x="12" y="71" width="531" height="16" uuid="3e980cb8-0712-5e47-8ff1-6651b7554b5e"/>
+				<box>
+					<leftPen lineWidth="1.0" lineColor="#BFC9D1"/>
+					<rightPen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Libelle" stretchType="ContainerHeight" x="0" y="0" width="200" height="16" uuid="1718fef8-5a7f-550c-92df-d0402a7ed535"/>
+					<textFieldExpression><![CDATA["Nationalité"]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement style="Valeur" stretchType="ContainerHeight" x="200" y="0" width="331" height="16" uuid="245110c5-8585-5a4f-82f1-dd2bc5230149"/>
+					<textElement markup="none"></textElement>
+					<textFieldExpression><![CDATA[$F{nationalityComplet} != null ? $F{nationalityComplet}
+: $F{nationality} != null && $F{nationality}.length() == 2
+  ? new java.util.Locale("", $F{nationality}).getDisplayCountry(java.util.Locale.FRENCH)
+  : $F{nationality}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" x="12" y="87" width="531" height="16" uuid="b38ca3e6-4b6f-51a7-9909-34785d016838"/>
+				<box>
+					<leftPen lineWidth="1.0" lineColor="#BFC9D1"/>
+					<rightPen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Libelle" stretchType="ContainerHeight" x="0" y="0" width="200" height="16" uuid="51827153-82a6-520a-96f7-f508150026c8"/>
+					<textFieldExpression><![CDATA["Adresse complète"]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement style="Valeur" stretchType="ContainerHeight" x="200" y="0" width="331" height="16" uuid="e9760f7b-39c3-5c7e-bdf7-b0f5d8d0e379"/>
+					<textElement markup="none"></textElement>
+					<textFieldExpression><![CDATA[$F{address} != null ? $F{address} : $F{applicantAddress}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" x="12" y="103" width="531" height="16" uuid="57bee74b-4bd3-5c68-914d-0c167528728a"/>
+				<box>
+					<leftPen lineWidth="1.0" lineColor="#BFC9D1"/>
+					<rightPen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Libelle" stretchType="ContainerHeight" x="0" y="0" width="200" height="16" uuid="c8fca365-ed0e-59bb-bae9-0a558d81796c"/>
+					<textFieldExpression><![CDATA["Téléphone"]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement style="Valeur" stretchType="ContainerHeight" x="200" y="0" width="331" height="16" uuid="a88b988d-28d5-5fcb-9269-9d7927b586c6"/>
+					<textElement markup="none"></textElement>
+					<textFieldExpression><![CDATA[$F{phone} != null ? $F{phone} : $F{applicantPhone}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" x="12" y="119" width="531" height="16" uuid="ddda703b-9c07-5aca-9eb9-9afaab9895da"/>
+				<box>
+					<leftPen lineWidth="1.0" lineColor="#BFC9D1"/>
+					<rightPen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Libelle" stretchType="ContainerHeight" x="0" y="0" width="200" height="16" uuid="3e55173c-437f-5d31-8f55-39e3fddb688c"/>
+					<textFieldExpression><![CDATA["E-mail"]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement style="Valeur" stretchType="ContainerHeight" x="200" y="0" width="331" height="16" uuid="4cb99dca-51ff-5464-8dc1-abf47bd41284"/>
+					<textElement markup="none"></textElement>
+					<textFieldExpression><![CDATA[$F{applicantEmail} != null ? $F{applicantEmail} : $F{email}]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+		<band height="103" splitType="Prevent">
+			<textField textAdjust="StretchHeight">
+				<reportElement style="Section" positionType="Float" x="12" y="8" width="531" height="15" uuid="493c7890-d3f6-5046-8ba4-3e05d3b0a8c7"/>
+				<textFieldExpression><![CDATA["2. OBJET DE L’AUTORISATION"]]></textFieldExpression>
+			</textField>
+			<frame>
+				<reportElement positionType="Float" x="12" y="23" width="531" height="16" uuid="68f25455-a35c-5bb6-b459-4f4781483119"/>
+				<box>
+					<leftPen lineWidth="1.0" lineColor="#BFC9D1"/>
+					<rightPen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Libelle" stretchType="ContainerHeight" x="0" y="0" width="200" height="16" uuid="f4950046-6522-530d-8ff4-c4efa4b64719"/>
+					<textFieldExpression><![CDATA["Nature de la demande"]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement style="Valeur" stretchType="ContainerHeight" x="200" y="0" width="331" height="16" uuid="22df5e79-b061-5f7d-b8c2-48434ba5e663"/>
+					<textElement markup="none"></textElement>
+					<textFieldExpression><![CDATA[($F{natureDemande} == null ? "—" : (String) $P{LIBELLES}.getOrDefault($F{natureDemande}, $F{natureDemande}))
++ ("RENOUVELLEMENT".equals($F{natureDemande}) && $F{referenceAutorisationAnterieure} != null ? " (autorisation échue : " + $F{referenceAutorisationAnterieure} + ")" : "")]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" x="12" y="39" width="531" height="16" uuid="e50db231-599f-591c-9a6b-eb1d2191de78"/>
+				<box>
+					<leftPen lineWidth="1.0" lineColor="#BFC9D1"/>
+					<rightPen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Libelle" stretchType="ContainerHeight" x="0" y="0" width="200" height="16" uuid="0a8d68a4-fedb-539b-807d-b3a15288e437"/>
+					<textFieldExpression><![CDATA["Type(s) de réseau"]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement style="Valeur" stretchType="ContainerHeight" x="200" y="0" width="331" height="16" uuid="ecf235ee-dac8-5b9c-9181-b522f9f6e1ac"/>
+					<textElement markup="none"><font isBold="true"/></textElement>
+					<textFieldExpression><![CDATA[$V{typesLibelle}.isEmpty() ? "—" : $V{typesLibelle}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" x="12" y="55" width="531" height="16" uuid="ab704bc5-d97a-5236-b742-8a519bbed40e"/>
+				<box>
+					<leftPen lineWidth="1.0" lineColor="#BFC9D1"/>
+					<rightPen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Libelle" stretchType="ContainerHeight" x="0" y="0" width="200" height="16" uuid="09bab781-f5ee-5a08-8db3-4ec45292af93"/>
+					<textFieldExpression><![CDATA["Service(s) autorisé(s)"]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement style="Valeur" stretchType="ContainerHeight" x="200" y="0" width="331" height="16" uuid="6053cd37-bcdc-595c-8faa-c4323b28bfd1"/>
+					<textElement markup="none"><font isBold="true"/></textElement>
+					<textFieldExpression><![CDATA[$V{servicesLibelle}.isEmpty() ? "—" : $V{servicesLibelle}]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" x="12" y="71" width="531" height="16" uuid="48662247-15a1-5efc-a252-2ba62b731aca"/>
+				<box>
+					<leftPen lineWidth="1.0" lineColor="#BFC9D1"/>
+					<rightPen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Libelle" stretchType="ContainerHeight" x="0" y="0" width="200" height="16" uuid="6853f9b0-c59f-5f79-bf4c-c822d4586fa2"/>
+					<textFieldExpression><![CDATA["Nombre de sites / liaisons"]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement style="Valeur" stretchType="ContainerHeight" x="200" y="0" width="331" height="16" uuid="c07d3837-946d-55a8-bf3e-67710cd57dee"/>
+					<textElement markup="none"></textElement>
+					<textFieldExpression><![CDATA[$V{nombreSites} + " site(s) — " + $V{nombreLiaisons} + " liaison(s), décrits en annexe"]]></textFieldExpression>
+				</textField>
+			</frame>
+			<frame>
+				<reportElement positionType="Float" x="12" y="87" width="531" height="16" uuid="309aa1dc-7b28-5d7c-8189-fa677532188c"/>
+				<box>
+					<leftPen lineWidth="1.0" lineColor="#BFC9D1"/>
+					<rightPen lineWidth="1.0" lineColor="#BFC9D1"/>
+				</box>
+				<textField textAdjust="StretchHeight">
+					<reportElement style="Libelle" stretchType="ContainerHeight" x="0" y="0" width="200" height="16" uuid="1bed5548-c2a0-513c-bceb-e5aced0735fb"/>
+					<textFieldExpression><![CDATA["Durée de validité"]]></textFieldExpression>
+				</textField>
+				<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+					<reportElement style="Valeur" stretchType="ContainerHeight" x="200" y="0" width="331" height="16" uuid="8641891d-1d7d-5475-906e-4c389d2f4078"/>
+					<textElement markup="none"></textElement>
+					<textFieldExpression><![CDATA["Cinq (05) ans renouvelable, à compter de la date de signature"]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+		<band height="44" splitType="Prevent">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" forecolor="#333333" x="12" y="6" width="531" height="34" uuid="73390f07-697a-56b3-bec6-f995b1fd0c77"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle" markup="none">
+					<font size="7" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["La présente autorisation est délivrée en application de l’article 18 de la loi n°026/2018 portant réglementation des communications électroniques en République gabonaise. Elle est strictement personnelle et ne peut être cédée. Le titulaire exploite son réseau dans le respect de la législation en vigueur et des conditions fixées par l’ARCEP ; toute modification du réseau ou tout nouveau service requiert l’avis préalable de l’ARCEP."]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="132" splitType="Prevent">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement forecolor="#00B050" x="330" y="4" width="109" height="16" uuid="d55c9a6f-7e29-5406-978b-a8cab7a74562"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Fait à : "]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement x="439" y="4" width="104" height="16" uuid="34b55cef-fa78-5c40-ac53-7c441fe02cd7"/>
+				<box leftPadding="3"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" markup="none">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Libreville"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement forecolor="#00B050" x="330" y="20" width="109" height="16" uuid="e49b6cda-58ab-5e9f-b370-0e1999ea2829"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Le : "]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement x="439" y="20" width="104" height="16" uuid="89deb752-d4c3-5a04-87da-b234030719da"/>
+				<box leftPadding="3"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" markup="none">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{dateSignature}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement mode="Opaque" backcolor="#F2F2F2" x="12" y="44" width="210" height="20" uuid="0c6a2909-96e0-5001-8413-74bd10b356c3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["VISA DU CHEF DE CENTRE"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement mode="Opaque" backcolor="#F2F2F2" x="322" y="44" width="221" height="20" uuid="4bfff8a6-5541-5374-9ac2-40306ad4c99d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["LE PRÉSIDENT DU CONSEIL DE RÉGULATION"]]></textFieldExpression>
+			</textField>
+			<image scaleImage="RetainShape" hAlign="Center" vAlign="Middle" isUsingCache="false" onErrorType="Blank">
+				<reportElement mode="Transparent" x="12" y="70" width="210" height="56" uuid="4db87075-6cc1-5b2b-a9a3-f36adca12542">
+					<property name="net.sf.jasperreports.image.render.type" value="draw"/>
+					<printWhenExpression><![CDATA[($F{signatureChefCentre} != null && !$F{signatureChefCentre}.trim().isEmpty())]]></printWhenExpression>
+				</reportElement>
+				<imageExpression><![CDATA[net.sf.jasperreports.renderers.SimpleDataRenderer.getInstance(java.util.Base64.getMimeDecoder().decode(
+    ($F{signatureChefCentre} != null && !$F{signatureChefCentre}.trim().isEmpty() ? $F{signatureChefCentre} : null).trim().replaceFirst("^data:[^,]*,", "")))]]></imageExpression>
+			</image>
+			<image scaleImage="RetainShape" hAlign="Center" vAlign="Middle" isUsingCache="false" onErrorType="Blank">
+				<reportElement mode="Transparent" x="322" y="70" width="221" height="56" uuid="c912d025-c723-5b14-923a-bc40cbcc137d">
+					<property name="net.sf.jasperreports.image.render.type" value="draw"/>
+					<printWhenExpression><![CDATA[($F{signaturePresidence} != null && !$F{signaturePresidence}.trim().isEmpty()) || ($F{signatureDirecteurCommerce} != null && !$F{signatureDirecteurCommerce}.trim().isEmpty())]]></printWhenExpression>
+				</reportElement>
+				<imageExpression><![CDATA[net.sf.jasperreports.renderers.SimpleDataRenderer.getInstance(java.util.Base64.getMimeDecoder().decode(
+    ($F{signaturePresidence} != null && !$F{signaturePresidence}.trim().isEmpty() ? $F{signaturePresidence} : $F{signatureDirecteurCommerce} != null && !$F{signatureDirecteurCommerce}.trim().isEmpty() ? $F{signatureDirecteurCommerce} : null).trim().replaceFirst("^data:[^,]*,", "")))]]></imageExpression>
+			</image>
+			<componentElement>
+				<reportElement positionType="Float" x="244" y="44" width="56" height="56" uuid="267aefd7-420b-546f-ac5a-59a1ad019782"/>
+				<jr:QRCode xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" margin="0" errorCorrectionLevel="H">
+					<jr:codeExpression><![CDATA[((java.util.function.Function<String, String>) q -> q.length() > 300 ? q.substring(0, 300) : q).apply(
+    "ARCEP - AUTORISATION RESEAU PRIVE N " + $V{numeroAutorisation} + " - TITULAIRE " + ($V{titulaire} != null ? $V{titulaire} : "") + " - DOSSIER " + ($F{reference} != null ? $F{reference} : ""))]]></jr:codeExpression>
+				</jr:QRCode>
+			</componentElement>
+			<image hAlign="Center" vAlign="Middle" onErrorType="Blank">
+				<reportElement positionType="Float" mode="Opaque" x="264" y="64" width="16" height="16" backcolor="#FFFFFF" uuid="10390880-e9b1-5e75-bf65-1b76cae07e9f"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#030000"/>
+				</box>
+				<imageExpression><![CDATA[$P{logo-arcep-1}]]></imageExpression>
+			</image>
+			<textField isBlankWhenNull="true">
+				<reportElement x="227" y="102" width="90" height="20" uuid="cdb792dc-5e01-5fb9-97b8-b34b9d60e51c"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="6.5" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Signature Électronique Unique"]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="66" splitType="Stretch">
+			<textField textAdjust="StretchHeight">
+				<reportElement style="Section" positionType="Float" x="12" y="14" width="531" height="15" uuid="3ae274be-0c04-53a0-ac9b-6bd23dd07b69"/>
+				<textFieldExpression><![CDATA["ANNEXE : SITES DU RÉSEAU"]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="12" y="31" width="531" height="14" uuid="0cb49fa2-f0df-5f38-9048-b5cc3944dc9c">
+					<printWhenExpression><![CDATA[$V{nombreSites} == 0]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Left" verticalAlignment="Middle" markup="none">
+					<font size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Aucun site déclaré."]]></textFieldExpression>
+			</textField>
+			<componentElement>
+				<reportElement positionType="Float" x="12" y="29" width="531" height="36" isRemoveLineWhenBlank="true" uuid="cc9b0020-8482-58f8-b10a-74a448838d0d">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<printWhenExpression><![CDATA[$V{nombreSites} > 0]]></printWhenExpression>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="dsSites" uuid="b13425cc-9442-5101-9460-21101bb42b23">
+						<dataSourceExpression><![CDATA[$F{sites} == null || $F{sites}.trim().isEmpty()
+? (net.sf.jasperreports.engine.JRDataSource) new net.sf.jasperreports.engine.JREmptyDataSource(0)
+: ((java.util.function.Function<String, net.sf.jasperreports.engine.JRDataSource>) t -> {
+    try {
+      net.sf.jasperreports.engine.data.JsonDataSource d = new net.sf.jasperreports.engine.data.JsonDataSource(
+          new java.io.ByteArrayInputStream(t.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+      d.setLocale(java.util.Locale.ROOT);
+      return d;
+    } catch (net.sf.jasperreports.engine.JRException e) { throw new RuntimeException(e); }
+  }).apply($F{sites})]]></dataSourceExpression>
+					</datasetRun>
+					<jr:column width="26" uuid="ee98bc62-6635-562e-b562-3ba9c0591422">
+						<jr:columnHeader height="18">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="26" height="18" uuid="99365e32-63b7-5690-a131-32fd0768f335"/>
+								<text><![CDATA[N°]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="26" height="18" uuid="8411e314-77cb-5ce7-a789-2e57127a4203"/>
+								<textElement textAlignment="Center" markup="none"></textElement>
+								<textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="150" uuid="558a5320-db2a-5ac9-8db6-641abe2a811d">
+						<jr:columnHeader height="18">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="150" height="18" uuid="a6a688f1-5712-5d2a-8088-48f9f453b93d"/>
+								<text><![CDATA[Site]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="150" height="18" uuid="5bef6580-61ff-5bc0-bf91-9814c647fdbc"/>
+								<textElement textAlignment="Left" markup="none"><font isBold="true"/></textElement>
+								<textFieldExpression><![CDATA[$F{nomSite} != null ? $F{nomSite} : "—"]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="90" uuid="6448910b-9a55-5058-b248-2a362e72113d">
+						<jr:columnHeader height="18">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="90" height="18" uuid="b0b0f966-8e3d-5152-b881-047f042f7a21"/>
+								<text><![CDATA[Province]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="90" height="18" uuid="59ebcbed-258b-5cc1-85d4-5687c4dd8bce"/>
+								<textElement textAlignment="Center" markup="none"></textElement>
+								<textFieldExpression><![CDATA[$F{province} != null ? $F{province} : "—"]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="80" uuid="465e4e8b-caf8-5a4f-88df-b41145217fbe">
+						<jr:columnHeader height="18">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="80" height="18" uuid="d2cdbf97-0bb2-5158-8b49-354915059f69"/>
+								<text><![CDATA[Ville]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="80" height="18" uuid="bf697423-8ee0-5db4-b2e7-ff340c2688e5"/>
+								<textElement textAlignment="Center" markup="none"></textElement>
+								<textFieldExpression><![CDATA[$F{ville} != null ? $F{ville} : "—"]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="70" uuid="8254f1ee-e918-5f56-b781-420000290529">
+						<jr:columnHeader height="18">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="70" height="18" uuid="1b24e7bb-07bf-5f59-bda8-36f07757fd4c"/>
+								<text><![CDATA[Latitude]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="70" height="18" uuid="bccc6004-ed4f-53f7-97dd-a846e75a0436"/>
+								<textElement textAlignment="Center" markup="none"></textElement>
+								<textFieldExpression><![CDATA[$F{latitudeDegres} == null ? "—"
+: $F{latitudeDegres} + "° " + String.format("%02d", $F{latitudeMinutes} == null ? 0 : $F{latitudeMinutes}) + "' "
+  + String.format(java.util.Locale.FRANCE, "%05.2f", $F{latitudeSecondes} == null ? 0d : $F{latitudeSecondes}) + "\" "
+  + ($F{latitudeSens} == null ? "" : $F{latitudeSens})]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="70" uuid="f6d43399-1451-5cd8-813e-10dfa2b6d288">
+						<jr:columnHeader height="18">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="70" height="18" uuid="9f662d8b-5e54-5265-b144-cf9e44fe89ff"/>
+								<text><![CDATA[Longitude]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="70" height="18" uuid="3d75d134-86fb-5129-9704-ff4cab1d3e18"/>
+								<textElement textAlignment="Center" markup="none"></textElement>
+								<textFieldExpression><![CDATA[$F{longitudeDegres} == null ? "—"
+: $F{longitudeDegres} + "° " + String.format("%02d", $F{longitudeMinutes} == null ? 0 : $F{longitudeMinutes}) + "' "
+  + String.format(java.util.Locale.FRANCE, "%05.2f", $F{longitudeSecondes} == null ? 0d : $F{longitudeSecondes}) + "\" "
+  + ($F{longitudeSens} == null ? "" : $F{longitudeSens})]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="45" uuid="757fed90-87a4-5678-b117-272c1e383fa6">
+						<jr:columnHeader height="18">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="45" height="18" uuid="4dd4ad80-7534-50b3-afad-ac1585ced89d"/>
+								<text><![CDATA[Altitude (m)]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="45" height="18" uuid="19d0fc09-798a-5ec6-8ae6-63d5977045e3"/>
+								<textElement textAlignment="Center" markup="none"></textElement>
+								<textFieldExpression><![CDATA[$F{altitude} == null ? "—"
+: new java.text.DecimalFormat("0.#", java.text.DecimalFormatSymbols.getInstance(java.util.Locale.FRANCE)).format($F{altitude})]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+		<band height="60" splitType="Stretch">
+			<printWhenExpression><![CDATA[$V{nombreLiaisons} > 0]]></printWhenExpression>
+			<textField textAdjust="StretchHeight">
+				<reportElement style="Section" positionType="Float" x="12" y="8" width="531" height="15" uuid="643aaa7e-386a-58da-8750-d69cf6e885a5"/>
+				<textFieldExpression><![CDATA["ANNEXE : LIAISONS DU RÉSEAU"]]></textFieldExpression>
+			</textField>
+			<componentElement>
+				<reportElement positionType="Float" x="12" y="23" width="531" height="36" isRemoveLineWhenBlank="true" uuid="fc01f8cf-c5c2-57e9-9729-f78df7efbb68">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<printWhenExpression><![CDATA[$V{nombreLiaisons} > 0]]></printWhenExpression>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="dsLiaisons" uuid="4ba6d552-f36b-59b5-bbcf-a8efab1e7f0c">
+						<datasetParameter name="NOMS_SITES">
+							<datasetParameterExpression><![CDATA[$V{nomsSites}]]></datasetParameterExpression>
+						</datasetParameter>
+						<dataSourceExpression><![CDATA[$F{liaisons} == null || $F{liaisons}.trim().isEmpty()
+? (net.sf.jasperreports.engine.JRDataSource) new net.sf.jasperreports.engine.JREmptyDataSource(0)
+: ((java.util.function.Function<String, net.sf.jasperreports.engine.JRDataSource>) t -> {
+    try {
+      net.sf.jasperreports.engine.data.JsonDataSource d = new net.sf.jasperreports.engine.data.JsonDataSource(
+          new java.io.ByteArrayInputStream(t.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+      d.setLocale(java.util.Locale.ROOT);
+      return d;
+    } catch (net.sf.jasperreports.engine.JRException e) { throw new RuntimeException(e); }
+  }).apply($F{liaisons})]]></dataSourceExpression>
+					</datasetRun>
+					<jr:column width="26" uuid="eaa544d5-21ad-53ad-b024-4adfbc048dd7">
+						<jr:columnHeader height="26">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="26" height="26" uuid="dbe42262-00ba-5234-821d-dc9d2038ea97"/>
+								<text><![CDATA[N°]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="26" height="18" uuid="93d855c5-715b-5bc4-ab7b-b3e6558a0771"/>
+								<textElement textAlignment="Center" markup="none"></textElement>
+								<textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="80" uuid="a948490d-972f-5b47-8e26-c7a35df7c0c0">
+						<jr:columnHeader height="26">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="80" height="26" uuid="51a15673-b0c4-597c-92e1-d1a0f14764e0"/>
+								<text><![CDATA[Nature]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="80" height="18" uuid="19277d13-ff73-57e5-9bd3-19118d484b3f"/>
+								<textElement textAlignment="Center" markup="none"><font isBold="true"/></textElement>
+								<textFieldExpression><![CDATA["FIBRE_OPTIQUE".equals($F{nature}) ? "Fibre optique"
+: "FH".equals($F{nature}) ? "Faisceau hertzien"
+: "BLR".equals($F{nature}) ? "Boucle locale radio"
+: "VSAT".equals($F{nature}) ? "VSAT"
+: "AUTRE".equals($F{nature}) ? ($F{precisionAutre} != null ? $F{precisionAutre} : "Autre")
+: $F{precisionAutre} != null ? $F{precisionAutre}
+: $F{nature} != null ? $F{nature} : "—"]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="100" uuid="13233661-2108-5675-a779-c98c6f629a0d">
+						<jr:columnHeader height="26">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="100" height="26" uuid="c3531b91-0d64-5b24-8991-68f845946699"/>
+								<text><![CDATA[Site d'origine]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="100" height="18" uuid="c307cfc2-0bc2-5346-9f1b-0e6d54f85c85"/>
+								<textElement textAlignment="Center" markup="none"></textElement>
+								<textFieldExpression><![CDATA[$F{siteOrigineId} == null ? "—"
+: (String) $P{NOMS_SITES}.getOrDefault(String.valueOf($F{siteOrigineId}), "Site n° " + $F{siteOrigineId})]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="100" uuid="f01c49a1-4142-5fd2-9af5-805d456b45c4">
+						<jr:columnHeader height="26">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="100" height="26" uuid="40b21276-15cd-59c7-b658-4d6cc9ec4a6b"/>
+								<text><![CDATA[Site d'extrémité]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="100" height="18" uuid="83b814bf-cf20-5000-9d97-4e4820b62eb3"/>
+								<textElement textAlignment="Center" markup="none"></textElement>
+								<textFieldExpression><![CDATA[$F{siteExtremiteId} == null ? "—"
+: (String) $P{NOMS_SITES}.getOrDefault(String.valueOf($F{siteExtremiteId}), "Site n° " + $F{siteExtremiteId})]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="95" uuid="4eb745cb-8740-5bf6-99c3-61eb35f56c80">
+						<jr:columnHeader height="26">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="95" height="26" uuid="504c5103-7721-5835-8059-db50e337b793"/>
+								<text><![CDATA[Bande de fréquences]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="95" height="18" uuid="0ca76af1-653d-5253-b8ab-a4bf181da0bc"/>
+								<textElement textAlignment="Center" markup="none"></textElement>
+								<textFieldExpression><![CDATA[$F{bandeFrequences} != null ? $F{bandeFrequences} : "—"]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="45" uuid="6dfe583d-19db-5baa-8c43-5d49c8cdbb52">
+						<jr:columnHeader height="26">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="45" height="26" uuid="c9ac850e-7370-5598-acf2-81a30adcff40"/>
+								<text><![CDATA[Débit Em (Mbit/s)]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="45" height="18" uuid="455b0d0c-1967-5e23-8dc4-a67b13ae1ac2"/>
+								<textElement textAlignment="Center" markup="none"></textElement>
+								<textFieldExpression><![CDATA[$F{debitEmission} == null ? "—"
+: new java.text.DecimalFormat("#,##0.###", java.text.DecimalFormatSymbols.getInstance(java.util.Locale.FRANCE)).format($F{debitEmission}).replace('\u202F', '\u00A0')]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="45" uuid="21ddf356-ddb0-5cd7-babf-fc21f93148c9">
+						<jr:columnHeader height="26">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="45" height="26" uuid="e816319a-268c-5e6e-a7ab-4d5ae27a8552"/>
+								<text><![CDATA[Débit Rec (Mbit/s)]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="45" height="18" uuid="84696990-a43f-50f9-8823-f659745ecf40"/>
+								<textElement textAlignment="Center" markup="none"></textElement>
+								<textFieldExpression><![CDATA[$F{debitReception} == null ? "—"
+: new java.text.DecimalFormat("#,##0.###", java.text.DecimalFormatSymbols.getInstance(java.util.Locale.FRANCE)).format($F{debitReception}).replace('\u202F', '\u00A0')]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="40" uuid="cec4cc22-9066-51a2-8c27-db8e4dd82383">
+						<jr:columnHeader height="26">
+							<staticText>
+								<reportElement style="Entete" x="0" y="0" width="40" height="26" uuid="58e5eb5e-9fc6-559b-8074-41402da1b76f"/>
+								<text><![CDATA[Bonds]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="18">
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement style="Cellule" stretchType="ContainerHeight" x="0" y="0" width="40" height="18" uuid="1e5b5529-caab-509d-9cc4-cedf634fdb8b"/>
+								<textElement textAlignment="Center" markup="none"></textElement>
+								<textFieldExpression><![CDATA[$F{nombreBonds} != null ? String.valueOf($F{nombreBonds}) : "—"]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="22" splitType="Stretch">
+			<rectangle>
+				<reportElement mode="Opaque" x="0" y="4" width="185" height="3" forecolor="#00B050" backcolor="#00B050" uuid="773c1911-f836-531a-86a5-751455729bb3"/>
+				<graphicElement>
+					<pen lineWidth="0.0"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Opaque" x="185" y="4" width="185" height="3" forecolor="#FFFF00" backcolor="#FFFF00" uuid="68c1cef8-b3ad-5bc0-9efb-325ec9979a63"/>
+				<graphicElement>
+					<pen lineWidth="0.0"/>
+				</graphicElement>
+			</rectangle>
+			<rectangle>
+				<reportElement mode="Opaque" x="370" y="4" width="185" height="3" forecolor="#0070C0" backcolor="#0070C0" uuid="9d83a0f3-ad2e-598a-ac16-eaae1e8e7f21"/>
+				<graphicElement>
+					<pen lineWidth="0.0"/>
+				</graphicElement>
+			</rectangle>
+			<textField isBlankWhenNull="true">
+				<reportElement forecolor="#0070C0" x="0" y="8" width="515" height="10" uuid="8b0705e2-7e52-552c-b0da-ad375238aec9"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="5.5" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ARCEP — SIEGE SOCIAL : 1030 AVENUE PAUL MOUKAMBI, KALIKAK | B.P : 50 000 LIBREVILLE | TEL : +241 11 44 68 11/12 | WWW.ARCEP.GA"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement forecolor="#555555" x="515" y="8" width="26" height="10" uuid="21db47aa-fd13-52f2-8cb4-e207af7235f1"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER} + " / "]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true" evaluationTime="Report">
+				<reportElement forecolor="#555555" x="541" y="8" width="14" height="10" uuid="9c1cca58-5fae-542e-93e0-4f7bbe0a4501"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" markup="none">
+					<font size="6"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

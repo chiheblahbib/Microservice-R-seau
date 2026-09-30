@@ -7,7 +7,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import picosoft.biz.arcep.domain.ispc.enumeration.FonctionSemaphore;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 /**
@@ -33,12 +32,11 @@ public class FonctionPointSemaphore implements Serializable {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "fonction", length = 16)
+    @Column(name = "fonction")
     private FonctionSemaphore fonction;
 
     /** N'a de sens que si `fonction` vaut AUTRE : le formulaire dit « preciser ». */
-    @Column(name = "precision_autre", length = 255)
-    @Size(max = 255)
+    @Column(name = "precision_autre")
     private String precisionAutre;
 
     @ManyToOne(fetch = FetchType.LAZY)

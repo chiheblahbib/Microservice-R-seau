@@ -20,7 +20,7 @@ import picosoft.biz.arcep.domain.numerocourturgence.DemandeNumeroCourtUrgence;
 import picosoft.biz.arcep.domain.pq.DemandePq;
 import picosoft.biz.arcep.domain.reseau.DemandeReseau;
 import picosoft.biz.arcep.domain.ussd.DemandeUssd;
-import picosoft.biz.arcep.domain.shared.RapportTechnique;
+import picosoft.biz.arcep.domain.drrrs.RapportTechnique;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -100,13 +100,16 @@ public class KernelService {
     public static final String reseau_role_canEditReseau = "reseau_can_edit_reseau";
     public static final String reseau_role_canReadReseau = "reseau_can_read_reseau";
 
-    public static final String reseau_role_canCreateSite = "reseau_can_create_site";
-    public static final String reseau_role_canEditSite = "reseau_can_edit_site";
-    public static final String reseau_role_canReadSite = "reseau_can_read_site";
 
     public static final String ussd_role_canCreateUssd = "ussd_can_create_ussd";
     public static final String ussd_role_canEditUssd = "ussd_can_edit_ussd";
     public static final String ussd_role_canReadUssd = "ussd_can_read_ussd";
+
+    // Bareme tarifaire. Table de reference transverse aux douze imprimes :
+    // ni dossier, ni circuit, ni objet ACL. Un seul role d'ecriture, sans
+    // create ni read distincts -- la meme personne tient la grille, et sa
+    // lecture sert au calcul des frais, qu'on ne bride pas.
+    public static final String reftarif_role_canEditRefTarif = "reftarif_can_edit_reftarif";
 
     public static final String SEQ_AERONEF = "seq_aeronef";
     public static final String SEQ_DECLARATIF = "seq_declaratif";
@@ -120,7 +123,6 @@ public class KernelService {
     public static final String SEQ_NUMEROCOURTURGENCE = "seq_numerocourturgence";
     public static final String SEQ_PQ = "seq_pq";
     public static final String SEQ_RESEAU = "seq_reseau";
-    public static final String SEQ_SITE = "seq_site";
     public static final String SEQ_USSD = "seq_ussd";
     public static final String SEQ_RAPPORT_TECHNIQUE = "seq_rapport_technique";
 
@@ -138,7 +140,6 @@ public class KernelService {
             SEQ_NUMEROCOURTURGENCE,
             SEQ_PQ,
             SEQ_RESEAU,
-            SEQ_SITE,
             SEQ_USSD,
             SEQ_RAPPORT_TECHNIQUE);
 
@@ -179,12 +180,10 @@ public class KernelService {
             reseau_role_canCreateReseau,
             reseau_role_canEditReseau,
             reseau_role_canReadReseau,
-            reseau_role_canCreateSite,
-            reseau_role_canEditSite,
-            reseau_role_canReadSite,
             ussd_role_canCreateUssd,
             ussd_role_canEditUssd,
-            ussd_role_canReadUssd);
+            ussd_role_canReadUssd,
+            reftarif_role_canEditRefTarif);
 
 
     // ------------------------------------------------------------------
@@ -339,18 +338,6 @@ public class KernelService {
         return reseau_role_canReadReseau;
     }
 
-    public String reseau_role_canCreateSite() {
-        return reseau_role_canCreateSite;
-    }
-
-    public String reseau_role_canEditSite() {
-        return reseau_role_canEditSite;
-    }
-
-    public String reseau_role_canReadSite() {
-        return reseau_role_canReadSite;
-    }
-
     public String ussd_role_canCreateUssd() {
         return ussd_role_canCreateUssd;
     }
@@ -361,6 +348,10 @@ public class KernelService {
 
     public String ussd_role_canReadUssd() {
         return ussd_role_canReadUssd;
+    }
+
+    public String reftarif_role_canEditRefTarif() {
+        return reftarif_role_canEditRefTarif;
     }
 
     public KernelService(KernelInterface kernelInterface) {
@@ -846,13 +837,16 @@ public class KernelService {
             variable.add(new Variable(reseau_role_canEditReseau, "'" + reseau_role_canEditReseau + "'"));
             variable.add(new Variable(reseau_role_canReadReseau, "'" + reseau_role_canReadReseau + "'"));
 
-            variable.add(new Variable(reseau_role_canCreateSite, "'" + reseau_role_canCreateSite + "'"));
-            variable.add(new Variable(reseau_role_canEditSite, "'" + reseau_role_canEditSite + "'"));
-            variable.add(new Variable(reseau_role_canReadSite, "'" + reseau_role_canReadSite + "'"));
 
             variable.add(new Variable(ussd_role_canCreateUssd, "'" + ussd_role_canCreateUssd + "'"));
             variable.add(new Variable(ussd_role_canEditUssd, "'" + ussd_role_canEditUssd + "'"));
             variable.add(new Variable(ussd_role_canReadUssd, "'" + ussd_role_canReadUssd + "'"));
+
+            // reftarif_role_canEditRefTarif est declare dans `roles` mais n'a PAS
+            // de Variable ici, volontairement : ces variables existent pour que les
+            // userTask du BPMN puissent ecrire candidateGroups="${<role>}". Le bareme
+            // n'a aucun circuit -- une variable que nul processus ne lit serait de la
+            // configuration morte poussee dans le kernel.
 
             initVariable.setVariable(variable);
             initVariable.setRoleName(roles);

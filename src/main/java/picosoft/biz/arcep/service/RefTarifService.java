@@ -83,8 +83,24 @@ public class RefTarifService {
         return refTarifRepository.findById(id).map(refTarifMapper::toDto);
     }
 
+    /**
+     * Une ligne qui a pris effet a servi à facturer : elle ne s'efface plus, elle
+     * se révise. Effacer le barème sous un montant déjà appliqué rendrait ce montant
+     * inexplicable -- ce que `reviser` existe précisément pour éviter.
+     *
+     * Restent effaçables : la ligne jamais datée, et celle dont la prise d'effet est
+     * encore à venir -- une grille saisie d'avance, annulée avant d'entrer en vigueur.
+     */
     public void delete(Long id) {
-        refTarifRepository.deleteById(id);
+        RefTarif entity = refTarifRepository.findById(id)
+                .orElseThrow(() -> new BadRequestAlertException(ReseauErrors.OBJECT_NOT_FOUND,
+                        ReseauErrors.CLASS, ReseauErrors.OBJECT_NOT_FOUND));
+
+        if (entity.getDateEffet() != null && !entity.getDateEffet().isAfter(LocalDate.now())) {
+            throw new BadRequestAlertException(ReseauErrors.OBJECT_ENGAGED,
+                    ReseauErrors.CLASS, ReseauErrors.OBJECT_ENGAGED);
+        }
+        refTarifRepository.delete(entity);
     }
 
     // ------------------------------------------------------------- lecture

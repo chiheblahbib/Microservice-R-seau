@@ -1,7 +1,5 @@
 package picosoft.biz.arcep.service.dto;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +26,6 @@ public class DemandeReseauInputDTO implements Serializable {
 
     private Boolean web;
 
-    @Size(max = 25)
     private String reference;
 
     private ZonedDateTime createdDate;
@@ -36,50 +33,37 @@ public class DemandeReseauInputDTO implements Serializable {
 
     private String approvedBy;
 
-    @Size(max = 32)
     private String statutDossier;
 
-    @Size(max = 50)
     private String typeDossier;
 
     private NatureReseau natureReseau;
     private NatureDemande natureDemande;
 
-    @Size(max = 25)
     private String referenceAutorisationAnterieure;
 
     private BigDecimal fraisDossier;
 
-    @Size(max = 8)
     private String deviseFrais;
 
-    @Size(max = 100)
     private String engagementNom;
 
-    @Size(max = 100)
     private String engagementQualite;
 
-    @Size(max = 100)
     private String engagementLieu;
 
     private ZonedDateTime engagementDate;
 
-    @Valid
     private ClientDTO client;
 
-    @Valid
     private ApplicantDTO applicant;
 
-    @Valid
     private List<TypeReseauDeclareDTO> typesReseau;
 
-    @Valid
     private List<ServiceDeclareDTO> services;
 
-    @Valid
     private List<SiteReseauDTO> sites;
 
-    @Valid
     private List<LiaisonReseauDTO> liaisons;
 
     // ------------------------- workflow / ACL -------------------------

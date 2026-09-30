@@ -97,6 +97,7 @@ public class DemandePqController {
         return demandePqService.byId(id);
     }
 
+    @PreAuthorize("hasAuthority(@kernelService.pq_role_canEditPq())")
     @DeleteMapping("/demande-pqs/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         demandePqService.delete(id);

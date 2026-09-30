@@ -1,7 +1,5 @@
 package picosoft.biz.arcep.service.dto;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +26,6 @@ public class DemandeIspcInputDTO implements Serializable {
 
     private Boolean web;
 
-    @Size(max = 25)
     private String reference;
 
     private ZonedDateTime createdDate;
@@ -36,7 +33,6 @@ public class DemandeIspcInputDTO implements Serializable {
 
     private String approvedBy;
 
-    @Size(max = 32)
     private String statutDossier;
 
     /**
@@ -44,7 +40,6 @@ public class DemandeIspcInputDTO implements Serializable {
      * L'omettre enverrait tous les dossiers sur la branche par defaut, sans
      * erreur ni message.
      */
-    @Size(max = 50)
     private String typeDossier;
 
     /**
@@ -61,14 +56,11 @@ public class DemandeIspcInputDTO implements Serializable {
      * module en propose un, et qu'un renouvellement sans reference du titre
      * precedent oblige l'instructeur a le chercher a la main.
      */
-    @Size(max = 25)
     private String referenceAutorisationAnterieure;
 
     // ------------------------- point semaphore local
-    @Size(max = 200)
     private String fabricantTypeSemaphore;
 
-    @Size(max = 255)
     private String adressePhysiqueSemaphore;
 
     /** Demandee au mois pres par le formulaire ; stockee en date complete. */
@@ -77,40 +69,31 @@ public class DemandeIspcInputDTO implements Serializable {
     private String lieuSemaphoreMpt;
 
     // ------------------------- point semaphore distant
-    @Size(max = 255)
     private String semaphoreDistantNomAdresse;
 
-    @Size(max = 255)
     private String semaphoreDistantEmplacement;
 
     /** « S'il est connu » : facultatif, le formulaire le dit. */
-    @Size(max = 32)
     private String semaphoreDistantCodeIspc;
 
     /** Le code attribue par l'ARCEP : resultat du dossier, vide au depot. */
-    @Size(max = 32)
     private String codeIspcAttribue;
 
     private BigDecimal fraisDossier;
 
-    @Size(max = 8)
     private String deviseFrais;
 
-    @Valid
     private ClientDTO client;
 
-    @Valid
     private ApplicantDTO applicant;
 
     /** Rubrique 5 : les equipements de bord. */
-    @Valid
     private List<FonctionPointSemaphoreDTO> fonctions;
 
     /**
      * Le rapport d'instruction. Renseigne par l'ARCEP, jamais par le
      * demandeur -- voir RapportTechnique.
      */
-    @Valid
     private RapportTechniqueDTO rapportTechnique;
 
     // ------------------------- workflow / ACL -------------------------

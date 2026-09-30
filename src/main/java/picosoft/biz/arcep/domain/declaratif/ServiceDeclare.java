@@ -7,7 +7,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import picosoft.biz.arcep.domain.declaratif.enumeration.TypeServiceDeclare;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 /**
@@ -37,12 +36,11 @@ public class ServiceDeclare implements Serializable {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type_service", length = 40)
+    @Column(name = "type_service")
     private TypeServiceDeclare typeService;
 
     /** N'a de sens que si typeService vaut AUTRE : le formulaire dit « preciser ». */
-    @Column(name = "precision_autre", length = 255)
-    @Size(max = 255)
+    @Column(name = "precision_autre")
     private String precisionAutre;
 
     /**
@@ -52,8 +50,7 @@ public class ServiceDeclare implements Serializable {
      * « des l'obtention du certificat » ou une date precise y sont tous
      * recevables. Une colonne de date aurait refuse les deux premiers.
      */
-    @Column(name = "calendrier", length = 255)
-    @Size(max = 255)
+    @Column(name = "calendrier")
     private String calendrier;
 
     @ManyToOne(fetch = FetchType.LAZY)

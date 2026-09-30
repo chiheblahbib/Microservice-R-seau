@@ -97,6 +97,7 @@ public class DemandeMmsiController {
         return demandeMmsiService.byId(id);
     }
 
+    @PreAuthorize("hasAuthority(@kernelService.mmsi_role_canEditMmsi())")
     @DeleteMapping("/demande-mmsis/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         demandeMmsiService.delete(id);

@@ -97,6 +97,7 @@ public class DemandeIspcController {
         return demandeIspcService.byId(id);
     }
 
+    @PreAuthorize("hasAuthority(@kernelService.ispc_role_canEditIspc())")
     @DeleteMapping("/demande-ispcs/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         demandeIspcService.delete(id);

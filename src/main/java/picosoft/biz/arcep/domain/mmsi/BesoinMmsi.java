@@ -32,7 +32,7 @@ public class BesoinMmsi implements Serializable {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "besoin", length = 48)
+    @Column(name = "besoin")
     private TypeBesoinMmsi besoin;
 
     @ManyToOne(fetch = FetchType.LAZY)

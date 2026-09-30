@@ -1,7 +1,5 @@
 package picosoft.biz.arcep.service.dto;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,7 +25,6 @@ public class DemandeReseauOutputDTO implements Serializable {
 
     private Boolean web;
 
-    @Size(max = 25)
     private String reference;
 
     private ZonedDateTime createdDate;
@@ -35,50 +32,37 @@ public class DemandeReseauOutputDTO implements Serializable {
 
     private String approvedBy;
 
-    @Size(max = 32)
     private String statutDossier;
 
-    @Size(max = 50)
     private String typeDossier;
 
     private NatureReseau natureReseau;
     private NatureDemande natureDemande;
 
-    @Size(max = 25)
     private String referenceAutorisationAnterieure;
 
     private BigDecimal fraisDossier;
 
-    @Size(max = 8)
     private String deviseFrais;
 
-    @Size(max = 100)
     private String engagementNom;
 
-    @Size(max = 100)
     private String engagementQualite;
 
-    @Size(max = 100)
     private String engagementLieu;
 
     private ZonedDateTime engagementDate;
 
-    @Valid
     private ClientDTO client;
 
-    @Valid
     private ApplicantDTO applicant;
 
-    @Valid
     private List<TypeReseauDeclareDTO> typesReseau;
 
-    @Valid
     private List<ServiceDeclareDTO> services;
 
-    @Valid
     private List<SiteReseauDTO> sites;
 
-    @Valid
     private List<LiaisonReseauDTO> liaisons;
 
     /**
@@ -109,6 +93,18 @@ public class DemandeReseauOutputDTO implements Serializable {
     private Boolean endProcess;
     private String state;
     private Long numberOfattachments;
+
+    /**
+     * Ce que le kernel autorise CET utilisateur a faire sur CE dossier :
+     * WRITE, READ ou NONE. Pose a la lecture par le service, jamais persiste.
+     *
+     * Meme champ, meme role et meme nom que sur AsiOutputDTO. Le front s'en
+     * sert pour decider si la barre de decisions s'affiche et si les sections
+     * sont saisissables : sans lui, l'ecran ne peut qu'ouvrir tout a tout le
+     * monde, quelle que soit la tache en cours et quel que soit le role.
+     */
+    private String userPermission;
+
     private Long step;
     private String commentaire;
 }

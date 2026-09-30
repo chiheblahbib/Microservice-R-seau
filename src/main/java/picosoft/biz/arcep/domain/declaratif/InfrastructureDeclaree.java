@@ -7,7 +7,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import picosoft.biz.arcep.domain.declaratif.enumeration.TypeInfrastructure;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 /** Une caracteristique de reseau declaree, rubrique 8.a. Cumulable. */
@@ -26,12 +25,11 @@ public class InfrastructureDeclaree implements Serializable {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type_infrastructure", length = 40)
+    @Column(name = "type_infrastructure")
     private TypeInfrastructure typeInfrastructure;
 
     /** Le detail que le formulaire fait porter en regard de chaque ligne. */
-    @Column(name = "precision_detail", length = 255)
-    @Size(max = 255)
+    @Column(name = "precision_detail")
     private String precisionDetail;
 
     @ManyToOne(fetch = FetchType.LAZY)

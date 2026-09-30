@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import picosoft.biz.arcep.domain.installateur.enumeration.TypeOutillage;
 
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 /** Voir l'entite {@link picosoft.biz.arcep.domain.installateur.OutillageDeclare}. */
@@ -21,7 +20,6 @@ public class OutillageDeclareDTO implements Serializable {
     private TypeOutillage typeOutillage;
 
     /** La designation saisie, quand typeOutillage vaut AUTRE. */
-    @Size(max = 200)
     private String designation;
 
     private Long demandeInstallateurId;

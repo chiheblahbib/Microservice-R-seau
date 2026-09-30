@@ -5,6 +5,7 @@ import javax.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import picosoft.biz.arcep.service.FrequenceService;
 import picosoft.biz.arcep.service.criteria.FrequenceCriteria;
@@ -48,6 +49,7 @@ public class FrequenceController {
         return ResponseEntity.ok(frequenceService.findByStation(stationId));
     }
 
+    @PreAuthorize("hasAuthority(@kernelService.station_role_canEditStation())")
     @DeleteMapping("/frequences/{id}")
     public ResponseEntity<Void> deleteFrequence(@PathVariable Long id) {
         frequenceService.delete(id);

@@ -97,6 +97,7 @@ public class DemandeUssdController {
         return demandeUssdService.byId(id);
     }
 
+    @PreAuthorize("hasAuthority(@kernelService.ussd_role_canEditUssd())")
     @DeleteMapping("/demande-ussds/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         demandeUssdService.delete(id);

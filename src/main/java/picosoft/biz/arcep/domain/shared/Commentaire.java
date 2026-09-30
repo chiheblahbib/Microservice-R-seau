@@ -27,13 +27,13 @@ public class Commentaire extends Auditable implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "auteur", length = 100, nullable = true)
+    @Column(name = "auteur", nullable = true)
     private String auteur;
 
     @Column(name = "description", columnDefinition = "TEXT", nullable = true)
     private String description;
 
-    @Column(name = "date_saisie", length = 25, nullable = true)
+    @Column(name = "date_saisie", nullable = true)
     private ZonedDateTime dateSaisie;
 
     @Column(name = "class_id", nullable = true)

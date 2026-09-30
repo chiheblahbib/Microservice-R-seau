@@ -1,7 +1,5 @@
 package picosoft.biz.arcep.service.dto;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,7 +31,6 @@ public class DemandeIspcDTO implements Serializable {
 
     private Boolean web;
 
-    @Size(max = 25)
     private String reference;
 
     /**
@@ -56,7 +53,6 @@ public class DemandeIspcDTO implements Serializable {
 
     private String approvedBy;
 
-    @Size(max = 32)
     private String statutDossier;
 
     /**
@@ -64,7 +60,6 @@ public class DemandeIspcDTO implements Serializable {
      * L'omettre enverrait tous les dossiers sur la branche par defaut, sans
      * erreur ni message.
      */
-    @Size(max = 50)
     private String typeDossier;
 
     /**
@@ -81,14 +76,11 @@ public class DemandeIspcDTO implements Serializable {
      * module en propose un, et qu'un renouvellement sans reference du titre
      * precedent oblige l'instructeur a le chercher a la main.
      */
-    @Size(max = 25)
     private String referenceAutorisationAnterieure;
 
     // ------------------------- point semaphore local
-    @Size(max = 200)
     private String fabricantTypeSemaphore;
 
-    @Size(max = 255)
     private String adressePhysiqueSemaphore;
 
     /** Demandee au mois pres par le formulaire ; stockee en date complete. */
@@ -97,40 +89,31 @@ public class DemandeIspcDTO implements Serializable {
     private String lieuSemaphoreMpt;
 
     // ------------------------- point semaphore distant
-    @Size(max = 255)
     private String semaphoreDistantNomAdresse;
 
-    @Size(max = 255)
     private String semaphoreDistantEmplacement;
 
     /** « S'il est connu » : facultatif, le formulaire le dit. */
-    @Size(max = 32)
     private String semaphoreDistantCodeIspc;
 
     /** Le code attribue par l'ARCEP : resultat du dossier, vide au depot. */
-    @Size(max = 32)
     private String codeIspcAttribue;
 
     private BigDecimal fraisDossier;
 
-    @Size(max = 8)
     private String deviseFrais;
 
-    @Valid
     private ClientDTO client;
 
-    @Valid
     private ApplicantDTO applicant;
 
     /** Rubrique 5 : les equipements de bord. */
-    @Valid
     private List<FonctionPointSemaphoreDTO> fonctions;
 
     /**
      * Le rapport d'instruction. Renseigne par l'ARCEP, jamais par le
      * demandeur -- voir RapportTechnique.
      */
-    @Valid
     private RapportTechniqueDTO rapportTechnique;
 
     // ------------------------- workflow / ACL -------------------------
@@ -150,6 +133,15 @@ public class DemandeIspcDTO implements Serializable {
     private Boolean endProcess;
     private String state;
     private Long numberOfattachments;
+    /**
+     * Ce que le kernel autorise CET utilisateur a faire sur CE dossier.
+     *
+     * Meme champ que sur le DTO de sortie, et pour la meme raison : le
+     * formulaire lit par ici, et c'est de cette valeur qu'il deduit si ses
+     * rubriques sont saisissables. Jamais persiste, jamais relu en entree.
+     */
+    private String userPermission;
+
     private Long step;
     private String commentaire;
 }

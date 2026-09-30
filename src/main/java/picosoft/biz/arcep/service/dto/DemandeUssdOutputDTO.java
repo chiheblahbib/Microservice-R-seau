@@ -1,7 +1,5 @@
 package picosoft.biz.arcep.service.dto;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,7 +25,6 @@ public class DemandeUssdOutputDTO implements Serializable {
 
     private Boolean web;
 
-    @Size(max = 25)
     private String reference;
 
     private ZonedDateTime createdDate;
@@ -35,7 +32,6 @@ public class DemandeUssdOutputDTO implements Serializable {
 
     private String approvedBy;
 
-    @Size(max = 32)
     private String statutDossier;
 
     /**
@@ -43,7 +39,6 @@ public class DemandeUssdOutputDTO implements Serializable {
      * L'omettre enverrait tous les dossiers sur la branche par defaut, sans
      * erreur ni message.
      */
-    @Size(max = 50)
     private String typeDossier;
 
     private NatureDemande natureDemande;
@@ -51,7 +46,6 @@ public class DemandeUssdOutputDTO implements Serializable {
     // ---------------- rubrique 3
     private NatureActivite natureActivite;
 
-    @Size(max = 255)
     private String natureActivitePrecision;
 
     // ---------------- rubrique 4 : le bilan de l'existant
@@ -64,7 +58,6 @@ public class DemandeUssdOutputDTO implements Serializable {
     // ---------------- rubrique 5
     private Integer nombreCodesSollicites;
 
-    @Size(max = 255)
     private String formatCodes;
 
     // ---------------- rubriques 6 et 7
@@ -73,29 +66,23 @@ public class DemandeUssdOutputDTO implements Serializable {
     /** Le tarif aux USAGERS, une grille et non un montant. */
     private String tarifUsagers;
 
-    @Size(max = 25)
     private String referenceAutorisationAnterieure;
 
     private BigDecimal fraisDossier;
 
-    @Size(max = 8)
     private String deviseFrais;
 
-    @Valid
     private ClientDTO client;
 
-    @Valid
     private ApplicantDTO applicant;
 
     /** Rubrique 5 : les equipements de bord. */
-    @Valid
     private List<CodeUssdDTO> codes;
 
     /**
      * Le rapport d'instruction. Renseigne par l'ARCEP, jamais par le
      * demandeur -- voir RapportTechnique.
      */
-    @Valid
     private RapportTechniqueDTO rapportTechnique;
 
     /**
@@ -126,6 +113,18 @@ public class DemandeUssdOutputDTO implements Serializable {
     private Boolean endProcess;
     private String state;
     private Long numberOfattachments;
+
+    /**
+     * Ce que le kernel autorise CET utilisateur a faire sur CE dossier :
+     * WRITE, READ ou NONE. Pose a la lecture par le service, jamais persiste.
+     *
+     * Meme champ, meme role et meme nom que sur AsiOutputDTO. Le front s'en
+     * sert pour decider si la barre de decisions s'affiche et si les sections
+     * sont saisissables : sans lui, l'ecran ne peut qu'ouvrir tout a tout le
+     * monde, quelle que soit la tache en cours et quel que soit le role.
+     */
+    private String userPermission;
+
     private Long step;
     private String commentaire;
 }

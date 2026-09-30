@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import picosoft.biz.arcep.service.RefTarifService;
 import picosoft.biz.arcep.service.criteria.RefTarifCriteria;
@@ -28,11 +29,13 @@ public class RefTarifController {
         this.refTarifService = refTarifService;
     }
 
+    @PreAuthorize("hasAuthority(@kernelService.reftarif_role_canEditRefTarif())")
     @PostMapping("/ref-tarifs")
     public ResponseEntity<RefTarifDTO> create(@RequestBody @Valid RefTarifDTO dto) {
         return ResponseEntity.ok(refTarifService.save(dto));
     }
 
+    @PreAuthorize("hasAuthority(@kernelService.reftarif_role_canEditRefTarif())")
     @PutMapping("/ref-tarifs/{id}")
     public ResponseEntity<RefTarifDTO> update(@PathVariable Long id, @RequestBody @Valid RefTarifDTO dto) {
         return ResponseEntity.ok(refTarifService.update(id, dto));
@@ -65,6 +68,7 @@ public class RefTarifController {
      * Cloture la ligne en vigueur et en ouvre une neuve : une revision tarifaire
      * sans perdre l'historique.
      */
+    @PreAuthorize("hasAuthority(@kernelService.reftarif_role_canEditRefTarif())")
     @PostMapping("/ref-tarifs/{id}/reviser")
     public ResponseEntity<RefTarifDTO> reviser(@PathVariable Long id,
                                                @RequestParam BigDecimal montant,
@@ -74,6 +78,7 @@ public class RefTarifController {
         return ResponseEntity.ok(refTarifService.reviser(id, montant, dateEffet));
     }
 
+    @PreAuthorize("hasAuthority(@kernelService.reftarif_role_canEditRefTarif())")
     @DeleteMapping("/ref-tarifs/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         refTarifService.delete(id);

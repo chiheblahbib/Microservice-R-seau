@@ -46,95 +46,95 @@ public class Client extends Auditable implements Serializable {
     @Column(name = "client_type", nullable = true)
     private ClientType clientType;
 
-    @Column(name = "qualification", length = 100, nullable = true)
+    @Column(name = "qualification", nullable = true)
     private String qualification;
 
-    @Column(name = "client_name", length = 100, nullable = true)
+    @Column(name = "client_name", nullable = true)
     private String clientName;
 
-    @Column(name = "company", length = 100)
+    @Column(name = "company")
     private String company;
 
-    @Column(name = "trade_register_number", length = 50, nullable = true)
+    @Column(name = "trade_register_number", nullable = true)
     private String tradeRegisterNumber;
 
-    @Column(name = "nationality", length = 50, nullable = true)
+    @Column(name = "nationality", nullable = true)
     private String nationality;
 
-    @Column(name = "nationality_complet", length = 100, nullable = true)
+    @Column(name = "nationality_complet", nullable = true)
     private String nationalityComplet;
 
-    @Column(name = "address", length = 200, nullable = true)
+    @Column(name = "address", nullable = true)
     private String address;
 
-    @Column(name = "phone", length = 20, nullable = true)
+    @Column(name = "phone", nullable = true)
     private String phone;
 
-    @Column(name = "fax", length = 20)
+    @Column(name = "fax")
     private String fax;
 
-    @Column(name = "email", length = 100, nullable = true)
+    @Column(name = "email", nullable = true)
     private String email;
 
-    @Column(name = "website", length = 100)
+    @Column(name = "website")
     private String website;
 
-    @Column(name = "nature_activite", length = 500, nullable = true)
+    @Column(name = "nature_activite", nullable = true)
     private String natureActivite;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "usage_equipement", length = 16, nullable = true)
+    @Column(name = "usage_equipement", nullable = true)
     private UsageEquipement usageEquipement;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "mode_transport", length = 16, nullable = true)
+    @Column(name = "mode_transport", nullable = true)
     private ModeTransport modeTransport;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_aeronef_id", nullable = true, unique = true)
+    @JoinColumn(name = "demande_aeronef_id", nullable = true)
     private DemandeAeronef demandeAeronef;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_declaratif_id", nullable = true, unique = true)
+    @JoinColumn(name = "demande_declaratif_id", nullable = true)
     private DemandeDeclaratif demandeDeclaratif;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_implantation_id", nullable = true, unique = true)
+    @JoinColumn(name = "demande_implantation_id", nullable = true)
     private DemandeImplantation demandeImplantation;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_installateur_id", nullable = true, unique = true)
+    @JoinColumn(name = "demande_installateur_id", nullable = true)
     private DemandeInstallateur demandeInstallateur;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_ispc_id", nullable = true, unique = true)
+    @JoinColumn(name = "demande_ispc_id", nullable = true)
     private DemandeIspc demandeIspc;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_mmsi_id", nullable = true, unique = true)
+    @JoinColumn(name = "demande_mmsi_id", nullable = true)
     private DemandeMmsi demandeMmsi;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_navire_id", nullable = true, unique = true)
+    @JoinColumn(name = "demande_navire_id", nullable = true)
     private DemandeNavire demandeNavire;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_numerocourt_id", nullable = true, unique = true)
+    @JoinColumn(name = "demande_numerocourt_id", nullable = true)
     private DemandeNumeroCourt demandeNumeroCourt;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_numerocourturgence_id", nullable = true, unique = true)
+    @JoinColumn(name = "demande_numerocourturgence_id", nullable = true)
     private DemandeNumeroCourtUrgence demandeNumeroCourtUrgence;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_pq_id", nullable = true, unique = true)
+    @JoinColumn(name = "demande_pq_id", nullable = true)
     private DemandePq demandePq;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_reseau_id", nullable = true, unique = true)
+    @JoinColumn(name = "demande_reseau_id", nullable = true)
     private DemandeReseau demandeReseau;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "demande_ussd_id", nullable = true, unique = true)
+    @JoinColumn(name = "demande_ussd_id", nullable = true)
     private DemandeUssd demandeUssd;
 }

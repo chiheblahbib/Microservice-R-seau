@@ -63,9 +63,9 @@
 -->
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" targetNamespace="http://flowable.org/test">
   <collaboration id="Collaboration_processDeclaratif">
-    <participant id="pool_processDeclaratif" name="Processus d&#39;autorisation de station a bord d&#39;un declaratif" processRef="processDeclaratif" />
+    <participant id="pool_processDeclaratif" name="Processus de d&#233;claration d&#39;activit&#233;s - r&#233;gime d&#233;claratif" processRef="processDeclaratif" />
   </collaboration>
-  <process id="processDeclaratif" name="Processus d&#39;autorisation de station a bord d&#39;un declaratif" isExecutable="true">
+  <process id="processDeclaratif" name="Processus de d&#233;claration d&#39;activit&#233;s - r&#233;gime d&#233;claratif" isExecutable="true">
     <laneSet id="laneSet_processDeclaratif">
       <lane id="lane_reception" name="Réception">
         <flowNodeRef>Start_declaratif</flowNodeRef>
@@ -104,10 +104,11 @@
         <flowable:inputOutput>
           <flowable:inputParameter name="components">
             <flowable:map>
-              <flowable:entry key="SectionOperateur">WRITE</flowable:entry>
-              <flowable:entry key="SectionStation">WRITE</flowable:entry>
-              <flowable:entry key="SectionEquipements">WRITE</flowable:entry>
+              <flowable:entry key="SectionDemandeur">WRITE</flowable:entry>
+              <flowable:entry key="SectionDeclaration">WRITE</flowable:entry>
+              <flowable:entry key="SectionServices">WRITE</flowable:entry>
               <flowable:entry key="SectionAttachment">WRITE</flowable:entry>
+              <flowable:entry key="ActiveSection">SectionDemandeur,SectionDeclaration,SectionServices,SectionAttachment</flowable:entry>
             </flowable:map>
           </flowable:inputParameter>
         </flowable:inputOutput>
@@ -120,10 +121,11 @@
         <flowable:inputOutput>
           <flowable:inputParameter name="components">
             <flowable:map>
-              <flowable:entry key="SectionOperateur">WRITE</flowable:entry>
-              <flowable:entry key="SectionStation">WRITE</flowable:entry>
-              <flowable:entry key="SectionEquipements">WRITE</flowable:entry>
+              <flowable:entry key="SectionDemandeur">WRITE</flowable:entry>
+              <flowable:entry key="SectionDeclaration">WRITE</flowable:entry>
+              <flowable:entry key="SectionServices">WRITE</flowable:entry>
               <flowable:entry key="SectionAttachment">WRITE</flowable:entry>
+              <flowable:entry key="ActiveSection">SectionDemandeur,SectionDeclaration,SectionServices,SectionAttachment</flowable:entry>
             </flowable:map>
           </flowable:inputParameter>
         </flowable:inputOutput>
@@ -136,10 +138,11 @@
         <flowable:inputOutput>
           <flowable:inputParameter name="components">
             <flowable:map>
-              <flowable:entry key="SectionOperateur">READ</flowable:entry>
-              <flowable:entry key="SectionStation">READ</flowable:entry>
-              <flowable:entry key="SectionEquipements">READ</flowable:entry>
+              <flowable:entry key="SectionDemandeur">READ</flowable:entry>
+              <flowable:entry key="SectionDeclaration">READ</flowable:entry>
+              <flowable:entry key="SectionServices">READ</flowable:entry>
               <flowable:entry key="SectionAttachment">READ</flowable:entry>
+              <flowable:entry key="ActiveSection">SectionDemandeur,SectionDeclaration,SectionServices,SectionAttachment</flowable:entry>
             </flowable:map>
           </flowable:inputParameter>
         </flowable:inputOutput>
@@ -152,10 +155,11 @@
         <flowable:inputOutput>
           <flowable:inputParameter name="components">
             <flowable:map>
-              <flowable:entry key="SectionOperateur">WRITE</flowable:entry>
-              <flowable:entry key="SectionStation">WRITE</flowable:entry>
-              <flowable:entry key="SectionEquipements">WRITE</flowable:entry>
+              <flowable:entry key="SectionDemandeur">WRITE</flowable:entry>
+              <flowable:entry key="SectionDeclaration">WRITE</flowable:entry>
+              <flowable:entry key="SectionServices">WRITE</flowable:entry>
               <flowable:entry key="SectionAttachment">WRITE</flowable:entry>
+              <flowable:entry key="ActiveSection">SectionDemandeur,SectionDeclaration,SectionServices,SectionAttachment</flowable:entry>
             </flowable:map>
           </flowable:inputParameter>
         </flowable:inputOutput>
@@ -168,10 +172,11 @@
         <flowable:inputOutput>
           <flowable:inputParameter name="components">
             <flowable:map>
-              <flowable:entry key="SectionOperateur">READ</flowable:entry>
-              <flowable:entry key="SectionStation">READ</flowable:entry>
-              <flowable:entry key="SectionEquipements">READ</flowable:entry>
+              <flowable:entry key="SectionDemandeur">READ</flowable:entry>
+              <flowable:entry key="SectionDeclaration">READ</flowable:entry>
+              <flowable:entry key="SectionServices">READ</flowable:entry>
               <flowable:entry key="SectionAttachment">READ</flowable:entry>
+              <flowable:entry key="ActiveSection">SectionDemandeur,SectionDeclaration,SectionServices,SectionAttachment</flowable:entry>
             </flowable:map>
           </flowable:inputParameter>
         </flowable:inputOutput>
@@ -184,10 +189,11 @@
         <flowable:inputOutput>
           <flowable:inputParameter name="components">
             <flowable:map>
-              <flowable:entry key="SectionOperateur">WRITE</flowable:entry>
-              <flowable:entry key="SectionStation">WRITE</flowable:entry>
-              <flowable:entry key="SectionEquipements">WRITE</flowable:entry>
+              <flowable:entry key="SectionDemandeur">WRITE</flowable:entry>
+              <flowable:entry key="SectionDeclaration">WRITE</flowable:entry>
+              <flowable:entry key="SectionServices">WRITE</flowable:entry>
               <flowable:entry key="SectionAttachment">WRITE</flowable:entry>
+              <flowable:entry key="ActiveSection">SectionDemandeur,SectionDeclaration,SectionServices,SectionAttachment</flowable:entry>
             </flowable:map>
           </flowable:inputParameter>
         </flowable:inputOutput>
@@ -199,10 +205,11 @@
         <flowable:inputOutput>
           <flowable:inputParameter name="components">
             <flowable:map>
-              <flowable:entry key="SectionOperateur">READ</flowable:entry>
-              <flowable:entry key="SectionStation">READ</flowable:entry>
-              <flowable:entry key="SectionEquipements">READ</flowable:entry>
+              <flowable:entry key="SectionDemandeur">READ</flowable:entry>
+              <flowable:entry key="SectionDeclaration">READ</flowable:entry>
+              <flowable:entry key="SectionServices">READ</flowable:entry>
               <flowable:entry key="SectionAttachment">READ</flowable:entry>
+              <flowable:entry key="ActiveSection">SectionDemandeur,SectionDeclaration,SectionServices,SectionAttachment</flowable:entry>
             </flowable:map>
           </flowable:inputParameter>
         </flowable:inputOutput>
@@ -225,7 +232,7 @@
           reserialise a chaque transition : au second passage, la liste n'est
           plus vide et rien n'est recree.
         -->
-        <flowable:executionListener expression="${empty data.attestations ? attestationService.createAttestationForAutorisation(data) : execution.setVariable('isCreatedAtt', true)}" event="start" />
+        <flowable:executionListener expression="${empty data.attestations ? attestationService.createAttestationForDeclaratif(data) : execution.setVariable('isCreatedAtt', true)}" event="start" />
       </extensionElements>
     </exclusiveGateway>
     <userTask id="Task_signature_presidence" name="Signature du Pr&#233;sident du Conseil de R&#233;gulation" flowable:assignee="Direction Commerce" flowable:candidateGroups="DirectionCommerce" flowable:formFieldValidation="true">
@@ -234,10 +241,11 @@
         <flowable:inputOutput>
           <flowable:inputParameter name="components">
             <flowable:map>
-              <flowable:entry key="SectionOperateur">READ</flowable:entry>
-              <flowable:entry key="SectionStation">READ</flowable:entry>
-              <flowable:entry key="SectionEquipements">READ</flowable:entry>
+              <flowable:entry key="SectionDemandeur">READ</flowable:entry>
+              <flowable:entry key="SectionDeclaration">READ</flowable:entry>
+              <flowable:entry key="SectionServices">READ</flowable:entry>
               <flowable:entry key="SectionAttachment">READ</flowable:entry>
+              <flowable:entry key="ActiveSection">SectionDemandeur,SectionDeclaration,SectionServices,SectionAttachment</flowable:entry>
             </flowable:map>
           </flowable:inputParameter>
         </flowable:inputOutput>
@@ -249,10 +257,11 @@
         <flowable:inputOutput>
           <flowable:inputParameter name="components">
             <flowable:map>
-              <flowable:entry key="SectionOperateur">READ</flowable:entry>
-              <flowable:entry key="SectionStation">READ</flowable:entry>
-              <flowable:entry key="SectionEquipements">READ</flowable:entry>
+              <flowable:entry key="SectionDemandeur">READ</flowable:entry>
+              <flowable:entry key="SectionDeclaration">READ</flowable:entry>
+              <flowable:entry key="SectionServices">READ</flowable:entry>
               <flowable:entry key="SectionAttachment">READ</flowable:entry>
+              <flowable:entry key="ActiveSection">SectionDemandeur,SectionDeclaration,SectionServices,SectionAttachment</flowable:entry>
             </flowable:map>
           </flowable:inputParameter>
         </flowable:inputOutput>

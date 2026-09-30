@@ -1,7 +1,5 @@
 package picosoft.biz.arcep.service.dto;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +19,6 @@ public class TypeReseauDeclareDTO implements Serializable {
 
     private TypeReseau type;
 
-    @Size(max = 255)
     private String precisionAutre;
 
     private Long demandeReseauId;

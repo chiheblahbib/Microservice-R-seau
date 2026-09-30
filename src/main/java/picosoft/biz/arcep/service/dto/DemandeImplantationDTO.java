@@ -1,7 +1,5 @@
 package picosoft.biz.arcep.service.dto;
 
-import javax.validation.constraints.Size;
-import javax.validation.Valid;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,7 +26,6 @@ public class DemandeImplantationDTO implements Serializable {
 
     private Boolean web;
 
-    @Size(max = 25)
 
     private String reference;
 
@@ -46,25 +43,19 @@ public class DemandeImplantationDTO implements Serializable {
 
     private ZonedDateTime sendedDate;
 
-    @Size(max = 25)
 
     private String approvedBy;
 
-    @Size(max = 32)
 
     private String statutDossier;
 
-    @Size(max = 50)
 
     private String typeDossier;
 
-    @Valid
     private ClientDTO client;
 
-    @Valid
     private ApplicantDTO applicant;
 
-    @Valid
     /** LA station du dossier : une autorisation en vise une seule. */
     private StationDTO station;
 
@@ -90,7 +81,6 @@ public class DemandeImplantationDTO implements Serializable {
 
     private Boolean endProcess;
 
-    @Size(max = 64)
 
     private String state;
 
@@ -100,9 +90,17 @@ public class DemandeImplantationDTO implements Serializable {
 
     private Long numberOfattachments;
 
+    /**
+     * Ce que le kernel autorise CET utilisateur a faire sur CE dossier.
+     *
+     * Meme champ que sur le DTO de sortie, et pour la meme raison : le
+     * formulaire lit par ici, et c'est de cette valeur qu'il deduit si ses
+     * rubriques sont saisissables. Jamais persiste, jamais relu en entree.
+     */
+    private String userPermission;
+
     private Long step;
 
-    @Size(max = 500)
 
     private String commentaire;
 }

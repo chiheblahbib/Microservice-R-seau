@@ -16,6 +16,7 @@ import picosoft.biz.arcep.Workflow.service.WorkflowService;
 import picosoft.biz.arcep.client.currentuser.model.CurrentUser;
 import picosoft.biz.arcep.client.kernel.intercomm.KernelInterface;
 import picosoft.biz.arcep.client.kernel.model.acl.AclClass;
+import picosoft.biz.arcep.client.kernel.model.acl.Permission;
 import picosoft.biz.arcep.client.kernel.model.acl.AclObjectIdentity;
 import picosoft.biz.arcep.client.kernel.model.objects.AttachementInputDTO;
 import picosoft.biz.arcep.client.kernel.model.objects.PublicAttachementDto;
@@ -23,7 +24,7 @@ import picosoft.biz.arcep.controller.errors.BadRequestAlertException;
 import picosoft.biz.arcep.controller.errors.MmsiErrors;
 import picosoft.biz.arcep.domain.mmsi.DemandeMmsi;
 import picosoft.biz.arcep.domain.shared.Commentaire;
-import picosoft.biz.arcep.domain.shared.RapportTechnique;
+import picosoft.biz.arcep.domain.drrrs.RapportTechnique;
 import picosoft.biz.arcep.service.dto.RapportTechniqueDTO;
 import picosoft.biz.arcep.repository.CommentaireRepository;
 import picosoft.biz.arcep.repository.DemandeMmsiRepository;
@@ -133,15 +134,85 @@ public class DemandeMmsiService {
         return demandeMmsiQueryService.findByCriteria(criteria, pageable, size);
     }
 
+    /**
+     * Le dossier pour l'ecran de SAISIE, avec ce que le kernel autorise.
+     *
+     * A la difference de byId, cette lecture ne refuse RIEN. byId sert
+     * l'ecran de detail et applique la regle du gabarit -- un acces NONE
+     * est une erreur. Ici on renseigne la permission et on laisse le
+     * formulaire en tirer les consequences rubrique par rubrique, ce qui
+     * est precisement ce que la map `components` du circuit decrit.
+     */
     public Optional<DemandeMmsiDTO> findOne(Long id) {
-        return demandeMmsiRepository.findById(id).map(demandeMmsiMapper::toDto);
+        return demandeMmsiRepository.findById(id).map(entity -> {
+            DemandeMmsiDTO dto = demandeMmsiMapper.toDto(entity);
+            dto.setUserPermission(permissionSur(entity.getId()));
+            return dto;
+        });
     }
 
+    /**
+     * Ce que le kernel accorde a l'utilisateur courant, ou null s'il se tait.
+     *
+     * Null n'est pas un refus, c'est une absence de reponse : classe ACL
+     * pas encore declaree, ou kernel injoignable. L'ecran retombe alors
+     * sur son comportement d'avant plutot que de se verrouiller sur une
+     * donnee qu'il n'a pas. Verrouiller sur un silence ferait passer une
+     * panne d'infrastructure pour un refus de droits.
+     */
+    private String permissionSur(Long id) {
+        if (id == null) { return null; }
+        try {
+            AclClass aclClass = kernelInterface.getaclClassByClassName(DemandeMmsi.class.getName());
+            if (aclClass == null) { return null; }
+            return kernelInterface.checkSecurity(aclClass.getSimpleName(), id, currentUser.getSid());
+        } catch (Exception e) {
+            log.warn("checkSecurity indisponible pour le dossier {} : {}", id, e.toString());
+            return null;
+        }
+    }
+
+    /**
+     * Le dossier tel que CET utilisateur a le droit de le voir.
+     *
+     * Repris de AsiService.asiById : resoudre la classe ACL, demander au
+     * kernel la permission de l'utilisateur courant sur cet objet, refuser
+     * si elle est NONE, puis la poser sur le DTO. Le front lit ensuite
+     * `userPermission` exactement comme sur un dossier ASI.
+     *
+     * Le refus ne vaut que si l'objet porte deja une identite ACL : un
+     * dossier tout juste cree n'en a pas encore, et le kernel n'a alors
+     * rien a repondre -- l'interdire fermerait l'ecran a son propre auteur.
+     *
+     * Ecart assume avec le gabarit : le test est ecrit dans l'autre sens,
+     * Permission.NONE.name().equals(permission). Celui d'ASI appelle
+     * .equals sur la reponse du kernel et leve un NullPointerException si
+     * elle est nulle. Meme comportement pour toute reponse non nulle.
+     */
     public DemandeMmsiOutputDTO byId(Long id) {
         DemandeMmsi entity = demandeMmsiRepository.findById(id)
                 .orElseThrow(() -> new BadRequestAlertException(MmsiErrors.OBJECT_NOT_FOUND,
                         MmsiErrors.CLASS, MmsiErrors.OBJECT_NOT_FOUND));
-        return demandeMmsiOutputMapper.toDto(entity);
+
+        AclClass aclClass = kernelInterface.getaclClassByClassName(DemandeMmsi.class.getName());
+        if (aclClass == null) {
+            throw new BadRequestAlertException(MmsiErrors.ACL_CLASS_NOT_FOUND,
+                    MmsiErrors.CLASS, MmsiErrors.ACL_CLASS_NOT_FOUND);
+        }
+
+        String permission = kernelInterface.checkSecurity(
+                aclClass.getSimpleName(), id, currentUser.getSid());
+
+        if (Permission.NONE.name().equals(permission) && entity.getAclObjectIdentity() != null) {
+            throw new BadRequestAlertException(MmsiErrors.OBJECT_NOT_AUTHORIZED,
+                    MmsiErrors.CLASS, MmsiErrors.OBJECT_NOT_AUTHORIZED);
+        }
+
+        DemandeMmsiOutputDTO output = demandeMmsiOutputMapper.toDto(entity);
+        output.setClassId(aclClass.getId());
+        output.setClassName(aclClass.getClasse());
+        output.setUserPermission(permission);
+        return output;
     }
 
     /**
@@ -432,6 +503,25 @@ public class DemandeMmsiService {
                 .orElseThrow(() -> new BadRequestAlertException(MmsiErrors.OBJECT_NOT_FOUND,
                         MmsiErrors.CLASS, MmsiErrors.OBJECT_NOT_FOUND));
 
+        // C'est le kernel qui dit qui peut faire avancer ce dossier, et lui
+        // seul. Repris d'AsiService.submitAsi : sans WRITE ni INH_WRITE la
+        // transition est refusee ici, quelle que soit la decision demandee.
+        //
+        // C'est le PENDANT SERVEUR du bandeau de decisions, qui ne s'affiche
+        // cote front que sur un userPermission a WRITE. Une garde d'ecran
+        // seule se contourne avec un appel direct : les deux vont ensemble.
+        //
+        // Le droit est rejoue a chaque transition -- appliquerRetourMoteur
+        // repousse les authors et readers que le moteur rend pour la tache
+        // suivante -- donc l'acteur de la tache en cours est toujours auteur.
+        String permission = kernelInterface.checkSecurity(
+                aclClass.getSimpleName(), entity.getId(), currentUser.getSid());
+        if (!Permission.WRITE.name().equals(permission)
+                && !Permission.INH_WRITE.name().equals(permission)) {
+            throw new BadRequestAlertException(MmsiErrors.OBJECT_NOT_AUTHORIZED,
+                    MmsiErrors.CLASS, MmsiErrors.OBJECT_NOT_AUTHORIZED);
+        }
+
         demandeMmsiInputMapper.partialUpdate(entity, input);
         entity = demandeMmsiRepository.save(entity);
 
@@ -665,7 +755,7 @@ public class DemandeMmsiService {
             return;
         }
         Commentaire commentaire = new Commentaire();
-        commentaire.setAuteur(currentUser.getEmployeSid());
+        commentaire.setAuteur(currentUser.nomPourCommentaire());
         commentaire.setDescription(texte);
         commentaire.setDateSaisie(ZonedDateTime.now());
         commentaire.setClassId(aclClass.getId());

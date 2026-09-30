@@ -1,0 +1,78 @@
+{
+  "id": 29,
+  "uuid": "3f6c2a9e-8b1d-4c52-9e7a-5d0b8f4a1c27",
+  "web": false,
+  "reference": "0026-28-09-2026",
+  "createdDate": "2026-09-28T13:19:05.482913+02:00[Europe/Paris]",
+  "sendedDate": "2026-09-28T13:19:05.483027+02:00[Europe/Paris]",
+  "statutDossier": "soumis",
+  "typeDossier": "RESEAU",
+  "natureReseau": "PRIVE",
+  "natureDemande": "NOUVEAU",
+  "fraisDossier": 500000.0,
+  "deviseFrais": "XAF",
+  "client": {
+    "id": 57,
+    "clientType": "COMPANY",
+    "company": "Société Test E2E v20",
+    "tradeRegisterNumber": "RCCM-TEST-2026-020",
+    "address": "Libreville, Quartier Louis, BP 1234",
+    "phone": "+241 01 23 45 67",
+    "natureActivite": "Télécommunications"
+  },
+  "applicant": {
+    "id": 31,
+    "applicantType": "COMPANY",
+    "applicantName": "Recette Test v20",
+    "qualification": "Directeur technique",
+    "nationality": "GA",
+    "nationalityComplet": "Gabon",
+    "address": "Libreville, Glass, BP 5678",
+    "email": "recette.v20@exemple.test"
+  },
+  "typesReseau": [
+    { "id": 52, "type": "FH", "demandeReseauId": 29 }
+  ],
+  "services": [
+    { "id": 53, "type": "ACCES_INTERNET", "demandeReseauId": 29 }
+  ],
+  "sites": [
+    {
+      "id": 41,
+      "nomSite": "Site Test E2E Libreville",
+      "province": "Estuaire",
+      "ville": "Libreville",
+      "latitudeSens": "N",
+      "latitudeDegres": 0,
+      "latitudeMinutes": 24,
+      "latitudeSecondes": 31.2,
+      "longitudeSens": "E",
+      "longitudeDegres": 9,
+      "longitudeMinutes": 26,
+      "longitudeSecondes": 30.73,
+      "altitude": 6.0,
+      "demandeReseauId": 29
+    }
+  ],
+  "liaisons": [],
+  "attestations": [
+    {
+      "id": 84,
+      "reference": "0084-28-09-2026",
+      "classId": 1203,
+      "nomModele": "PRIVE",
+      "sysdateCreated": "2026-09-28T13:47:12.308114+02:00[Europe/Paris]",
+      "sysdateUpdated": "2026-09-28T13:47:12.341507+02:00[Europe/Paris]"
+    }
+  ],
+  "idsPostAttachments": "b7e1c0d2-6a41-4f7e-9d3b-1c2e5f8a9b01,4c9d2e7f-1b3a-4e6c-8f0d-2a5b7c9e1d03,9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c65",
+  "labelsPostAttachments": "Attestation du Nom commercial,Pièce d’identité du demandeur,Preuve de statut légal",
+  "wfProcessID": "5c1e9f3a-7d2b-11f1-9a4e-0a0027000011",
+  "classId": 1187,
+  "className": "picosoft.biz.arcep.domain.reseau.DemandeReseau",
+  "activityName": "Signature du Président du Conseil de Régulation",
+  "assignee": "Direction Commerce",
+  "endProcess": false,
+  "state": "En cours",
+  "numberOfattachments": 0
+}

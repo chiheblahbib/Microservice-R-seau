@@ -312,6 +312,22 @@ public class CurrentUser {
         return displayName;
     }
 
+    /**
+     * L'auteur d'un commentaire, lisible : resolveCommentaireAuteur d'homologation
+     * (AsiService) -- le nom affiche, sinon celui de l'employe, sinon l'identifiant
+     * de connexion. Ecrire l'identifiant technique (employeSid) affichait un UUID
+     * dans la colonne « Auteur ».
+     */
+    public String nomPourCommentaire() {
+        if (displayName != null && !displayName.isBlank()) {
+            return displayName;
+        }
+        if (employeDisplayName != null && !employeDisplayName.isBlank()) {
+            return employeDisplayName;
+        }
+        return samaccountname;
+    }
+
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }

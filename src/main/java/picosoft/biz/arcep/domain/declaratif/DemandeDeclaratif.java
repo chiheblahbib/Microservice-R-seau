@@ -7,14 +7,13 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import picosoft.biz.arcep.configuration.audit.Auditable;
 import picosoft.biz.arcep.domain.shared.Applicant;
-import picosoft.biz.arcep.domain.shared.RapportTechnique;
+import picosoft.biz.arcep.domain.drrrs.RapportTechnique;
 import picosoft.biz.arcep.domain.declaratif.enumeration.*;
 import picosoft.biz.arcep.client.kernel.model.acl.AclObjectIdentity;
 import picosoft.biz.arcep.domain.shared.Attestation;
 import picosoft.biz.arcep.domain.shared.Client;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -67,20 +66,19 @@ public class DemandeDeclaratif extends Auditable implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
+    @Column(columnDefinition = "uuid", updatable = false)
     private UUID uuid;
 
     @Column(name = "web")
     private Boolean web;
 
-    @Column(name = "reference", length = 25)
-    @Size(max = 25)
+    @Column(name = "reference")
     private String reference;
 
-    @Column(name = "created_date", length = 25)
+    @Column(name = "created_date")
     private ZonedDateTime createdDate;
 
-    @Column(name = "sended_date", length = 25)
+    @Column(name = "sended_date")
     private ZonedDateTime sendedDate;
 
     @Column(name = "approvedBy")
@@ -91,12 +89,10 @@ public class DemandeDeclaratif extends Auditable implements Serializable {
      * Chaine et non enumeration, pour s'aligner sur Asi et sur les diagrammes
      * deployes, qui testent des chaines nues. La valeur est posee par le front.
      */
-    @Column(name = "statut_dossier", length = 32)
-    @Size(max = 32)
+    @Column(name = "statut_dossier")
     private String statutDossier;
 
-    @Column(name = "type_dossier", length = 50)
-    @Size(max = 50)
+    @Column(name = "type_dossier")
     private String typeDossier;
 
     // ---------------------------- rubrique 4 ----------------------------
@@ -109,17 +105,16 @@ public class DemandeDeclaratif extends Auditable implements Serializable {
      * dont les ecrans de suivi trient dessus.
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "nature_demande", length = 16)
+    @Column(name = "nature_demande")
     private NatureDemande natureDemande;
 
     /** Nouvelle declaration, ou modification d'un certificat existant. */
     @Enumerated(EnumType.STRING)
-    @Column(name = "type_enregistrement", length = 32)
+    @Column(name = "type_enregistrement")
     private TypeEnregistrement typeEnregistrement;
 
     /** Le numero du certificat modifie. N'a de sens qu'en modification. */
-    @Column(name = "numero_certificat", length = 50)
-    @Size(max = 50)
+    @Column(name = "numero_certificat")
     private String numeroCertificat;
 
     /**
@@ -127,8 +122,7 @@ public class DemandeDeclaratif extends Auditable implements Serializable {
      *
      * Vide au depot : c'est le livrable du dossier, pas une donnee saisie.
      */
-    @Column(name = "certificat_delivre", length = 50)
-    @Size(max = 50)
+    @Column(name = "certificat_delivre")
     private String certificatDelivre;
 
     // ---------------------------- rubrique 1 ----------------------------
@@ -136,13 +130,11 @@ public class DemandeDeclaratif extends Auditable implements Serializable {
     // `client`, la table partagee. Restent ici les deux champs qu'elle n'a pas.
 
     /** Forme juridique : SARL, SA, etablissement public... */
-    @Column(name = "forme_juridique", length = 100)
-    @Size(max = 100)
+    @Column(name = "forme_juridique")
     private String formeJuridique;
 
     /** Boite postale, que `client` ne porte pas separement de l'adresse. */
-    @Column(name = "boite_postale", length = 50)
-    @Size(max = 50)
+    @Column(name = "boite_postale")
     private String boitePostale;
 
     // ---------------------------- rubrique 5 ----------------------------
@@ -163,7 +155,7 @@ public class DemandeDeclaratif extends Auditable implements Serializable {
 
     /** Province, ou tout le territoire national. */
     @Enumerated(EnumType.STRING)
-    @Column(name = "type_couverture", length = 16)
+    @Column(name = "type_couverture")
     private TypeCouverture typeCouverture;
 
     /**
@@ -173,8 +165,7 @@ public class DemandeDeclaratif extends Auditable implements Serializable {
      * et personne ne cherchera un dossier par province avant longtemps. Le
      * jour ou ce sera le cas, une table sera justifiee -- pas avant.
      */
-    @Column(name = "provinces", length = 255)
-    @Size(max = 255)
+    @Column(name = "provinces")
     private String provinces;
 
     // ---------------------------- rubrique 8 ----------------------------
@@ -233,8 +224,7 @@ public class DemandeDeclaratif extends Auditable implements Serializable {
     @Column(name = "frais_dossier", precision = 12, scale = 2)
     private BigDecimal fraisDossier;
 
-    @Column(name = "devise_frais", length = 8)
-    @Size(max = 8)
+    @Column(name = "devise_frais")
     private String deviseFrais;
 
     // ------------------------------------------------------------------
@@ -343,8 +333,7 @@ public class DemandeDeclaratif extends Auditable implements Serializable {
     @Column(name = "end_process")
     private Boolean endProcess = false;
 
-    @Column(name = "state", length = 64)
-    @Size(max = 64)
+    @Column(name = "state")
     private String state;
 
     @Column(name = "number_of_attachments")

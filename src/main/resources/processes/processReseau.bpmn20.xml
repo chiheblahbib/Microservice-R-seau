@@ -19,11 +19,10 @@
   [2] Les flux nommes 'sys_...' sont EXCLUS de la liste des decisions
       (WorkflowService:200). C'est ainsi qu'on cache une branche automatique.
 
-      Ce circuit a deux aiguillages pilotes par la DONNEE et non par l'utilisateur :
-      Gw_frais (ordre de recette requis ?) et Gw_signataire (quel signataire ?).
-      Sur chacun, UN SEUL flux reste visible : il fournit le bouton, la branche
-      opposee est en 'sys_'. Le routage se fait ensuite sur la condition de donnee,
-      la valeur de Decision n'etant pas testee.
+      Ce circuit n'a plus d'aiguillage pilote par la donnee : la v22 de l'admin kernel
+      (28/09/2026) a retire Gw_frais (ordre de recette requis ?) et Gw_signataire (quel
+      signataire ?), ainsi que les deux taches « Automatique ». « Soumettre » mene
+      toujours a l'ordre de recette, « Pour Signature » toujours au President.
 
       Attention : mettre 'sys_' sur TOUTES les sorties d'une gateway rend muette la
       tache qui la precede ~~ getGatewayDecision renvoie alors une liste vide et le
@@ -60,14 +59,12 @@
       * la suite Saisie -> Numerotation -> Orientation -> Etude technique ->
       Validation du rapport est supposee identique ;
       * le signataire final : le formulaire adresse la demande a M. le President
-      du Conseil de Regulation, d'ou la branche "Signature du President du
-      Conseil de Regulation" a la place de la Direction Commerce. La branche
-      par defaut reste le Chef Centre ;
+      du Conseil de Regulation. Tout dossier passe donc par la "Signature du
+      President du Conseil de Regulation", puis revient au Chef Centre qui le
+      confirme et le cloture ;
       * les frais de dossier sont dus dans TOUS LES CAS (300 000 FCFA pour un
-      reseau PMR unique, 500 000 pour tout autre assemblage). La passerelle
-      Gw_frais teste pourtant encore ${data.statutDossier== 'soumis'}, condition
-      heritee : si l'ordre de recette doit etre systematique, la branche
-      Flow_sys_sans_frais est a supprimer.
+      reseau PMR unique, 500 000 pour tout autre assemblage) : l'ordre de recette
+      est systematique depuis la v22.
 
   ETAPES SPECIFIQUES AU RESEAU, NON MODELISEES
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -77,22 +74,18 @@
       * les justificatifs d'homologation des equipements (item g).
   A separer en taches si l'instruction les confie a des agents differents.
 
-  VALEURS METIER, CONFIRMEES LE 27/08/2026
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ${data.typeDossier== 'COMMERCE'}  -> signature du President du Conseil de Regulation
-  ${data.typeDossier!= 'COMMERCE'}  -> signature Chef Centre (branche par defaut)
-  ${data.statutDossier== 'soumis'}  -> passage par l'ordre de recette
+  VALEURS METIER
+  ~~~~~~~~~~~~~
+  Depuis la v22, le circuit ne teste plus ni typeDossier ni statutDossier. Le front
+  pose toujours typeDossier = 'RESEAU' (anciennement 'COMMERCE') ; les dossiers
+  demarres sur une version anterieure (v23 et avant) continuent sur leur version,
+  qui teste encore ces valeurs.
 
-  La valeur 'COMMERCE' est celle du circuit d'implantation, conservee pour ne
-  pas casser la condition. Un libelle propre au reseau serait plus clair ~~
-  'PRESIDENCE' par exemple ~~ mais il faudrait le poser cote front ET ici, en
-  meme temps, sous peine d'envoyer tous les dossiers sur la branche par defaut
-  sans aucune erreur.
-
-  Ces deux champs sont des String libres, poses par le front : rien cote serveur ne
-  contraint leurs valeurs. Une faute de frappe sur 'COMMERCE' enverra silencieusement
-  le dossier au Chef Centre, sans erreur. Si ce risque doit etre ferme, ajouter un
-  controle des valeurs acceptees a l'entree du service.
+  SYNCHRONISATION AVEC LE KERNEL : ce fichier suit la v22 deployee par l'admin depuis
+  l'editeur BPM du kernel. Au demarrage, drrrs-back redeploie ce dossier s'il differe
+  du dernier « SpringBootAutoDeployment » : un fichier en retard efface la version de
+  l'admin (c'est arrive le 28/09/2026 a 15:19, v23). Avant de modifier ce fichier ou de
+  redemarrer apres une intervention de l'admin, relire la derniere version deployee.
   ============================================================================================
 -->
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" targetNamespace="http://flowable.org/test">
@@ -104,6 +97,9 @@
       <lane id="lane_reception" name="Réception">
         <flowNodeRef>Start_reseau</flowNodeRef>
         <flowNodeRef>Task_saisie</flowNodeRef>
+        <flowNodeRef>Gw_debut</flowNodeRef>
+        <flowNodeRef>Task_depot_web</flowNodeRef>
+        <flowNodeRef>Gw_retour_saisie</flowNodeRef>
       </lane>
       <lane id="lane_numerotation" name="Numérotation">
         <flowNodeRef>Task_numerotation</flowNodeRef>
@@ -113,9 +109,9 @@
         <flowNodeRef>Task_orientation</flowNodeRef>
         <flowNodeRef>Gw_retour_orientation</flowNodeRef>
         <flowNodeRef>Task_validation_rapport</flowNodeRef>
-        <flowNodeRef>Gw_frais</flowNodeRef>
+        <flowNodeRef>Gw_retour_validation</flowNodeRef>
+        <flowNodeRef>Gw_retour_ordre</flowNodeRef>
         <flowNodeRef>Task_validation_ordre</flowNodeRef>
-        <flowNodeRef>Gw_signataire</flowNodeRef>
         <flowNodeRef>Task_signature_chef</flowNodeRef>
         <flowNodeRef>End_reseau</flowNodeRef>
       </lane>
@@ -131,33 +127,60 @@
       </lane>
     </laneSet>
     <startEvent id="Start_reseau" name="Début" />
-    <userTask id="Task_saisie" name="Saisie &#38; Étude Complétude Dossier" flowable:assignee="Réception" flowable:candidateGroups="Reception" flowable:formFieldValidation="true">
+    <!-- Comme processAsi : un dossier deposé depuis le web (data.web) passe d'abord par
+         « Dépôt depuis le web », aux mains du déposant, qui le soumet à la Réception ;
+         un dossier déposé au guichet va directement à la saisie. -->
+    <exclusiveGateway id="Gw_debut" />
+    <userTask id="Task_depot_web" name="Dépôt depuis le web" flowable:assignee="Demandeur" flowable:candidateGroups="${initiator}" flowable:formFieldValidation="true">
       <extensionElements>
-        <flowable:executionListener expression="${execution.setVariable('${data.state}','En attente')}" event="start" />
-        <flowable:executionListener expression="${createEvent._execute(execution,'DepotReseauNotif')}" event="start" />
         <flowable:inputOutput>
           <flowable:inputParameter name="components">
             <flowable:map>
-              <flowable:entry key="SectionRequerant">WRITE</flowable:entry>
+              <flowable:entry key="SectionDemandeur">WRITE</flowable:entry>
               <flowable:entry key="SectionReseau">WRITE</flowable:entry>
               <flowable:entry key="SectionSites">WRITE</flowable:entry>
+              <flowable:entry key="SectionPostAttachment">WRITE</flowable:entry>
               <flowable:entry key="SectionAttachment">WRITE</flowable:entry>
             </flowable:map>
           </flowable:inputParameter>
         </flowable:inputOutput>
       </extensionElements>
     </userTask>
-    <userTask id="Task_numerotation" name="Contrôle &#38; Numérotation du Dossier" flowable:assignee="Service Numérotation" flowable:candidateGroups="Numerotation" flowable:dueDate="P3D" flowable:formFieldValidation="true">
+    <exclusiveGateway id="Gw_retour_saisie" />
+    <userTask id="Task_saisie" name="Saisie &#38; Étude Complétude Dossier" flowable:assignee="Réception" flowable:candidateUsers="${initiator}" flowable:candidateGroups="Reception" flowable:formFieldValidation="true">
       <extensionElements>
-        <flowable:executionListener expression="${execution.setVariable('${data.state}','En cours')}" event="start" />
+        <flowable:executionListener expression="${data.state == null ? data.setState('En attente') : null}" event="start" />
+        <flowable:executionListener expression="${createEvent._execute(execution,'DepotReseauNotif')}" event="start" />
+        <flowable:inputOutput>
+          <flowable:inputParameter name="components">
+            <flowable:map>
+              <flowable:entry key="SectionDemandeur">WRITE</flowable:entry>
+              <flowable:entry key="SectionReseau">WRITE</flowable:entry>
+              <flowable:entry key="SectionSites">WRITE</flowable:entry>
+              <flowable:entry key="SectionPostAttachment">WRITE</flowable:entry>
+              <flowable:entry key="SectionAttachment">WRITE</flowable:entry>
+              <flowable:entry key="ActiveSection">SectionPostAttachment,SectionAttachment</flowable:entry>
+            </flowable:map>
+          </flowable:inputParameter>
+        </flowable:inputOutput>
+      </extensionElements>
+    </userTask>
+    <!-- Regle DRRRS (ecart voulu avec ASI) : la Numerotation CONSULTE le dossier, sans le
+         modifier ; elle numerise les pieces, puis accepte ou renvoie « Pour Vérification ».
+         Etat : « En attente » (depot, onglet « À numériser ») ou « À vérifier » (renvoye par
+         le Chef Centre, onglet « Retournés pour vérification »), comme dans processAsi. -->
+    <userTask id="Task_numerotation" name="Contrôle &#38; Numérotation du Dossier" flowable:assignee="Service Numérotation" flowable:candidateUsers="Reception,${initiator}" flowable:candidateGroups="Numerotation" flowable:dueDate="P3D" flowable:formFieldValidation="true">
+      <extensionElements>
         <flowable:executionListener expression="${createEvent._execute(execution,'NumeriserReseauNotif')}" event="start" />
         <flowable:inputOutput>
           <flowable:inputParameter name="components">
             <flowable:map>
-              <flowable:entry key="SectionRequerant">WRITE</flowable:entry>
-              <flowable:entry key="SectionReseau">WRITE</flowable:entry>
-              <flowable:entry key="SectionSites">WRITE</flowable:entry>
+              <flowable:entry key="SectionDemandeur">READ</flowable:entry>
+              <flowable:entry key="SectionReseau">READ</flowable:entry>
+              <flowable:entry key="SectionSites">READ</flowable:entry>
+              <flowable:entry key="SectionPostAttachment">WRITE</flowable:entry>
               <flowable:entry key="SectionAttachment">WRITE</flowable:entry>
+              <flowable:entry key="ActiveSection">SectionPostAttachment,SectionAttachment</flowable:entry>
             </flowable:map>
           </flowable:inputParameter>
         </flowable:inputOutput>
@@ -166,30 +189,40 @@
     <exclusiveGateway id="Gw_retour_numerotation" />
     <userTask id="Task_orientation" name="Orientation du Dossier" flowable:assignee="Chef Centre" flowable:candidateGroups="ChefCentre" flowable:dueDate="P2D" flowable:formFieldValidation="true">
       <extensionElements>
-        <flowable:executionListener expression="${createEvent._execute(execution,'OrientationReseauNotif')}" event="start" />
+        <flowable:executionListener expression="${data.setState('En cours')}" event="start" />
         <flowable:inputOutput>
           <flowable:inputParameter name="components">
             <flowable:map>
-              <flowable:entry key="SectionRequerant">READ</flowable:entry>
+              <flowable:entry key="SectionDemandeur">READ</flowable:entry>
               <flowable:entry key="SectionReseau">READ</flowable:entry>
               <flowable:entry key="SectionSites">READ</flowable:entry>
+              <flowable:entry key="SectionPostAttachment">READ</flowable:entry>
               <flowable:entry key="SectionAttachment">READ</flowable:entry>
+              <flowable:entry key="DemandeComplement">WRITE</flowable:entry>
+              <flowable:entry key="ActiveSection">SectionDemandeur,SectionReseau,SectionSites,SectionAttachment</flowable:entry>
             </flowable:map>
           </flowable:inputParameter>
         </flowable:inputOutput>
       </extensionElements>
     </userTask>
     <exclusiveGateway id="Gw_retour_orientation" />
-    <userTask id="Task_etude" name="Étude Technique" flowable:assignee="Service Technique" flowable:candidateGroups="ServiceTechnique" flowable:formFieldValidation="true">
+    <!-- candidateUsers = LECTEURS (WorkflowService._getCandidateUsers -> applySecurity readers) :
+         le Chef Centre garde la lecture pendant l'etude, ce qui alimente son onglet
+         « Dossier a affecter » (liste findAll, masques 1-2-4) et son action Affecter,
+         comme pour le dossier ASI. Sans lui, applySecurity non cumulatif ne laisse
+         au dossier que le groupe ServiceTechnique. -->
+    <userTask id="Task_etude" name="Étude Technique" flowable:assignee="Service Technique" flowable:candidateGroups="ServiceTechnique" flowable:candidateUsers="ChefCentre" flowable:formFieldValidation="true">
       <extensionElements>
-        <flowable:executionListener expression="${createEvent._execute(execution,'EtudeTechniqueReseauNotif')}" event="start" />
         <flowable:inputOutput>
           <flowable:inputParameter name="components">
             <flowable:map>
-              <flowable:entry key="SectionRequerant">WRITE</flowable:entry>
+              <flowable:entry key="SectionDemandeur">READ</flowable:entry>
               <flowable:entry key="SectionReseau">WRITE</flowable:entry>
               <flowable:entry key="SectionSites">WRITE</flowable:entry>
-              <flowable:entry key="SectionAttachment">WRITE</flowable:entry>
+              <flowable:entry key="SectionPostAttachment">READ</flowable:entry>
+              <flowable:entry key="SectionAttachment">READ</flowable:entry>
+              <flowable:entry key="DemandeComplement">WRITE</flowable:entry>
+              <flowable:entry key="ActiveSection">SectionDemandeur,SectionReseau,SectionSites</flowable:entry>
             </flowable:map>
           </flowable:inputParameter>
         </flowable:inputOutput>
@@ -198,30 +231,35 @@
     <exclusiveGateway id="Gw_retour_etude" />
     <userTask id="Task_validation_rapport" name="Validation Rapport Technique" flowable:assignee="Chef Centre" flowable:candidateGroups="ChefCentre" flowable:formFieldValidation="true">
       <extensionElements>
-        <flowable:executionListener expression="${createEvent._execute(execution,'ValidationRapportReseauNotif')}" event="start" />
         <flowable:inputOutput>
           <flowable:inputParameter name="components">
             <flowable:map>
-              <flowable:entry key="SectionRequerant">READ</flowable:entry>
+              <flowable:entry key="SectionDemandeur">READ</flowable:entry>
               <flowable:entry key="SectionReseau">READ</flowable:entry>
               <flowable:entry key="SectionSites">READ</flowable:entry>
+              <flowable:entry key="SectionPostAttachment">READ</flowable:entry>
               <flowable:entry key="SectionAttachment">READ</flowable:entry>
+              <flowable:entry key="DemandeComplement">WRITE</flowable:entry>
+              <flowable:entry key="ActiveSection">SectionDemandeur,SectionReseau,SectionSites</flowable:entry>
             </flowable:map>
           </flowable:inputParameter>
         </flowable:inputOutput>
       </extensionElements>
     </userTask>
-    <exclusiveGateway id="Gw_frais" name="Frais de dossier a percevoir ?" />
+    <!-- Comme processAsi : le Chef Centre valide le rapport, ou le renvoie a l'Etude
+         Technique « Pour Vérification » (etat « À vérifier »). -->
+    <exclusiveGateway id="Gw_retour_validation" />
     <userTask id="Task_ordre_recette" name="Établir l&#39;Ordre de Recette" flowable:assignee="Service Comptabilité" flowable:candidateGroups="Comptabilite" flowable:formFieldValidation="true">
       <extensionElements>
-        <flowable:executionListener expression="${createEvent._execute(execution,'OrdreRecetteNotif')}" event="start" />
         <flowable:inputOutput>
           <flowable:inputParameter name="components">
             <flowable:map>
-              <flowable:entry key="SectionRequerant">WRITE</flowable:entry>
+              <flowable:entry key="SectionDemandeur">WRITE</flowable:entry>
               <flowable:entry key="SectionReseau">WRITE</flowable:entry>
               <flowable:entry key="SectionSites">WRITE</flowable:entry>
-              <flowable:entry key="SectionAttachment">WRITE</flowable:entry>
+              <flowable:entry key="SectionPostAttachment">READ</flowable:entry>
+              <flowable:entry key="SectionAttachment">READ</flowable:entry>
+              <flowable:entry key="ActiveSection">SectionDemandeur,SectionReseau,SectionSites</flowable:entry>
             </flowable:map>
           </flowable:inputParameter>
         </flowable:inputOutput>
@@ -229,49 +267,35 @@
     </userTask>
     <userTask id="Task_validation_ordre" name="Validation Ordre de Recette" flowable:assignee="Chef Centre" flowable:candidateGroups="ChefCentre" flowable:formFieldValidation="true">
       <extensionElements>
-        <flowable:executionListener expression="${createEvent._execute(execution,'ValidationOrdreRecetteNotif')}" event="start" />
         <flowable:inputOutput>
           <flowable:inputParameter name="components">
             <flowable:map>
-              <flowable:entry key="SectionRequerant">READ</flowable:entry>
+              <flowable:entry key="SectionDemandeur">READ</flowable:entry>
               <flowable:entry key="SectionReseau">READ</flowable:entry>
               <flowable:entry key="SectionSites">READ</flowable:entry>
+              <flowable:entry key="SectionPostAttachment">READ</flowable:entry>
               <flowable:entry key="SectionAttachment">READ</flowable:entry>
+              <flowable:entry key="ActiveSection">SectionDemandeur,SectionReseau,SectionSites</flowable:entry>
             </flowable:map>
           </flowable:inputParameter>
         </flowable:inputOutput>
       </extensionElements>
     </userTask>
-<exclusiveGateway id="Gw_signataire" name="Quel signataire ?">
-      <extensionElements>
-        <!--
-          DELIVRANCE DU TITRE.
-
-          Pose sur la passerelle et non sur un flux : les deux branches menent a
-          une signature, et l'autorisation doit exister AVANT d'etre signee. Un
-          ecouteur par branche aurait duplique l'expression pour le meme effet.
-
-          La garde protege des retours en arriere : ce point est re-traversable
-          par la boucle « Retourner », et AttestationService n'est pas idempotent
-          ~~ sans elle, chaque aller-retour delivrerait un titre de plus.
-
-          `data.attestations` vient de DemandeReseauOutputDTO, que le moteur
-          reserialise a chaque transition : au second passage, la liste n'est
-          plus vide et rien n'est recree.
-        -->
-        <flowable:executionListener expression="${empty data.attestations ? attestationService.createAttestationForAutorisation(data) : execution.setVariable('isCreatedAtt', true)}" event="start" />
-      </extensionElements>
-    </exclusiveGateway>
+    <!-- Comme processAsi : le Chef Centre valide l'ordre de recette (« Pour Signature »),
+         ou le renvoie a la Comptabilite « Pour Vérification » (etat « À vérifier »). -->
+    <exclusiveGateway id="Gw_retour_ordre" />
     <userTask id="Task_signature_presidence" name="Signature du Pr&#233;sident du Conseil de R&#233;gulation" flowable:assignee="Direction Commerce" flowable:candidateGroups="DirectionCommerce" flowable:formFieldValidation="true">
       <extensionElements>
         <flowable:executionListener expression="${createEvent._execute(execution,'SignaturePresidenceNotif')}" event="start" />
         <flowable:inputOutput>
           <flowable:inputParameter name="components">
             <flowable:map>
-              <flowable:entry key="SectionRequerant">READ</flowable:entry>
+              <flowable:entry key="SectionDemandeur">READ</flowable:entry>
               <flowable:entry key="SectionReseau">READ</flowable:entry>
               <flowable:entry key="SectionSites">READ</flowable:entry>
+              <flowable:entry key="SectionPostAttachment">READ</flowable:entry>
               <flowable:entry key="SectionAttachment">READ</flowable:entry>
+              <flowable:entry key="ActiveSection">SectionDemandeur,SectionReseau,SectionSites</flowable:entry>
             </flowable:map>
           </flowable:inputParameter>
         </flowable:inputOutput>
@@ -283,10 +307,13 @@
         <flowable:inputOutput>
           <flowable:inputParameter name="components">
             <flowable:map>
-              <flowable:entry key="SectionRequerant">READ</flowable:entry>
+              <flowable:entry key="SectionDemandeur">READ</flowable:entry>
               <flowable:entry key="SectionReseau">READ</flowable:entry>
               <flowable:entry key="SectionSites">READ</flowable:entry>
+              <flowable:entry key="SectionPostAttachment">READ</flowable:entry>
               <flowable:entry key="SectionAttachment">READ</flowable:entry>
+              <flowable:entry key="DemandeComplement">WRITE</flowable:entry>
+              <flowable:entry key="ActiveSection">SectionDemandeur,SectionReseau,SectionSites</flowable:entry>
             </flowable:map>
           </flowable:inputParameter>
         </flowable:inputOutput>
@@ -294,51 +321,105 @@
     </userTask>
     <endEvent id="End_reseau" name="Clôturé">
       <extensionElements>
-        <flowable:executionListener expression="${execution.setVariable('${data.state}','Clôturé')}" event="start" />
+        <flowable:executionListener expression="${data.setState('Clôturé')}" event="start" />
       </extensionElements>
     </endEvent>
-    <sequenceFlow id="Flow_debut" sourceRef="Start_reseau" targetRef="Task_saisie" />
-    <sequenceFlow id="Flow_soumettre" name="Soumettre" sourceRef="Task_saisie" targetRef="Task_numerotation">
+    <sequenceFlow id="Flow_debut" sourceRef="Start_reseau" targetRef="Gw_debut" />
+    <sequenceFlow id="Flow_debut_guichet" sourceRef="Gw_debut" targetRef="Task_saisie">
+      <conditionExpression xsi:type="tFormalExpression">${data.web != true}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_debut_web" sourceRef="Gw_debut" targetRef="Task_depot_web">
+      <conditionExpression xsi:type="tFormalExpression">${data.web == true}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_web_soumettre" name="Soumettre" sourceRef="Task_depot_web" targetRef="Task_saisie">
       <extensionElements>
         <flowable:properties>
           <flowable:property name="ordre" value="0" />
           <flowable:property name="color" value="bg-green-600 hover:bg-green-700 text-white" />
           <flowable:property name="icon" value="submit" />
-          <flowable:property name="decisionMessageConfirmation" value="Soumettre le dossier au service numérotation" />
+          <flowable:property name="decisionMessageConfirmation" value="Soumettre le dossier à la réception" />
+          <flowable:property name="decisionComponentAlert" value="PieceJointe" />
         </flowable:properties>
+        <flowable:executionListener expression="${data.setState('En attente')}" event="take" />
       </extensionElements>
     </sequenceFlow>
-    <sequenceFlow id="Flow_vers_gw_num" sourceRef="Task_numerotation" targetRef="Gw_retour_numerotation" />
-    <sequenceFlow id="Flow_accepter" name="Accepter" sourceRef="Gw_retour_numerotation" targetRef="Task_orientation">
+    <!-- Comme processAsi : la Réception soumet à la Numérotation, ou « Retourner » le dossier
+         au déposant web (état « À vérifier »). Toute décision autre que le retour soumet,
+         ce qui laisse passer le premier dépôt (_initAndNextTask). -->
+    <sequenceFlow id="Flow_vers_gw_saisie" sourceRef="Task_saisie" targetRef="Gw_retour_saisie" />
+    <sequenceFlow id="Flow_saisie_retour" name="Retourner" sourceRef="Gw_retour_saisie" targetRef="Task_depot_web">
       <extensionElements>
         <flowable:properties>
           <flowable:property name="ordre" value="0" />
-          <flowable:property name="color" value="bg-green-600 hover:bg-green-700 text-white" />
-          <flowable:property name="icon" value="submit" />
-          <flowable:property name="decisionMessageConfirmation" value="Accepter et orienter le dossier" />
+          <flowable:property name="color" value="bg-orange-600 hover:bg-orange-700 text-white" />
+          <flowable:property name="icon" value="reject" />
+          <flowable:property name="decisionMessageConfirmation" value="Êtes-vous sûr de retourner ce dossier au demandeur ?" />
+          <flowable:property name="decisionComponentAlert" value="NONE" />
         </flowable:properties>
+        <flowable:executionListener expression="${data.setState('À vérifier')}" event="take" />
       </extensionElements>
-      <conditionExpression xsi:type="tFormalExpression">${Decision == 'Flow_accepter'}</conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression">${Decision == 'Flow_saisie_retour'}</conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="Flow_num_retour" name="Retourner" sourceRef="Gw_retour_numerotation" targetRef="Task_saisie">
+    <sequenceFlow id="Flow_soumettre" name="Soumettre" sourceRef="Gw_retour_saisie" targetRef="Task_numerotation">
       <extensionElements>
         <flowable:properties>
           <flowable:property name="ordre" value="1" />
-          <flowable:property name="color" value="bg-red-600 hover:bg-red-700 text-white" />
-          <flowable:property name="icon" value="undo" />
-          <flowable:property name="decisionMessageConfirmation" value="Retourner le dossier à la réception" />
+          <flowable:property name="color" value="bg-green-600 hover:bg-green-700 text-white" />
+          <flowable:property name="icon" value="submit" />
+          <flowable:property name="decisionMessageConfirmation" value="Soumettre le dossier au service numérotation" />
+          <flowable:property name="decisionComponentAlert" value="PieceJointe" />
         </flowable:properties>
+        <flowable:executionListener expression="${data.setState('En attente')}" event="take" />
       </extensionElements>
-      <conditionExpression xsi:type="tFormalExpression">${Decision == 'Flow_num_retour'}</conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression">${Decision != 'Flow_saisie_retour'}</conditionExpression>
+    </sequenceFlow>
+    <!-- Copie de processAsi (lu sur ARCEP-DEV le 24/09/2026) : la Numerotation accepte le
+         dossier (Orientation du Chef Centre) ou le renvoie a la Reception « Pour Vérification »,
+         statut « À vérifier ». -->
+    <!-- Ordre des boutons comme processAsi : le retour « Pour Vérification » a gauche (ordre 0),
+         l'action qui fait avancer le dossier a droite (ordre 1). -->
+    <sequenceFlow id="Flow_vers_gw_num" sourceRef="Task_numerotation" targetRef="Gw_retour_numerotation" />
+    <!-- DECHARGE (accuse de reception), comme processAsi sur son « Accepter » : l'evenement kernel
+         DechargeReseau (classe DemandeReseau) produit le PDF avec le modele Jasper DechargeReseau et
+         le range dans jrxml-events, d'ou le front le relit. Pas de garde « sendDecharge » : DemandeReseau
+         n'a pas ce champ, et une nouvelle acceptation apres un retour reedite une decharge a jour.
+         Un evenement non declare au kernel est seulement journalise (createEvent), le circuit continue. -->
+    <sequenceFlow id="Flow_accepter" name="Accepter" sourceRef="Gw_retour_numerotation" targetRef="Task_orientation">
+      <extensionElements>
+        <flowable:properties>
+          <flowable:property name="ordre" value="1" />
+          <flowable:property name="color" value="bg-green-600 hover:bg-green-700 text-white" />
+          <flowable:property name="icon" value="submit" />
+          <flowable:property name="decisionMessageConfirmation" value="Accepter et orienter le dossier" />
+          <flowable:property name="decisionComponentAlert" value="PieceJointe" />
+        </flowable:properties>
+        <flowable:executionListener expression="${createEvent._execute(execution,'DechargeReseau')}" event="take" />
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression">${Decision == 'Flow_accepter'}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_num_verif" name="Pour Vérification" sourceRef="Gw_retour_numerotation" targetRef="Task_saisie">
+      <documentation>Retourner au réception pour vérification</documentation>
+      <extensionElements>
+        <flowable:properties>
+          <flowable:property name="ordre" value="0" />
+          <flowable:property name="color" value="bg-orange-600 hover:bg-orange-700 text-white" />
+          <flowable:property name="icon" value="reject" />
+          <flowable:property name="decisionMessageConfirmation" value="Êtes-vous sûr de retourner ce dossier à la réception ?" />
+          <flowable:property name="decisionComponentAlert" value="NONE" />
+        </flowable:properties>
+        <flowable:executionListener expression="${data.setState('À vérifier')}" event="take" />
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression">${Decision == 'Flow_num_verif'}</conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="Flow_vers_gw_orientation" sourceRef="Task_orientation" targetRef="Gw_retour_orientation" />
     <sequenceFlow id="Flow_pour_etude" name="Pour Étude" sourceRef="Gw_retour_orientation" targetRef="Task_etude">
       <extensionElements>
         <flowable:properties>
-          <flowable:property name="ordre" value="0" />
+          <flowable:property name="ordre" value="1" />
           <flowable:property name="color" value="bg-green-600 hover:bg-green-700 text-white" />
           <flowable:property name="icon" value="submit" />
           <flowable:property name="decisionMessageConfirmation" value="Transmettre au service technique" />
+          <flowable:property name="decisionComponentAlert" value="PieceJointe" />
         </flowable:properties>
       </extensionElements>
       <conditionExpression xsi:type="tFormalExpression">${Decision == 'Flow_pour_etude'}</conditionExpression>
@@ -346,11 +427,13 @@
     <sequenceFlow id="Flow_orientation_verif" name="Pour Vérification" sourceRef="Gw_retour_orientation" targetRef="Task_numerotation">
       <extensionElements>
         <flowable:properties>
-          <flowable:property name="ordre" value="1" />
-          <flowable:property name="color" value="bg-red-600 hover:bg-red-700 text-white" />
-          <flowable:property name="icon" value="undo" />
-          <flowable:property name="decisionMessageConfirmation" value="Renvoyer au service numérotation" />
+          <flowable:property name="ordre" value="0" />
+          <flowable:property name="color" value="bg-orange-600 hover:bg-orange-700 text-white" />
+          <flowable:property name="icon" value="reject" />
+          <flowable:property name="decisionMessageConfirmation" value="Êtes-vous sûr de renvoyer ce dossier au service numérotation ?" />
+          <flowable:property name="decisionComponentAlert" value="NONE" />
         </flowable:properties>
+        <flowable:executionListener expression="${data.setState('À vérifier')}" event="take" />
       </extensionElements>
       <conditionExpression xsi:type="tFormalExpression">${Decision == 'Flow_orientation_verif'}</conditionExpression>
     </sequenceFlow>
@@ -358,39 +441,50 @@
     <sequenceFlow id="Flow_pour_validation" name="Pour Validation" sourceRef="Gw_retour_etude" targetRef="Task_validation_rapport">
       <extensionElements>
         <flowable:properties>
-          <flowable:property name="ordre" value="0" />
+          <flowable:property name="ordre" value="1" />
           <flowable:property name="color" value="bg-green-600 hover:bg-green-700 text-white" />
           <flowable:property name="icon" value="submit" />
           <flowable:property name="decisionMessageConfirmation" value="Soumettre le rapport technique à validation" />
         </flowable:properties>
+        <flowable:executionListener expression="${data.setState('En cours')}" event="take" />
       </extensionElements>
       <conditionExpression xsi:type="tFormalExpression">${Decision == 'Flow_pour_validation'}</conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="Flow_etude_retour" name="Retourner" sourceRef="Gw_retour_etude" targetRef="Task_orientation">
       <extensionElements>
         <flowable:properties>
-          <flowable:property name="ordre" value="1" />
-          <flowable:property name="color" value="bg-red-600 hover:bg-red-700 text-white" />
-          <flowable:property name="icon" value="undo" />
+          <flowable:property name="ordre" value="0" />
+          <flowable:property name="color" value="bg-orange-600 hover:bg-orange-700 text-white" />
+          <flowable:property name="icon" value="reject" />
           <flowable:property name="decisionMessageConfirmation" value="Retourner au chef de centre" />
         </flowable:properties>
       </extensionElements>
       <conditionExpression xsi:type="tFormalExpression">${Decision == 'Flow_etude_retour'}</conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="Flow_vers_gw_statut" sourceRef="Task_validation_rapport" targetRef="Gw_frais" />
-    <sequenceFlow id="Flow_sys_avec_frais" name="Soumettre" sourceRef="Gw_frais" targetRef="Task_ordre_recette">
+    <sequenceFlow id="Flow_vers_gw_statut" sourceRef="Task_validation_rapport" targetRef="Gw_retour_validation" />
+    <sequenceFlow id="Flow_rapport_valider" name="Soumettre" sourceRef="Gw_retour_validation" targetRef="Task_ordre_recette">
+      <extensionElements>
+        <flowable:properties>
+          <flowable:property name="ordre" value="1" />
+          <flowable:property name="color" value="bg-green-600 hover:bg-green-700 text-white" />
+          <flowable:property name="icon" value="submit" />
+          <flowable:property name="decisionMessageConfirmation" value="Valider le rapport technique et soumettre le dossier a la suite du circuit" />
+        </flowable:properties>
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression">${Decision == 'Flow_rapport_valider'}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_rapport_verif" name="Pour Vérification" sourceRef="Gw_retour_validation" targetRef="Task_etude">
       <extensionElements>
         <flowable:properties>
           <flowable:property name="ordre" value="0" />
-          <flowable:property name="color" value="bg-green-600 hover:bg-green-700 text-white" />
-          <flowable:property name="icon" value="submit" />
-          <flowable:property name="decisionMessageConfirmation" value="Soumettre le dossier a la suite du circuit" />
+          <flowable:property name="color" value="bg-orange-600 hover:bg-orange-700 text-white" />
+          <flowable:property name="icon" value="reject" />
+          <flowable:property name="decisionMessageConfirmation" value="Êtes-vous sûr de renvoyer ce rapport au service technique ?" />
+          <flowable:property name="decisionComponentAlert" value="NONE" />
         </flowable:properties>
+        <flowable:executionListener expression="${data.setState('À vérifier')}" event="take" />
       </extensionElements>
-      <conditionExpression xsi:type="tFormalExpression">${data.statutDossier== 'soumis'}</conditionExpression>
-    </sequenceFlow>
-    <sequenceFlow id="Flow_sys_sans_frais" name="sys_sans_ordre_recette" sourceRef="Gw_frais" targetRef="Gw_signataire">
-      <conditionExpression xsi:type="tFormalExpression">${data.statutDossier!= 'soumis'}</conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression">${Decision == 'Flow_rapport_verif'}</conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="Flow_ordre_validation" name="Pour Validation" sourceRef="Task_ordre_recette" targetRef="Task_validation_ordre">
       <extensionElements>
@@ -400,30 +494,50 @@
           <flowable:property name="icon" value="submit" />
           <flowable:property name="decisionMessageConfirmation" value="Soumettre l'ordre de recette à validation" />
         </flowable:properties>
+        <flowable:executionListener expression="${data.setState('En cours')}" event="take" />
       </extensionElements>
     </sequenceFlow>
-    <sequenceFlow id="Flow_vers_gw_type" sourceRef="Task_validation_ordre" targetRef="Gw_signataire" />
-    <sequenceFlow id="Flow_sys_presidence" name="Pour Signature" sourceRef="Gw_signataire" targetRef="Task_signature_presidence">
+    <sequenceFlow id="Flow_vers_gw_type" sourceRef="Task_validation_ordre" targetRef="Gw_retour_ordre" />
+    <!-- DELIVRANCE DU TITRE au passage de « Pour Signature » (v22 de l'admin kernel, qui a
+         retire la tache « Automatique » et la passerelle « Quel signataire ? ») : l'autorisation
+         doit exister AVANT d'etre signee. La garde protege des retours en arriere :
+         AttestationService n'est pas idempotent, et `data.attestations`
+         (DemandeReseauOutputDTO, reserialise a chaque transition) n'est plus vide au second
+         passage. -->
+    <sequenceFlow id="Flow_ordre_valider" name="Pour Signature" sourceRef="Gw_retour_ordre" targetRef="Task_signature_presidence">
+      <extensionElements>
+        <flowable:properties>
+          <flowable:property name="ordre" value="1" />
+          <flowable:property name="color" value="bg-green-600 hover:bg-green-700 text-white" />
+          <flowable:property name="icon" value="submit" />
+          <flowable:property name="decisionMessageConfirmation" value="Valider l'ordre de recette et transmettre a la signature" />
+        </flowable:properties>
+        <flowable:executionListener expression="${empty data.attestations ? attestationService.createAttestationForAutorisation(data) : execution.setVariable('isCreatedAtt', true)}" event="take" />
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression">${Decision == 'Flow_ordre_valider'}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_ordre_verif" name="Pour Vérification" sourceRef="Gw_retour_ordre" targetRef="Task_ordre_recette">
+      <extensionElements>
+        <flowable:properties>
+          <flowable:property name="ordre" value="0" />
+          <flowable:property name="color" value="bg-orange-600 hover:bg-orange-700 text-white" />
+          <flowable:property name="icon" value="reject" />
+          <flowable:property name="decisionMessageConfirmation" value="Êtes-vous sûr de renvoyer cet ordre de recette à la comptabilité ?" />
+          <flowable:property name="decisionComponentAlert" value="NONE" />
+        </flowable:properties>
+        <flowable:executionListener expression="${data.setState('À vérifier')}" event="take" />
+      </extensionElements>
+      <conditionExpression xsi:type="tFormalExpression">${Decision == 'Flow_ordre_verif'}</conditionExpression>
+    </sequenceFlow>
+    <!-- Comme processAsi : apres la signature de la Direction Commerce, le dossier revient au
+         Chef Centre (« Signature du Dossier ») qui le confirme et le cloture. -->
+    <sequenceFlow id="Flow_presidence_fin" name="Soumettre" sourceRef="Task_signature_presidence" targetRef="Task_signature_chef">
       <extensionElements>
         <flowable:properties>
           <flowable:property name="ordre" value="0" />
           <flowable:property name="color" value="bg-green-600 hover:bg-green-700 text-white" />
           <flowable:property name="icon" value="submit" />
-          <flowable:property name="decisionMessageConfirmation" value="Transmettre a la signature" />
-        </flowable:properties>
-      </extensionElements>
-      <conditionExpression xsi:type="tFormalExpression">${data.typeDossier== 'COMMERCE'}</conditionExpression>
-    </sequenceFlow>
-    <sequenceFlow id="Flow_sys_chef" name="sys_signature_chef" sourceRef="Gw_signataire" targetRef="Task_signature_chef">
-      <conditionExpression xsi:type="tFormalExpression">${data.typeDossier!= 'COMMERCE'}</conditionExpression>
-    </sequenceFlow>
-    <sequenceFlow id="Flow_presidence_fin" name="Confirmer" sourceRef="Task_signature_presidence" targetRef="End_reseau">
-      <extensionElements>
-        <flowable:properties>
-          <flowable:property name="ordre" value="0" />
-          <flowable:property name="color" value="bg-green-600 hover:bg-green-700 text-white" />
-          <flowable:property name="icon" value="check" />
-          <flowable:property name="decisionMessageConfirmation" value="Signer et clôturer le dossier" />
+          <flowable:property name="decisionMessageConfirmation" value="Transmettre le dossier signé au chef de centre" />
         </flowable:properties>
       </extensionElements>
     </sequenceFlow>
@@ -441,164 +555,253 @@
   <bpmndi:BPMNDiagram id="BPMNDiagram_processReseau">
     <bpmndi:BPMNPlane id="BPMNPlane_processReseau" bpmnElement="Collaboration_processReseau">
       <bpmndi:BPMNShape id="BPMNShape_pool_processReseau" bpmnElement="pool_processReseau" isHorizontal="true">
-        <omgdc:Bounds x="40" y="20" width="2118" height="920" />
+        <omgdc:Bounds x="40" y="20" width="2550" height="1150" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_lane_reception" bpmnElement="lane_reception" isHorizontal="true">
-        <omgdc:Bounds x="70" y="20" width="2088" height="150" />
+        <omgdc:Bounds x="70" y="20" width="2520" height="260" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_lane_numerotation" bpmnElement="lane_numerotation" isHorizontal="true">
-        <omgdc:Bounds x="70" y="170" width="2088" height="150" />
+        <omgdc:Bounds x="70" y="280" width="2520" height="160" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_lane_chefcentre" bpmnElement="lane_chefcentre" isHorizontal="true">
-        <omgdc:Bounds x="70" y="320" width="2088" height="150" />
+        <omgdc:Bounds x="70" y="440" width="2520" height="200" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_lane_technique" bpmnElement="lane_technique" isHorizontal="true">
-        <omgdc:Bounds x="70" y="470" width="2088" height="150" />
+        <omgdc:Bounds x="70" y="640" width="2520" height="200" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_lane_comptabilite" bpmnElement="lane_comptabilite" isHorizontal="true">
-        <omgdc:Bounds x="70" y="620" width="2088" height="150" />
+        <omgdc:Bounds x="70" y="840" width="2520" height="180" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_lane_commerce" bpmnElement="lane_commerce" isHorizontal="true">
-        <omgdc:Bounds x="70" y="770" width="2088" height="150" />
+        <omgdc:Bounds x="70" y="1020" width="2520" height="150" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_Start_reseau" bpmnElement="Start_reseau">
-        <omgdc:Bounds x="130" y="80" width="30" height="30" />
+        <omgdc:Bounds x="110" y="65" width="30" height="30" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="104" y="100" width="42" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Gw_debut" bpmnElement="Gw_debut" isMarkerVisible="true">
+        <omgdc:Bounds x="180" y="60" width="40" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_depot_web" bpmnElement="Task_depot_web">
+        <omgdc:Bounds x="270" y="42" width="140" height="76" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_Task_saisie" bpmnElement="Task_saisie">
-        <omgdc:Bounds x="210" y="60" width="130" height="70" />
+        <omgdc:Bounds x="270" y="167" width="140" height="76" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Gw_retour_saisie" bpmnElement="Gw_retour_saisie" isMarkerVisible="true">
+        <omgdc:Bounds x="480" y="185" width="40" height="40" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_Task_numerotation" bpmnElement="Task_numerotation">
-        <omgdc:Bounds x="400" y="210" width="130" height="70" />
+        <omgdc:Bounds x="570" y="322" width="140" height="76" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_Gw_retour_numerotation" bpmnElement="Gw_retour_numerotation">
-        <omgdc:Bounds x="570" y="225" width="40" height="40" />
+      <bpmndi:BPMNShape id="BPMNShape_Gw_retour_numerotation" bpmnElement="Gw_retour_numerotation" isMarkerVisible="true">
+        <omgdc:Bounds x="780" y="340" width="40" height="40" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_Task_orientation" bpmnElement="Task_orientation">
-        <omgdc:Bounds x="650" y="360" width="130" height="70" />
+        <omgdc:Bounds x="870" y="502" width="140" height="76" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_Gw_retour_orientation" bpmnElement="Gw_retour_orientation">
-        <omgdc:Bounds x="820" y="375" width="40" height="40" />
+      <bpmndi:BPMNShape id="BPMNShape_Gw_retour_orientation" bpmnElement="Gw_retour_orientation" isMarkerVisible="true">
+        <omgdc:Bounds x="1080" y="520" width="40" height="40" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_Task_etude" bpmnElement="Task_etude">
-        <omgdc:Bounds x="900" y="510" width="130" height="70" />
+        <omgdc:Bounds x="1030" y="692" width="140" height="76" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_Gw_retour_etude" bpmnElement="Gw_retour_etude">
-        <omgdc:Bounds x="1070" y="525" width="40" height="40" />
+      <bpmndi:BPMNShape id="BPMNShape_Gw_retour_etude" bpmnElement="Gw_retour_etude" isMarkerVisible="true">
+        <omgdc:Bounds x="1240" y="710" width="40" height="40" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_Task_validation_rapport" bpmnElement="Task_validation_rapport">
-        <omgdc:Bounds x="1150" y="360" width="130" height="70" />
+        <omgdc:Bounds x="1190" y="502" width="140" height="76" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_Gw_frais" bpmnElement="Gw_frais">
-        <omgdc:Bounds x="1320" y="375" width="40" height="40" />
+      <bpmndi:BPMNShape id="BPMNShape_Gw_retour_validation" bpmnElement="Gw_retour_validation" isMarkerVisible="true">
+        <omgdc:Bounds x="1400" y="520" width="40" height="40" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_Task_ordre_recette" bpmnElement="Task_ordre_recette">
-        <omgdc:Bounds x="1400" y="660" width="130" height="70" />
+        <omgdc:Bounds x="1640" y="872" width="140" height="76" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_Task_validation_ordre" bpmnElement="Task_validation_ordre">
-        <omgdc:Bounds x="1570" y="360" width="130" height="70" />
+        <omgdc:Bounds x="1800" y="502" width="140" height="76" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_Gw_signataire" bpmnElement="Gw_signataire">
-        <omgdc:Bounds x="1740" y="375" width="40" height="40" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_Task_signature_presidence" bpmnElement="Task_signature_presidence">
-        <omgdc:Bounds x="1820" y="810" width="130" height="70" />
+      <bpmndi:BPMNShape id="BPMNShape_Gw_retour_ordre" bpmnElement="Gw_retour_ordre" isMarkerVisible="true">
+        <omgdc:Bounds x="2000" y="520" width="40" height="40" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_Task_signature_chef" bpmnElement="Task_signature_chef">
-        <omgdc:Bounds x="1820" y="360" width="130" height="70" />
+        <omgdc:Bounds x="2220" y="502" width="140" height="76" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_Task_signature_presidence" bpmnElement="Task_signature_presidence">
+        <omgdc:Bounds x="2220" y="1057" width="160" height="76" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_End_reseau" bpmnElement="End_reseau">
-        <omgdc:Bounds x="2010" y="381" width="28" height="28" />
+        <omgdc:Bounds x="2520" y="526" width="28" height="28" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="2512" y="560" width="45" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="BPMNEdge_Flow_debut" bpmnElement="Flow_debut">
-        <omgdi:waypoint x="145" y="95" />
-        <omgdi:waypoint x="275" y="95" />
+        <omgdi:waypoint x="140" y="80" />
+        <omgdi:waypoint x="180" y="80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_debut_web" bpmnElement="Flow_debut_web">
+        <omgdi:waypoint x="220" y="80" />
+        <omgdi:waypoint x="270" y="80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_debut_guichet" bpmnElement="Flow_debut_guichet">
+        <omgdi:waypoint x="200" y="100" />
+        <omgdi:waypoint x="200" y="205" />
+        <omgdi:waypoint x="270" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_web_soumettre" bpmnElement="Flow_web_soumettre">
+        <omgdi:waypoint x="340" y="118" />
+        <omgdi:waypoint x="340" y="167" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="346" y="135" width="55" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_vers_gw_saisie" bpmnElement="Flow_vers_gw_saisie">
+        <omgdi:waypoint x="410" y="205" />
+        <omgdi:waypoint x="480" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_saisie_retour" bpmnElement="Flow_saisie_retour">
+        <omgdi:waypoint x="500" y="185" />
+        <omgdi:waypoint x="500" y="80" />
+        <omgdi:waypoint x="410" y="80" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="506" y="125" width="55" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_Flow_soumettre" bpmnElement="Flow_soumettre">
-        <omgdi:waypoint x="275" y="95" />
-        <omgdi:waypoint x="275" y="245" />
-        <omgdi:waypoint x="465" y="245" />
+        <omgdi:waypoint x="520" y="205" />
+        <omgdi:waypoint x="640" y="205" />
+        <omgdi:waypoint x="640" y="322" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="552" y="187" width="55" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_Flow_vers_gw_num" bpmnElement="Flow_vers_gw_num">
-        <omgdi:waypoint x="465" y="245" />
-        <omgdi:waypoint x="590" y="245" />
+        <omgdi:waypoint x="710" y="360" />
+        <omgdi:waypoint x="780" y="360" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_Flow_accepter" bpmnElement="Flow_accepter">
-        <omgdi:waypoint x="590" y="245" />
-        <omgdi:waypoint x="590" y="395" />
-        <omgdi:waypoint x="715" y="395" />
+        <omgdi:waypoint x="820" y="360" />
+        <omgdi:waypoint x="940" y="360" />
+        <omgdi:waypoint x="940" y="502" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="853" y="342" width="48" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="BPMNEdge_Flow_num_retour" bpmnElement="Flow_num_retour">
-        <omgdi:waypoint x="590" y="245" />
-        <omgdi:waypoint x="590" y="95" />
-        <omgdi:waypoint x="275" y="95" />
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_num_verif" bpmnElement="Flow_num_verif">
+        <omgdi:waypoint x="800" y="380" />
+        <omgdi:waypoint x="800" y="420" />
+        <omgdi:waypoint x="340" y="420" />
+        <omgdi:waypoint x="340" y="243" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="710" y="402" width="85" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_Flow_vers_gw_orientation" bpmnElement="Flow_vers_gw_orientation">
-        <omgdi:waypoint x="715" y="395" />
-        <omgdi:waypoint x="840" y="395" />
+        <omgdi:waypoint x="1010" y="540" />
+        <omgdi:waypoint x="1080" y="540" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_Flow_pour_etude" bpmnElement="Flow_pour_etude">
-        <omgdi:waypoint x="840" y="395" />
-        <omgdi:waypoint x="840" y="545" />
-        <omgdi:waypoint x="965" y="545" />
+        <omgdi:waypoint x="1100" y="560" />
+        <omgdi:waypoint x="1100" y="692" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1039" y="600" width="55" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_Flow_orientation_verif" bpmnElement="Flow_orientation_verif">
-        <omgdi:waypoint x="840" y="395" />
-        <omgdi:waypoint x="840" y="245" />
-        <omgdi:waypoint x="465" y="245" />
+        <omgdi:waypoint x="1100" y="520" />
+        <omgdi:waypoint x="1100" y="300" />
+        <omgdi:waypoint x="680" y="300" />
+        <omgdi:waypoint x="680" y="322" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="850" y="304" width="85" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_Flow_vers_gw_etude" bpmnElement="Flow_vers_gw_etude">
-        <omgdi:waypoint x="965" y="545" />
-        <omgdi:waypoint x="1090" y="545" />
+        <omgdi:waypoint x="1170" y="730" />
+        <omgdi:waypoint x="1240" y="730" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_Flow_pour_validation" bpmnElement="Flow_pour_validation">
-        <omgdi:waypoint x="1090" y="545" />
-        <omgdi:waypoint x="1090" y="395" />
-        <omgdi:waypoint x="1215" y="395" />
+        <omgdi:waypoint x="1260" y="710" />
+        <omgdi:waypoint x="1260" y="578" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1266" y="655" width="80" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_Flow_etude_retour" bpmnElement="Flow_etude_retour">
-        <omgdi:waypoint x="1090" y="545" />
-        <omgdi:waypoint x="1090" y="395" />
-        <omgdi:waypoint x="715" y="395" />
+        <omgdi:waypoint x="1260" y="750" />
+        <omgdi:waypoint x="1260" y="805" />
+        <omgdi:waypoint x="940" y="805" />
+        <omgdi:waypoint x="940" y="578" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1070" y="809" width="55" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_Flow_vers_gw_statut" bpmnElement="Flow_vers_gw_statut">
-        <omgdi:waypoint x="1215" y="395" />
-        <omgdi:waypoint x="1340" y="395" />
+        <omgdi:waypoint x="1330" y="540" />
+        <omgdi:waypoint x="1400" y="540" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="BPMNEdge_Flow_sys_avec_frais" bpmnElement="Flow_sys_avec_frais">
-        <omgdi:waypoint x="1340" y="395" />
-        <omgdi:waypoint x="1340" y="695" />
-        <omgdi:waypoint x="1465" y="695" />
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_rapport_valider" bpmnElement="Flow_rapport_valider">
+        <omgdi:waypoint x="1440" y="540" />
+        <omgdi:waypoint x="1710" y="540" />
+        <omgdi:waypoint x="1710" y="872" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1718" y="669" width="51" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="BPMNEdge_Flow_sys_sans_frais" bpmnElement="Flow_sys_sans_frais">
-        <omgdi:waypoint x="1340" y="395" />
-        <omgdi:waypoint x="1760" y="395" />
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_rapport_verif" bpmnElement="Flow_rapport_verif">
+        <omgdi:waypoint x="1420" y="520" />
+        <omgdi:waypoint x="1420" y="470" />
+        <omgdi:waypoint x="1140" y="470" />
+        <omgdi:waypoint x="1140" y="692" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1235" y="452" width="85" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_Flow_ordre_validation" bpmnElement="Flow_ordre_validation">
-        <omgdi:waypoint x="1465" y="695" />
-        <omgdi:waypoint x="1465" y="395" />
-        <omgdi:waypoint x="1635" y="395" />
+        <omgdi:waypoint x="1780" y="910" />
+        <omgdi:waypoint x="1870" y="910" />
+        <omgdi:waypoint x="1870" y="578" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1788" y="892" width="80" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_Flow_vers_gw_type" bpmnElement="Flow_vers_gw_type">
-        <omgdi:waypoint x="1635" y="395" />
-        <omgdi:waypoint x="1760" y="395" />
+        <omgdi:waypoint x="1940" y="540" />
+        <omgdi:waypoint x="2000" y="540" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="BPMNEdge_Flow_sys_presidence" bpmnElement="Flow_sys_presidence">
-        <omgdi:waypoint x="1760" y="395" />
-        <omgdi:waypoint x="1760" y="845" />
-        <omgdi:waypoint x="1885" y="845" />
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_ordre_valider" bpmnElement="Flow_ordre_valider">
+        <omgdi:waypoint x="2020" y="560" />
+        <omgdi:waypoint x="2020" y="1095" />
+        <omgdi:waypoint x="2220" y="1095" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1936" y="798" width="74" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="BPMNEdge_Flow_sys_chef" bpmnElement="Flow_sys_chef">
-        <omgdi:waypoint x="1760" y="395" />
-        <omgdi:waypoint x="1885" y="395" />
+      <bpmndi:BPMNEdge id="BPMNEdge_Flow_ordre_verif" bpmnElement="Flow_ordre_verif">
+        <omgdi:waypoint x="2020" y="520" />
+        <omgdi:waypoint x="2020" y="475" />
+        <omgdi:waypoint x="1750" y="475" />
+        <omgdi:waypoint x="1750" y="872" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1840" y="457" width="85" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_Flow_presidence_fin" bpmnElement="Flow_presidence_fin">
-        <omgdi:waypoint x="1885" y="845" />
-        <omgdi:waypoint x="1885" y="395" />
-        <omgdi:waypoint x="2024" y="395" />
+        <omgdi:waypoint x="2290" y="1057" />
+        <omgdi:waypoint x="2290" y="578" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="2298" y="801" width="51" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="BPMNEdge_Flow_chef_fin" bpmnElement="Flow_chef_fin">
-        <omgdi:waypoint x="1885" y="395" />
-        <omgdi:waypoint x="2024" y="395" />
+        <omgdi:waypoint x="2360" y="540" />
+        <omgdi:waypoint x="2520" y="540" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="2412" y="522" width="50" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

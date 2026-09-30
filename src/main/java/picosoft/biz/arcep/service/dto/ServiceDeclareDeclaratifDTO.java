@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import picosoft.biz.arcep.domain.declaratif.enumeration.TypeServiceDeclare;
 
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 /** Un service declare et son calendrier, rubrique 7. */
@@ -21,11 +20,9 @@ public class ServiceDeclareDeclaratifDTO implements Serializable {
     private TypeServiceDeclare typeService;
 
     /** N'a de sens que si typeService vaut AUTRE. */
-    @Size(max = 255)
     private String precisionAutre;
 
     /** Texte libre : « T3 2026 » comme une date precise y sont recevables. */
-    @Size(max = 255)
     private String calendrier;
 
     private Long demandeDeclaratifId;

@@ -7,14 +7,13 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import picosoft.biz.arcep.configuration.audit.Auditable;
 import picosoft.biz.arcep.domain.shared.Applicant;
-import picosoft.biz.arcep.domain.shared.RapportTechnique;
+import picosoft.biz.arcep.domain.drrrs.RapportTechnique;
 import picosoft.biz.arcep.domain.ussd.enumeration.*;
 import picosoft.biz.arcep.client.kernel.model.acl.AclObjectIdentity;
 import picosoft.biz.arcep.domain.shared.Attestation;
 import picosoft.biz.arcep.domain.shared.Client;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -70,20 +69,19 @@ public class DemandeUssd extends Auditable implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(columnDefinition = "uuid", updatable = false, nullable = false)
+    @Column(columnDefinition = "uuid", updatable = false)
     private UUID uuid;
 
     @Column(name = "web")
     private Boolean web;
 
-    @Column(name = "reference", length = 25)
-    @Size(max = 25)
+    @Column(name = "reference")
     private String reference;
 
-    @Column(name = "created_date", length = 25)
+    @Column(name = "created_date")
     private ZonedDateTime createdDate;
 
-    @Column(name = "sended_date", length = 25)
+    @Column(name = "sended_date")
     private ZonedDateTime sendedDate;
 
     @Column(name = "approvedBy")
@@ -94,29 +92,26 @@ public class DemandeUssd extends Auditable implements Serializable {
      * Chaine et non enumeration, pour s'aligner sur Asi et sur les diagrammes
      * deployes, qui testent des chaines nues. La valeur est posee par le front.
      */
-    @Column(name = "statut_dossier", length = 32)
-    @Size(max = 32)
+    @Column(name = "statut_dossier")
     private String statutDossier;
 
-    @Column(name = "type_dossier", length = 50)
-    @Size(max = 50)
+    @Column(name = "type_dossier")
     private String typeDossier;
 
     // ---------------------------- rubrique 3 ----------------------------
 
     /** Nouvelle demande, modification, renouvellement. */
     @Enumerated(EnumType.STRING)
-    @Column(name = "nature_demande", length = 16)
+    @Column(name = "nature_demande")
     private NatureDemande natureDemande;
 
     /** Mobile, fixe, service a valeur ajoutee, ou autre. */
     @Enumerated(EnumType.STRING)
-    @Column(name = "nature_activite", length = 32)
+    @Column(name = "nature_activite")
     private NatureActivite natureActivite;
 
     /** N'a de sens que si natureActivite vaut AUTRE. */
-    @Column(name = "nature_activite_precision", length = 255)
-    @Size(max = 255)
+    @Column(name = "nature_activite_precision")
     private String natureActivitePrecision;
 
     // ---------------------------- rubrique 4 ----------------------------
@@ -150,8 +145,7 @@ public class DemandeUssd extends Auditable implements Serializable {
      * sollicites » sans en fixer la syntaxe. « *123# », « 4 chiffres » et
      * « court, 3 niveaux » y sont tous recevables.
      */
-    @Column(name = "format_codes", length = 255)
-    @Size(max = 255)
+    @Column(name = "format_codes")
     private String formatCodes;
 
     // ---------------------------- rubrique 6 ----------------------------
@@ -179,8 +173,7 @@ public class DemandeUssd extends Auditable implements Serializable {
     private String tarifUsagers;
 
     /** Reference du titre a renouveler. */
-    @Column(name = "reference_autorisation_anterieure", length = 25)
-    @Size(max = 25)
+    @Column(name = "reference_autorisation_anterieure")
     private String referenceAutorisationAnterieure;
 
     // ---------------------------- rubrique 9 ----------------------------
@@ -196,8 +189,7 @@ public class DemandeUssd extends Auditable implements Serializable {
     @Column(name = "frais_dossier", precision = 12, scale = 2)
     private BigDecimal fraisDossier;
 
-    @Column(name = "devise_frais", length = 8)
-    @Size(max = 8)
+    @Column(name = "devise_frais")
     private String deviseFrais;
 
     // ------------------------------------------------------------------
@@ -300,8 +292,7 @@ public class DemandeUssd extends Auditable implements Serializable {
     @Column(name = "end_process")
     private Boolean endProcess = false;
 
-    @Column(name = "state", length = 64)
-    @Size(max = 64)
+    @Column(name = "state")
     private String state;
 
     @Column(name = "number_of_attachments")

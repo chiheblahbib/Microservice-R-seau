@@ -9,7 +9,6 @@ import picosoft.biz.arcep.configuration.audit.Auditable;
 import picosoft.biz.arcep.domain.reseau.enumeration.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 /**
@@ -35,15 +34,13 @@ public class LiaisonReseau extends Auditable implements Serializable {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "nature", length = 24)
+    @Column(name = "nature")
     private NatureLiaison nature;
 
-    @Column(name = "precision_autre", length = 255)
-    @Size(max = 255)
+    @Column(name = "precision_autre")
     private String precisionAutre;
 
-    @Column(name = "bande_frequences", length = 100)
-    @Size(max = 100)
+    @Column(name = "bande_frequences")
     private String bandeFrequences;
 
     /** En Mbit/s, comme le formulaire les demande liaison par liaison. */

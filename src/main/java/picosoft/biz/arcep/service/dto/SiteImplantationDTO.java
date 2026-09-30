@@ -1,6 +1,5 @@
 package picosoft.biz.arcep.service.dto;
 
-import javax.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,28 +19,22 @@ public class SiteImplantationDTO implements Serializable {
 
     private Long id;
 
-    @Size(max = 100)
 
     private String nomSite;
 
-    @Size(max = 100)
 
     private String province;
 
-    @Size(max = 100)
 
     private String villeQuartier;
 
-    @Size(max = 100)
 
     private String departementCantonVillage;
 
     // N/S et E/W : sans eux le signe se perd pour un site proche de l'equateur
     // ou du meridien, ce qui est le cas d'une bonne partie du Gabon.
-    @Size(max = 1)
     private String latitudeSens;
 
-    @Size(max = 1)
     private String longitudeSens;
 
     private Integer longitudeDegres;
@@ -58,7 +51,6 @@ public class SiteImplantationDTO implements Serializable {
 
     private Double altitude;
 
-    @Size(max = 500)
 
     private String description;
 
@@ -70,7 +62,6 @@ public class SiteImplantationDTO implements Serializable {
 
     private Boolean sensibleAutres;
 
-    @Size(max = 255)
 
     private String sensibleAutresPrecision;
 
@@ -84,13 +75,11 @@ public class SiteImplantationDTO implements Serializable {
 
     private Boolean zoneAutres;
 
-    @Size(max = 255)
 
     private String zoneAutresPrecision;
 
     private Boolean pylonePresent;
 
-    @Size(max = 100)
 
     private String pyloneRaisonSociale;
 
