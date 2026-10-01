@@ -35,8 +35,8 @@ Pour chaque modèle :
 - `AutorisationReseauPrive` n'a besoin d'aucune ressource : son logo et son filigrane sont intégrés.
 
 Sur ARCEP-DEV, les trois premiers modèles sont déclarés sous les id 33, 34 et 35. Leur code
-est celui de ce dossier, recopié le 30/09/2026. **`FicheFacturationReseau` reste à déclarer**
-(mêmes ressources que les autres modèles).
+est celui de ce dossier, recopié le 30/09/2026. `FicheFacturationReseau` y est déclaré
+depuis le 01/10/2026, avec les mêmes ressources.
 
 ## Données attendues
 
