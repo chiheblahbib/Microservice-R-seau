@@ -16,8 +16,8 @@ Le fichier `déchageAsi.txt` fourni (et sa copie `rapport technique asi.txt`) co
 | Fichier | Nom du modèle au kernel | Document | Généré |
 |---|---|---|---|
 | `DechargeReseau.jrxml` | `DechargeReseau` | Accusé de réception de la demande | à la **Numérotation**, sur « Accepter » (comme l'ASI) |
-| `RapportTechniqueReseau.jrxml` | `RapportTechniqueReseau` | Rapport technique | pendant l'**Étude Technique** (comme l'ASI) |
-| `FicheFacturationReseau.jrxml` | `FicheFacturationReseau` | Fiche de facturation (frais de dossier) | à **Établir l'Ordre de Recette**, par la Comptabilité (comme `FicheFacturationAsi`) |
+| `RapportTechniqueReseau.jrxml` | `RapportTechniqueReseau` | Rapport technique | par l'**événement** du même nom, sur « Pour Validation » de l'**Étude Technique** |
+| `FicheFacturationReseau.jrxml` | `FicheFacturationReseau` | Fiche de facturation (frais de dossier) | par l'**événement** du même nom, sur « Pour Validation » d'**Établir l'Ordre de Recette** |
 | `AttestationReseau.jrxml` | `AttestationReseau` | Autorisation d'établissement et d'exploitation d'un réseau privé, certificat d'une page | aux signatures (Président, puis Chef Centre) |
 | `AutorisationReseauPrive.jrxml` | `AutorisationReseauPrive` | Variante : l'acte réglementaire complet (18 articles et son annexe, 3 pages), sur le modèle de l'acte 004/AUT/RP/ARCEP/2024 | au choix du métier |
 
@@ -190,22 +190,22 @@ redéployée en v24.
   - optionnellement, déclarer `sendDechargeReseau` pour l'envoi par courriel, comme
     `sendDechargeAsi` ;
   - fait : le bouton « Visualiser décharge » du front lit `jrxml-events`.
-- **Rapport technique, Fiche de facturation, Autorisation : faits côté front (01/10/2026)**, écran
-  du dossier Réseau (`detail-reseau`), comme `form-dossier-asi` :
-  - Étude Technique : le technicien saisit la conclusion, génère `RapportTechniqueReseau`
-    (signatures de l'agent et du Chef Centre) et le dépose sur le dossier sous la pièce
-    « Rapport technique » de `DemandeReseau` ; « Pour Validation » attend le rapport ;
-  - Établir l'Ordre de Recette : la Comptabilité génère `FicheFacturationReseau` (frais de
-    dossier, code comptable `FRAIS_DOSSIER` du référentiel, montant en lettres) et la dépose
-    sous la pièce « Fiche de facturation » de `DemandeReseau` ; « Pour Validation » attend la fiche ;
-  - Signature du Président, puis Signature du Dossier : `AttestationReseau` (signatures
-    Presidence, sinon DirectionCommerce, et ChefCentre), déposée avec `CreateAttachement` sur
-    `attestations[0]` sous la première pièce de la classe `Attestation` ; la transmission attend
-    l'autorisation ;
-  - le Chef Centre voit chaque document en lecture aux étapes de validation.
-
-  Les deux pièces du dossier sont reconnues à leur libellé (« rapport technique », « fiche …
-  facturation ») : elles doivent exister, facultatives, dans les définitions de pièces de
-  `DemandeReseau` au kernel. Les signatures suivent les rôles d'ASI
-  (`can_generate_signed_rapport_technique`, `can_generate_signed_fiche_facturation`,
-  `can_generate_signed_attestation`) : sans eux, le document est produit sans signature.
+- **Rapport technique et fiche de facturation : documents d'événement (01/10/2026)**, comme la
+  décharge. Ce ne sont pas des pièces jointes :
+  - `Flow_pour_validation` (Étude Technique → Validation Rapport) appelle
+    `${createEvent._execute(execution,'RapportTechniqueReseau')}` ;
+  - `Flow_ordre_validation` (Ordre de Recette → Validation Ordre) appelle
+    `${createEvent._execute(execution,'FicheFacturationReseau')}` ;
+  - `data` porte la conclusion, saisie par le technicien et enregistrée sur le dossier
+    (`DemandeReseau.conclusion`), et le nom de l'agent qui décide (`agentDecision`, imprimé
+    « Dossier traité par » / « Établie par ») ;
+  - **à déclarer au kernel**, comme `DechargeReseau` (id 52) : les événements
+    `RapportTechniqueReseau` et `FicheFacturationReseau`, classe `DemandeReseau`, modèle du
+    même nom, ni courriel ni notification. Non déclaré, l'appel est seulement journalisé ;
+  - l'écran du dossier relit le PDF dans `jrxml-events` (bouton « Visualiser »), comme la
+    décharge. Produits par le kernel, ils n'ont ni signature ajoutée par le front ni montant
+    en lettres.
+- **Autorisation**, comme `genererModeleAttestation` en ASI : générée par le signataire
+  (Signature du Président ou du Dossier) avec `AttestationReseau`, signatures Presidence (à
+  défaut DirectionCommerce) et ChefCentre (rôle `can_generate_signed_attestation`), déposée
+  avec `CreateAttachement` sur `attestations[0]`.

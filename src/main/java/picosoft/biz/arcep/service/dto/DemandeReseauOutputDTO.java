@@ -53,6 +53,9 @@ public class DemandeReseauOutputDTO implements Serializable {
 
     private String referenceAutorisationAnterieure;
 
+    /** Conclusion de l'Etude Technique, imprimee sur le rapport technique. */
+    private String conclusion;
+
     private BigDecimal fraisDossier;
 
     private String deviseFrais;

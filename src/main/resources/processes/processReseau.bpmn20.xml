@@ -438,6 +438,9 @@
       <conditionExpression xsi:type="tFormalExpression">${Decision == 'Flow_orientation_verif'}</conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="Flow_vers_gw_etude" sourceRef="Task_etude" targetRef="Gw_retour_etude" />
+    <!-- RAPPORT TECHNIQUE, comme la decharge : l'evenement kernel RapportTechniqueReseau (classe
+         DemandeReseau) produit le PDF avec le modele du meme nom et le range dans jrxml-events.
+         `data` porte la conclusion saisie par le technicien et son nom (agentDecision). -->
     <sequenceFlow id="Flow_pour_validation" name="Pour Validation" sourceRef="Gw_retour_etude" targetRef="Task_validation_rapport">
       <extensionElements>
         <flowable:properties>
@@ -447,6 +450,7 @@
           <flowable:property name="decisionMessageConfirmation" value="Soumettre le rapport technique à validation" />
         </flowable:properties>
         <flowable:executionListener expression="${data.setState('En cours')}" event="take" />
+        <flowable:executionListener expression="${createEvent._execute(execution,'RapportTechniqueReseau')}" event="take" />
       </extensionElements>
       <conditionExpression xsi:type="tFormalExpression">${Decision == 'Flow_pour_validation'}</conditionExpression>
     </sequenceFlow>
@@ -486,6 +490,8 @@
       </extensionElements>
       <conditionExpression xsi:type="tFormalExpression">${Decision == 'Flow_rapport_verif'}</conditionExpression>
     </sequenceFlow>
+    <!-- FICHE DE FACTURATION : evenement kernel FicheFacturationReseau, meme mecanique ;
+         l'agent comptable (agentDecision) et les frais de dossier viennent de `data`. -->
     <sequenceFlow id="Flow_ordre_validation" name="Pour Validation" sourceRef="Task_ordre_recette" targetRef="Task_validation_ordre">
       <extensionElements>
         <flowable:properties>
@@ -495,6 +501,7 @@
           <flowable:property name="decisionMessageConfirmation" value="Soumettre l'ordre de recette à validation" />
         </flowable:properties>
         <flowable:executionListener expression="${data.setState('En cours')}" event="take" />
+        <flowable:executionListener expression="${createEvent._execute(execution,'FicheFacturationReseau')}" event="take" />
       </extensionElements>
     </sequenceFlow>
     <sequenceFlow id="Flow_vers_gw_type" sourceRef="Task_validation_ordre" targetRef="Gw_retour_ordre" />

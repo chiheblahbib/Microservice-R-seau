@@ -107,6 +107,15 @@ public class DemandeReseau extends Auditable implements Serializable {
     @Column(name = "reference_autorisation_anterieure")
     private String referenceAutorisationAnterieure;
 
+    /**
+     * Conclusion de l'Etude Technique, saisie par le technicien et envoyee avec sa
+     * decision « Pour Validation ». Le rapport technique la lit dans `data` : il est
+     * produit par l'evenement kernel RapportTechniqueReseau sur cette transition,
+     * comme la decharge sur l'« Accepter » de la Numerotation.
+     */
+    @Column(name = "conclusion", length = 4000)
+    private String conclusion;
+
     // ---------------------------- rubrique 9 ----------------------------
 
     /**

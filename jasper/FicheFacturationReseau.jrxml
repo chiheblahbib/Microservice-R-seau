@@ -192,6 +192,10 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="agentComptable"/>
 		<fieldDescription><![CDATA[agentComptable]]></fieldDescription>
 	</field>
+	<field name="agentDecision" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="agentDecision"/>
+		<fieldDescription><![CDATA[agentDecision]]></fieldDescription>
+	</field>
 	<field name="approvedBy" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="approvedBy"/>
 		<fieldDescription><![CDATA[approvedBy]]></fieldDescription>
@@ -300,6 +304,7 @@
 	</variable>
 	<variable name="agent" class="java.lang.String">
 		<variableExpression><![CDATA[$F{agentComptable} != null && !$F{agentComptable}.trim().isEmpty() ? $F{agentComptable}.trim()
+: $F{agentDecision} != null && !$F{agentDecision}.trim().isEmpty() ? $F{agentDecision}.trim()
 : $F{approvedBy} != null && !$F{approvedBy}.trim().isEmpty() ? $F{approvedBy}.trim() : null]]></variableExpression>
 	</variable>
 	<variable name="signatureAgent" class="java.lang.String">
