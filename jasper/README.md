@@ -199,9 +199,10 @@ redéployée en v24.
   - `data` porte la conclusion, saisie par le technicien et enregistrée sur le dossier
     (`DemandeReseau.conclusion`), et le nom de l'agent qui décide (`agentDecision`, imprimé
     « Dossier traité par » / « Établie par ») ;
-  - **à déclarer au kernel**, comme `DechargeReseau` (id 52) : les événements
-    `RapportTechniqueReseau` et `FicheFacturationReseau`, classe `DemandeReseau`, modèle du
-    même nom, ni courriel ni notification. Non déclaré, l'appel est seulement journalisé ;
+  - déclarés au kernel ARCEP-DEV le 01/10/2026, par copie de `DechargeReseau` (id 52) dans
+    `kernel.k_e_pb_event_types`, liés à leur modèle par `kernel.k_e_pj_et_rt` :
+    `RapportTechniqueReseau` (événement 53 → modèle 34) et `FicheFacturationReseau`
+    (événement 54 → modèle 36), classe `DemandeReseau` (45), ni courriel ni notification ;
   - l'écran du dossier relit le PDF dans `jrxml-events` (bouton « Visualiser »), comme la
     décharge. Produits par le kernel, ils n'ont ni signature ajoutée par le front ni montant
     en lettres.
