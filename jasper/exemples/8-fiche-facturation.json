@@ -1,0 +1,133 @@
+{
+  "id": 30,
+  "uuid": "0502d26e-eab3-4702-b0e4-f7a226f2e33f",
+  "web": false,
+  "reference": "0027-30-09-2026",
+  "createdDate": "2026-09-30T14:35:29Z",
+  "sendedDate": "2026-09-30T14:35:29Z",
+  "approvedBy": null,
+  "statutDossier": "soumis",
+  "typeDossier": "RESEAU",
+  "natureReseau": "PRIVE",
+  "natureDemande": "NOUVEAU",
+  "referenceAutorisationAnterieure": null,
+  "fraisDossier": 500000,
+  "deviseFrais": "XAF",
+  "engagementNom": null,
+  "engagementQualite": null,
+  "engagementLieu": null,
+  "engagementDate": null,
+  "client": {
+    "id": 802,
+    "clientType": "COMPANY",
+    "clientName": null,
+    "qualification": null,
+    "company": "SOCIETE TEST DECHARGE",
+    "tradeRegisterNumber": "GA-LBV-2026-B-99999",
+    "nationality": null,
+    "nationalityComplet": null,
+    "address": "Libreville, Quartier Louis, BP 1234",
+    "phone": "+241 01 23 45 67",
+    "fax": null,
+    "email": null,
+    "website": null,
+    "natureActivite": "Exploitation de reseau prive",
+    "usageEquipement": null,
+    "modeTransport": null
+  },
+  "applicant": {
+    "id": 806,
+    "applicantType": "COMPANY",
+    "applicantName": "Jean TEST-DECHARGE",
+    "qualification": "Directeur technique",
+    "company": null,
+    "tradeRegisterNumber": null,
+    "nationality": "GA",
+    "nationalityComplet": "Gabon",
+    "address": "Libreville, Quartier Louis, BP 1234",
+    "phone": null,
+    "fax": null,
+    "email": "test.decharge@example.com",
+    "website": null
+  },
+  "typesReseau": [
+    {
+      "id": 47,
+      "type": "FH",
+      "precisionAutre": null,
+      "demandeReseauId": 30
+    },
+    {
+      "id": 48,
+      "type": "VSAT",
+      "precisionAutre": null,
+      "demandeReseauId": 30
+    }
+  ],
+  "services": [
+    {
+      "id": 49,
+      "type": "ACCES_INTERNET",
+      "portee": null,
+      "demandeReseauId": 30
+    },
+    {
+      "id": 50,
+      "type": "TRANSMISSION_DONNEES",
+      "portee": null,
+      "demandeReseauId": 30
+    }
+  ],
+  "sites": [
+    {
+      "id": 32,
+      "nomSite": "Siege Libreville",
+      "province": "Estuaire",
+      "ville": "Libreville",
+      "latitudeSens": "N",
+      "latitudeDegres": 0,
+      "latitudeMinutes": 24,
+      "latitudeSecondes": 20.94,
+      "longitudeSens": "E",
+      "longitudeDegres": 9,
+      "longitudeMinutes": 26,
+      "longitudeSecondes": 34.9,
+      "altitude": 7,
+      "description": "Site principal de test pour la decharge : toit du siege, acces par l'escalier technique.",
+      "demandeReseauId": 30
+    }
+  ],
+  "liaisons": [],
+  "attestations": [],
+  "idsPostAttachments": "26,3,2",
+  "labelsPostAttachments": "Attestation du Nom commercial,Pièce d’identité du demandeur,Preuve de statut légal",
+  "labelsMissingPostAttachments": null,
+  "signataire": null,
+  "signataireKcId": null,
+  "wfProcessID": "2fd1518e-bcdc-11f1-96c2-c603a845aff6",
+  "classId": 45,
+  "className": "picosoft.biz.arcep.domain.reseau.DemandeReseau",
+  "activityName": "Orientation du Dossier",
+  "assignee": "Service Numérotation",
+  "traitedBy": "agent.technique",
+  "sidTraitedBy": null,
+  "endProcess": false,
+  "state": "En cours",
+  "numberOfattachments": null,
+  "userPermission": "WRITE",
+  "step": null,
+  "commentaire": null,
+  "agentDecision": "Agent Numérotation (test)",
+  "conclusion": "Conclusion de test.",
+  "lignesFacturation": [
+    {
+      "designation": "Frais de dossier — réseau privé",
+      "codeNature": "70611",
+      "quantite": 1,
+      "prixUnitaire": 500000,
+      "montant": 500000
+    }
+  ],
+  "montantEnLettres": "cinq cent mille francs CFA",
+  "agentComptable": "Agent Comptable Test"
+}

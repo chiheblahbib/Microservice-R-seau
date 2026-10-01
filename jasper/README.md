@@ -17,6 +17,7 @@ Le fichier `déchageAsi.txt` fourni (et sa copie `rapport technique asi.txt`) co
 |---|---|---|---|
 | `DechargeReseau.jrxml` | `DechargeReseau` | Accusé de réception de la demande | à la **Numérotation**, sur « Accepter » (comme l'ASI) |
 | `RapportTechniqueReseau.jrxml` | `RapportTechniqueReseau` | Rapport technique | pendant l'**Étude Technique** (comme l'ASI) |
+| `FicheFacturationReseau.jrxml` | `FicheFacturationReseau` | Fiche de facturation (frais de dossier) | à **Établir l'Ordre de Recette**, par la Comptabilité (comme `FicheFacturationAsi`) |
 | `AttestationReseau.jrxml` | `AttestationReseau` | Autorisation d'établissement et d'exploitation d'un réseau privé, certificat d'une page | aux signatures (Président, puis Chef Centre) |
 | `AutorisationReseauPrive.jrxml` | `AutorisationReseauPrive` | Variante : l'acte réglementaire complet (18 articles et son annexe, 3 pages), sur le modèle de l'acte 004/AUT/RP/ARCEP/2024 | au choix du métier |
 
@@ -34,7 +35,8 @@ Pour chaque modèle :
 - `AutorisationReseauPrive` n'a besoin d'aucune ressource : son logo et son filigrane sont intégrés.
 
 Sur ARCEP-DEV, les trois premiers modèles sont déclarés sous les id 33, 34 et 35. Leur code
-est celui de ce dossier, recopié le 30/09/2026.
+est celui de ce dossier, recopié le 30/09/2026. **`FicheFacturationReseau` reste à déclarer**
+(mêmes ressources que les autres modèles).
 
 ## Données attendues
 
@@ -58,6 +60,19 @@ obligatoire ; un champ absent s'imprime « — » ou laisse la ligne vide.
 | Numéro et date de l'autorisation | `attestations[0].reference`, `attestations[0].sysdateCreated` | | | ✓ |
 | Description des sites | `sites[].description` | | ✓ | |
 | Signatures (image base64) | `signatureAgentTechnique`, `signatureChefCentre`, `signaturePresidence` (sinon `signatureDirecteurCommerce`) | | agent technique, chef centre | chef centre, président |
+
+La fiche de facturation lit en plus, ajoutés au JSON par le front :
+
+| Donnée | Chemin JSON | Défaut |
+|---|---|---|
+| Lignes facturées | `lignesFacturation[]` : `designation`, `codeNature`, `quantite`, `prixUnitaire`, `montant` | une ligne « Frais de dossier — nature du réseau » au montant de `fraisDossier` (`codeNatureFraisDossier` pour son code) |
+| Montant en toutes lettres | `montantEnLettres` | ligne omise |
+| Agent qui établit la fiche | `agentComptable`, sinon `approvedBy` | « le service Comptabilité » |
+| Signatures | `signatureAgentComptable` (sinon `signatureAgentTechnique`, nom ASI), `signatureChefCentre` | cadre vide |
+
+Le total est la somme des montants (`quantite × prixUnitaire` quand `montant` manque). Sans ligne ni
+`fraisDossier`, la fiche l'indique et le total s'imprime « — ». Paramètre facultatif `DATE_EMISSION`
+(date imprimée, par défaut la date de génération).
 
 `assignee` n'est pas une personne : c'est le libellé de l'étape (`flowable:assignee`, par
 exemple « Service Numérotation »). Les modèles le gardent seulement en dernier recours.
@@ -104,6 +119,7 @@ les cinq exemples de `exemples/` :
 | 4 | dossier presque vide |
 | 5 | exemple 2 avec toutes les signatures et une conclusion |
 | 7 | dossier 30 de la recette, avec `agentDecision` et `traitedBy` |
+| 8 | dossier 30 avec les lignes de facturation, le montant en lettres et l'agent comptable (fiche de facturation) |
 
 Chaque exemple a été rempli de trois façons :
 
@@ -174,11 +190,22 @@ redéployée en v24.
   - optionnellement, déclarer `sendDechargeReseau` pour l'envoi par courriel, comme
     `sendDechargeAsi` ;
   - fait : le bouton « Visualiser décharge » du front lit `jrxml-events`.
-- **Rapport technique, pendant l'Étude Technique, comme l'ASI :**
-  - le front génère le PDF avec `jrxmlTemplateTest?templateName=RapportTechniqueReseau` ;
-  - il le dépose en pièce jointe. Faute d'entité `RapportTechnique` pour le réseau, la pièce va
-    sur le dossier (`classId` et `id` de `DemandeReseau`).
-- **Attestation**, comme `genererModeleAttestation` en ASI :
-  - `jrxmlTemplateTest?templateName=AttestationReseau`, avec les signatures ajoutées au JSON ;
-  - dépôt avec `CreateAttachement` sur `attestations[0]` (`classId`, `id`) ;
-  - relecture avec `GetAllAttachement`.
+- **Rapport technique, Fiche de facturation, Autorisation : faits côté front (01/10/2026)**, écran
+  du dossier Réseau (`detail-reseau`), comme `form-dossier-asi` :
+  - Étude Technique : le technicien saisit la conclusion, génère `RapportTechniqueReseau`
+    (signatures de l'agent et du Chef Centre) et le dépose sur le dossier sous la pièce
+    « Rapport technique » de `DemandeReseau` ; « Pour Validation » attend le rapport ;
+  - Établir l'Ordre de Recette : la Comptabilité génère `FicheFacturationReseau` (frais de
+    dossier, code comptable `FRAIS_DOSSIER` du référentiel, montant en lettres) et la dépose
+    sous la pièce « Fiche de facturation » de `DemandeReseau` ; « Pour Validation » attend la fiche ;
+  - Signature du Président, puis Signature du Dossier : `AttestationReseau` (signatures
+    Presidence, sinon DirectionCommerce, et ChefCentre), déposée avec `CreateAttachement` sur
+    `attestations[0]` sous la première pièce de la classe `Attestation` ; la transmission attend
+    l'autorisation ;
+  - le Chef Centre voit chaque document en lecture aux étapes de validation.
+
+  Les deux pièces du dossier sont reconnues à leur libellé (« rapport technique », « fiche …
+  facturation ») : elles doivent exister, facultatives, dans les définitions de pièces de
+  `DemandeReseau` au kernel. Les signatures suivent les rôles d'ASI
+  (`can_generate_signed_rapport_technique`, `can_generate_signed_fiche_facturation`,
+  `can_generate_signed_attestation`) : sans eux, le document est produit sans signature.
