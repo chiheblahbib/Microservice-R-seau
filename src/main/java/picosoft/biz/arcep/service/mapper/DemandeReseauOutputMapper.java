@@ -18,6 +18,8 @@ import picosoft.biz.arcep.service.dto.DemandeReseauOutputDTO;
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public abstract class DemandeReseauOutputMapper implements EntityMapper<DemandeReseauOutputDTO, DemandeReseau> {
 
+    /** agentDecision n'existe pas sur l'entite : le service le pose avant chaque decision. */
+    @Mapping(target = "agentDecision", ignore = true)
     public abstract DemandeReseauOutputDTO toDto(DemandeReseau demandeReseau);
 
     public abstract DemandeReseau toEntity(DemandeReseauOutputDTO dto);

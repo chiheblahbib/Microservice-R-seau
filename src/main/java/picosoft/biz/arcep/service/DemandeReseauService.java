@@ -545,6 +545,7 @@ public class DemandeReseauService {
 
         publierPiecesJointes(input, output, entity, aclClass);
 
+        output.setAgentDecision(currentUser.nomPourCommentaire());
         BpmJob bpmJob = workflowService._initAndNextTask(aclClass.getFwProcess(),
                 input.getDecision(), input.getWfComment(), output, aclClass);
 
@@ -610,6 +611,9 @@ public class DemandeReseauService {
 
         publierPiecesJointes(input, output, entity, aclClass);
 
+        // La variable `data` que lisent les ecouteurs du circuit -- dont la decharge,
+        // sur l'« Accepter » de la Numerotation -- porte ainsi le nom de l'agent qui decide.
+        output.setAgentDecision(currentUser.nomPourCommentaire());
         BpmJob bpmJob = workflowService._nextTask(entity.getWfProcessID(),
                 input.getDecision(), input.getWfComment(), output, aclClass);
 

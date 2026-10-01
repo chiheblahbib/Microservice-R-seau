@@ -283,6 +283,18 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="assignee"/>
 		<fieldDescription><![CDATA[assignee]]></fieldDescription>
 	</field>
+	<field name="agentDecision" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="agentDecision"/>
+		<fieldDescription><![CDATA[agentDecision]]></fieldDescription>
+	</field>
+	<field name="traitedBy" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="traitedBy"/>
+		<fieldDescription><![CDATA[traitedBy]]></fieldDescription>
+	</field>
+	<field name="agentTechnique" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="agentTechnique"/>
+		<fieldDescription><![CDATA[agentTechnique]]></fieldDescription>
+	</field>
 	<field name="referenceAttestation" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="attestations[0].reference"/>
 		<fieldDescription><![CDATA[attestations[0].reference]]></fieldDescription>

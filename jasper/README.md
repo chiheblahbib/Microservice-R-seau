@@ -52,11 +52,25 @@ obligatoire ; un champ absent s'imprime « — » ou laisse la ligne vide.
 | Types, services, sites, liaisons | `typesReseau[]`, `services[]`, `sites[]`, `liaisons[]` | types, services, sites | ✓ | ✓ |
 | Frais de dossier | `fraisDossier`, `deviseFrais` | ✓ | | |
 | Pièces reçues / manquantes | `labelsPostAttachments`, `labelsMissingPostAttachments` | ✓ | | |
-| Agent | `assignee` | ✓ (agent récepteur) | ✓ (dossier traité par) | |
+| Agent récepteur | `agentDecision`, sinon `assignee` | ✓ | | |
+| Dossier traité par | `agentTechnique`, sinon `traitedBy`, sinon `assignee` | | ✓ | |
 | Conclusion (ajoutée au JSON par le front) | `conclusion`, sinon `rapportTechnique.conclusion` | | ✓ (sinon « Conclusion non renseignée ») | |
 | Numéro et date de l'autorisation | `attestations[0].reference`, `attestations[0].sysdateCreated` | | | ✓ |
 | Description des sites | `sites[].description` | | ✓ | |
 | Signatures (image base64) | `signatureAgentTechnique`, `signatureChefCentre`, `signaturePresidence` (sinon `signatureDirecteurCommerce`) | | agent technique, chef centre | chef centre, président |
+
+`assignee` n'est pas une personne : c'est le libellé de l'étape (`flowable:assignee`, par
+exemple « Service Numérotation »). Les modèles le gardent seulement en dernier recours.
+
+- `agentDecision` : le nom affiché de l'agent qui prend la décision en cours. drrrs-back le pose
+  sur `data` juste avant de faire avancer le circuit (`DemandeReseauService.submit` et
+  `initAndSubmit`). À l'« Accepter » de la Numérotation, c'est donc l'agent qui émet la décharge.
+- `traitedBy` : le login de l'agent technique affecté par le Chef Centre (`updateStep`).
+- `agentTechnique` : facultatif. C'est le nom que le front peut ajouter au JSON en générant le
+  rapport, pour imprimer un nom plutôt qu'un login.
+
+Le DTO `DemandeReseauOutputDTO` porte un `serialVersionUID` figé : Flowable le stocke sérialisé
+dans `data`, et un champ ajouté sans cette précaution rendrait illisibles les dossiers en cours.
 
 Les signatures suivent la convention ASI : le front les ajoute au JSON (voir
 `genererModeleAttestation` en ASI). Le préfixe `data:image/...;base64,` est accepté.
@@ -85,6 +99,7 @@ les cinq exemples de `exemples/` :
 | 3 | signature du Président, et réseau ouvert au public |
 | 4 | dossier presque vide |
 | 5 | exemple 2 avec toutes les signatures et une conclusion |
+| 7 | dossier 30 de la recette, avec `agentDecision` et `traitedBy` |
 
 Chaque exemple a été rempli de trois façons :
 

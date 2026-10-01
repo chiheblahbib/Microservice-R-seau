@@ -19,6 +19,18 @@ import java.util.UUID;
 @AllArgsConstructor
 public class DemandeReseauOutputDTO implements Serializable {
 
+    /**
+     * FIGE a la valeur que la JVM calculait avant l'ajout d'agentDecision.
+     *
+     * Flowable range ce DTO, serialise en Java, dans la variable `data` de
+     * chaque instance processReseau. Sans valeur explicite, tout champ ajoute
+     * change l'identifiant calcule et rend illisibles les dossiers deja en
+     * circuit (InvalidClassException a la tache suivante). Au 01/10/2026, 14
+     * instances portaient cette valeur ; 4 plus anciennes en portaient une
+     * autre et etaient deja illisibles avant ce changement.
+     */
+    private static final long serialVersionUID = -2665863144270971418L;
+
     private Long id;
 
     private UUID uuid;
@@ -90,6 +102,17 @@ public class DemandeReseauOutputDTO implements Serializable {
     private String assignee;
     private String traitedBy;
     private String sidTraitedBy;
+
+    /**
+     * Nom de l'agent qui prend la decision en cours, pose par le service juste
+     * avant de faire avancer le circuit ; jamais persiste.
+     *
+     * `assignee` ne peut pas tenir ce role : c'est le LIBELLE de l'etape
+     * (flowable:assignee, « Service Numerotation »). La decharge, emise a
+     * l'« Accepter » de la Numerotation, imprime ce nom comme agent recepteur.
+     */
+    private String agentDecision;
+
     private Boolean endProcess;
     private String state;
     private Long numberOfattachments;

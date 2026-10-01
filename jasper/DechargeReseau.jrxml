@@ -243,6 +243,18 @@
 		<property name="net.sf.jasperreports.json.field.expression" value="assignee"/>
 		<fieldDescription><![CDATA[assignee]]></fieldDescription>
 	</field>
+	<field name="agentDecision" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="agentDecision"/>
+		<fieldDescription><![CDATA[agentDecision]]></fieldDescription>
+	</field>
+	<field name="traitedBy" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="traitedBy"/>
+		<fieldDescription><![CDATA[traitedBy]]></fieldDescription>
+	</field>
+	<field name="agentTechnique" class="java.lang.String">
+		<property name="net.sf.jasperreports.json.field.expression" value="agentTechnique"/>
+		<fieldDescription><![CDATA[agentTechnique]]></fieldDescription>
+	</field>
 	<field name="labelsPostAttachments" class="java.lang.String">
 		<property name="net.sf.jasperreports.json.field.expression" value="labelsPostAttachments"/>
 		<fieldDescription><![CDATA[labelsPostAttachments]]></fieldDescription>
@@ -962,7 +974,7 @@ java.util.Arrays.stream($F{labelsMissingPostAttachments}.split("[,;]")).map(Stri
 				<textElement textAlignment="Left" verticalAlignment="Middle" markup="styled">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Agent récepteur : <b>" + net.sf.jasperreports.engine.util.JRStringUtil.xmlEncode($F{assignee} != null ? $F{assignee} : "—") + "</b>"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Agent récepteur : <b>" + net.sf.jasperreports.engine.util.JRStringUtil.xmlEncode(($F{agentDecision} != null && !$F{agentDecision}.trim().isEmpty() ? $F{agentDecision} : ($F{assignee} != null && !$F{assignee}.trim().isEmpty() ? $F{assignee} : null)) != null ? ($F{agentDecision} != null && !$F{agentDecision}.trim().isEmpty() ? $F{agentDecision} : ($F{assignee} != null && !$F{assignee}.trim().isEmpty() ? $F{assignee} : null)) : "—") + "</b>"]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement positionType="Float" x="190" y="100" width="175" height="14" uuid="aaf971f5-69d7-525d-b853-d0fbd73f6fbd"/>
