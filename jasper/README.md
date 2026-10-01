@@ -66,7 +66,9 @@ exemple « Service Numérotation »). Les modèles le gardent seulement en derni
   sur `data` juste avant de faire avancer le circuit (`DemandeReseauService.submit` et
   `initAndSubmit`). À l'« Accepter » de la Numérotation, c'est donc l'agent qui émet la décharge.
   Le nom vient de `CurrentUser.nomPourCommentaire()` : nom affiché du profil kernel, sinon nom
-  de l'employé, sinon nom du jeton Keycloak (`name`, ou prénom et nom), sinon le login.
+  de l'employé, sinon nom du jeton Keycloak (`name`, ou prénom et nom), sinon le login. Le
+  kernel met le login dans `displayName` quand le profil n'a pas de nom : un nom égal au login
+  est donc ignoré.
 - `traitedBy` : le login de l'agent technique affecté par le Chef Centre (`updateStep`).
 - `agentTechnique` : facultatif. C'est le nom que le front peut ajouter au JSON en générant le
   rapport, pour imprimer un nom plutôt qu'un login.

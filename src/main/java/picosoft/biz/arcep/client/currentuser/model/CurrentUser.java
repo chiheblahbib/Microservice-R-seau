@@ -322,19 +322,25 @@ public class CurrentUser {
      * (AsiService) -- le nom affiche, sinon celui de l'employe, sinon le nom porte
      * par le jeton Keycloak, sinon l'identifiant de connexion. Ecrire l'identifiant
      * technique (employeSid) affichait un UUID dans la colonne « Auteur ».
+     * Le kernel remplit displayName avec le login quand le profil n'a pas de nom :
+     * un nom egal au login ne compte donc pas.
      */
     public String nomPourCommentaire() {
-        if (displayName != null && !displayName.isBlank()) {
+        if (estUnNom(displayName)) {
             return displayName;
         }
-        if (employeDisplayName != null && !employeDisplayName.isBlank()) {
+        if (estUnNom(employeDisplayName)) {
             return employeDisplayName;
         }
         String nomKeycloak = nomDuJetonKeycloak();
-        if (nomKeycloak != null) {
+        if (estUnNom(nomKeycloak)) {
             return nomKeycloak;
         }
-        return samaccountname;
+        return samaccountname != null ? samaccountname : displayName;
+    }
+
+    private boolean estUnNom(String nom) {
+        return nom != null && !nom.isBlank() && !nom.trim().equalsIgnoreCase(samaccountname);
     }
 
     /**
