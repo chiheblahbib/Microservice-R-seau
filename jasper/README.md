@@ -65,6 +65,8 @@ exemple « Service Numérotation »). Les modèles le gardent seulement en derni
 - `agentDecision` : le nom affiché de l'agent qui prend la décision en cours. drrrs-back le pose
   sur `data` juste avant de faire avancer le circuit (`DemandeReseauService.submit` et
   `initAndSubmit`). À l'« Accepter » de la Numérotation, c'est donc l'agent qui émet la décharge.
+  Le nom vient de `CurrentUser.nomPourCommentaire()` : nom affiché du profil kernel, sinon nom
+  de l'employé, sinon nom du jeton Keycloak (`name`, ou prénom et nom), sinon le login.
 - `traitedBy` : le login de l'agent technique affecté par le Chef Centre (`updateStep`).
 - `agentTechnique` : facultatif. C'est le nom que le front peut ajouter au JSON en générant le
   rapport, pour imprimer un nom plutôt qu'un login.

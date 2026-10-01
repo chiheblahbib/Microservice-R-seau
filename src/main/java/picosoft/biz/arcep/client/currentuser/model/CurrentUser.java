@@ -6,8 +6,11 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import picosoft.biz.arcep.client.kernel.intercomm.KernelInterface;
 import picosoft.biz.arcep.configuration.BeanUtil;
+import picosoft.biz.arcep.configuration.SecurityConstants;
 import picosoft.biz.arcep.configuration.audit.Auditable;
 import picosoft.biz.arcep.configuration.slf4j.Slf4jMDCFilterConfiguration;
 import org.springframework.security.core.Authentication;
@@ -19,6 +22,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 
+import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -314,9 +319,9 @@ public class CurrentUser {
 
     /**
      * L'auteur d'un commentaire, lisible : resolveCommentaireAuteur d'homologation
-     * (AsiService) -- le nom affiche, sinon celui de l'employe, sinon l'identifiant
-     * de connexion. Ecrire l'identifiant technique (employeSid) affichait un UUID
-     * dans la colonne « Auteur ».
+     * (AsiService) -- le nom affiche, sinon celui de l'employe, sinon le nom porte
+     * par le jeton Keycloak, sinon l'identifiant de connexion. Ecrire l'identifiant
+     * technique (employeSid) affichait un UUID dans la colonne « Auteur ».
      */
     public String nomPourCommentaire() {
         if (displayName != null && !displayName.isBlank()) {
@@ -325,7 +330,43 @@ public class CurrentUser {
         if (employeDisplayName != null && !employeDisplayName.isBlank()) {
             return employeDisplayName;
         }
+        String nomKeycloak = nomDuJetonKeycloak();
+        if (nomKeycloak != null) {
+            return nomKeycloak;
+        }
         return samaccountname;
+    }
+
+    /**
+     * Le nom de l'utilisateur dans le jeton Keycloak de la requete : claim « name »,
+     * sinon prenom et nom. Le profil kernel des comptes sans nom affiche n'a que le
+     * login, alors que Keycloak a le nom (scope profile). Le jeton n'est pas
+     * reverifie ici : init() l'a deja fait accepter au kernel par getCurrentUser.
+     */
+    private String nomDuJetonKeycloak() {
+        RequestAttributes req = RequestContextHolder.getRequestAttributes();
+        if (!(req instanceof ServletRequestAttributes)) {
+            return null;
+        }
+        String entete = ((ServletRequestAttributes) req).getRequest()
+            .getHeader(SecurityConstants.HEADER_STRING_AUTHORIZATION);
+        if (entete == null) {
+            return null;
+        }
+        String[] parties = entete.replaceFirst("^Bearer ", "").split("\\.");
+        if (parties.length < 2) {
+            return null;
+        }
+        try {
+            JsonNode claims = new ObjectMapper().readTree(Base64.getUrlDecoder().decode(parties[1]));
+            String nom = claims.path("name").asText("").trim();
+            if (nom.isEmpty()) {
+                nom = (claims.path("given_name").asText("") + " " + claims.path("family_name").asText("")).trim();
+            }
+            return nom.isEmpty() ? null : nom;
+        } catch (IllegalArgumentException | IOException e) {
+            return null;
+        }
     }
 
     public void setDisplayName(String displayName) {
